@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Omni post-message receiver</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #f8f8f8;
+            color: #333333;
+            padding: 2em;
+        }
+
+        textarea, input, .asInput {
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            border: 1px solid #adadad;
+            outline: none;
+            background-color: white;
+        }
+
+        textarea {
+            width: 100%;
+            resize: vertical;
+            box-sizing: border-box;
+            background: white url(https://omni.ru/src/assets/fav/apple-icon-57x57.png) no-repeat 100% 100%;
+        }
+
+        #time {
+            color: dimgrey;
+        }
+
+        details {
+            padding: 1em;
+        }
+
+        #commandData {
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+<details>
+    <summary>Omni post-message receiver</summary>
+    <br>
+    <div id="time"></div>
+    <textarea id="lastData" rows="20" placeholder="Sent OmniChildReady first!!!" readonly>
+
+        </textarea>
+</details>
+<details open>
+    <summary>Omni post-message sender</summary>
+    <br>
+    <form id="form">
+        <input placeholder="command" required id="command"  list="commands">
+        <input placeholder="payload (can be json)" id="commandData" list="payloads">
+        <label><input type="checkbox" id="sendToIframe">Отправить в iframe</label>
+        <input type="submit">
+        <datalist id="commands">
+            <option value="OmniChildReady">
+            <option value="OmniRequestChanged">
+            <option value="OmniClientSelected">
+        </datalist>
+        <datalist id="payloads">
+            <option value='{ "ClientId": "External-id-client-example-12346" }'>
+        </datalist>
+        <span style="padding: 1em" id="formRes"></span>
+    </form>
+</details>
+<details id="omniIframeContainer">
+    <summary>Omni iframe test</summary>
+    <br>
+    <form id="iframeurlform">
+        <input type="url" required style="width:100%" placeholder="iframeurl" id="iframeurlinput">
+    </form>
+    <iframe
+            border="1"
+            frameborder="1"
+            width="100%"
+            height="400"
+            id="iframe"
+    ></iframe>
+</details>
+
+
+<script>
+
+    iframeurlform.onsubmit = (e) => {
+        e.preventDefault();
+        setIframeUrl(iframeurlinput.value);
+    }
+
+    function setIframeUrl(url) {
+        const iframe = document.getElementById('iframe');
+        localStorage.setItem('iframeUrl', url);
+        iframe.setAttribute('src', url);
+    }
+
+    const currentIframeUrl = localStorage.getItem('iframeUrl');
+    if (currentIframeUrl.length) {
+        omniIframeContainer.setAttribute('open', true);
+        document.getElementById('iframeurlinput').value = currentIframeUrl;
+        setIframeUrl(localStorage.getItem('iframeUrl'))
+    }
+
+
+
+    function postMessageListener(event) {
+        // if (event.origin != 'http://ourTrustedDomain.ru') {
+        //     // что-то прислали с неизвестного домена - проигнорируем..
+        //     return;
+        // }
+
+        const { action = null, payload = null } = JSON.parse(event.data);
+
+        switch (action) {
+            case 'OmniRequestChanged':
+                document.getElementById('time').innerText = new Date().toLocaleString();
+                document.getElementById('lastData').value = JSON.stringify(payload);
+                console.warn('Received OmniRequestChanged event with data', payload);
+                break;
+
+            default:
+                document.getElementById('time').innerText = new Date().toLocaleString();
+                document.getElementById('lastData').value = JSON.stringify(payload);
+                console.warn('Received not Omni event')
+        }
+    }
+
+    window.addEventListener("message", postMessageListener);
+
+    // Sending
+
+    const renderFormResult = (str, title) => {
+        const el = document.getElementById('formRes');
+        el.textContent = str;
+        el.setAttribute('title', title);
+        setTimeout(() => {
+            el.textContent = '';
+            el.setAttribute('title', '');
+        }, 5000);
+    }
+
+    const sendPostMessage = (str) => {
+
+        if (sendToIframe.checked) {
+            iframe.contentWindow.postMessage(str, iframe.src);
+        }
+
+        if (window.parent) {
+            window.parent.postMessage(str, document.referrer.length > 0 ? document.referrer : undefined);
+            return;
+        }
+        window.postMessage(str);
+        console.warn('Send post message', str);
+    }
+
+    document.getElementById('form').onsubmit = (e) => {
+        e.preventDefault();
+        try {
+            const command = document.getElementById('command').value;
+            const cd = document.getElementById('commandData').value;
+            const commandData = cd.startsWith('{') ? JSON.parse(cd) : cd;
+
+            const str = JSON.stringify({ action: command, payload: commandData });
+            sendPostMessage(str);
+            renderFormResult('✔ Success!', str)
+        } catch (e) {
+            renderFormResult('❌ Error!', e.message)
+            throw e;
+        }
+    }
+</script>
+</body>
+</html>

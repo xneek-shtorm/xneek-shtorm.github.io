@@ -1,0 +1,15 @@
+html, body {
+    font-family: Arial;
+    color: #444444;
+    background: #f8f8f8;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

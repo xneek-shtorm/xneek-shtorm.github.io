@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CEC SipML demo</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <main>
+        <section>
+            <h1>SipML demo</h1>
+            <form id="form">
+                <input type="tel" id="phone">
+                <input type="submit">
+            </form>
+            <audio id="audio_remote" autoplay="autoplay"> </audio>
+            <audio id="ringtone" loop src="sounds/ringtone.wav"> </audio>
+            <audio id="ringbacktone" loop src="sounds/ringbacktone.wav"> </audio>
+            <audio id="dtmfTone" src="sounds/dtmf.wav"> </audio>
+
+        </section>
+    </main>
+    <script src="lib/SIPml-api.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

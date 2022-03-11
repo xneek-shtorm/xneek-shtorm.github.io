@@ -1,0 +1,3 @@
+<script>
+doument.write(JSON.stringify({}))
+</script>

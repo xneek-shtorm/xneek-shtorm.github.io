@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test webpush</title>
+    <style>
+      form label {
+        display: flex;
+        padding: 8px;
+        font-family: Arial;
+        font-size: 0.7em;
+        color: grey;
+        align-items: center;
+        gap: 8px;
+
+      }
+
+      form label span {
+        flex-basis: 150px;
+        text-align: right;
+      }
+
+      form input, form textarea {
+        min-width: 300px;
+      }
+
+
+
+    </style>
+</head>
+<body>
+  <form method="POST" action="https://fednik.ru/shtorm/webpush/" target="_blank">
+    <label>
+      <span><b></b></span>
+      <h3>Web push test</h3>
+    </label>
+    <label>
+      <span><b>Device id:</b></span>
+      <input required name="deviceId" id="deviceId">
+    </label>
+    <label>
+      <span>Title:</span>
+      <input required name="title" value="Олололо">
+    </label>
+    <label>
+      <span>Body:</span>
+      <textarea required rows="5" name="body">С точки зрения банальной эрудиции, далеко не каждый индивидуум способен игнорировать тенденции парадоксальных абстракций</textarea>
+    </label>
+    <label>
+      <span>Icon url:</span>
+      <input type="url" required name="icon" value="https://www.shtormtech.ru/img/icons/favicon@3x.png">
+    </label>
+    <label>
+      <span>Action url:</span>
+      <input type="url" required name="site" value="https://www.shtormtech.ru/">
+    </label>
+<!--    <label>-->
+<!--      <span>Sleep (sec):</span>-->
+<!--      <input type="number" name="sleep" value="0">-->
+<!--    </label>-->
+    <label>
+      <span></span>
+      <input type="submit" value="Отправить">
+    </label>
+  </form>
+
+  <script>
+    document.getElementById('deviceId').value = window.localStorage.getItem('sentFirebaseMessagingToken') || ''
+  </script>
+
+</body>
+</html>

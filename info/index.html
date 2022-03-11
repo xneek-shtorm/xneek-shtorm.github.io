@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            font-size: 16px;
+            font-family: Arial;
+            background-color: #fff
+
+        }
+        #div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        section {
+            text-align: center;
+            padding: 32px;
+
+            width: 380px;
+            border-radius: 1rem;
+            backdrop-filter: blur(1.5rem);
+            border: 1px solid rgba(248, 248, 248,.2);
+            box-shadow:
+                    -.25rem -.25rem .5rem rgba(255,255,255,.07),
+                    .25rem .25rem .5rem rgba(0,0,0,.12),
+                    -.75rem -.75rem 1.75rem rgba(255,255,255,.07),
+                    .75rem .75rem 1.75rem rgba(0,0,0,.12),
+                    inset 8rem 8rem 8rem rgba(0,0,0,.05),
+                    inset -8rem -8rem 8rem rgba(255,255,255,.05);
+        }
+
+        button {
+            padding: 12px 24px;
+            text-transform: uppercase;
+            transition: all .2s ease;
+
+            box-shadow: 3px 3px 6px #b8b9be, -3px -3px 6px #fff;
+
+            border: 0.0625rem solid transparent;
+            border-radius: 0.55rem;
+            cursor: pointer;
+
+            color: #fff;
+            background: #2086ed;
+        }
+
+        button:hover {
+            background: linear-gradient(0deg,rgba(34,34,34,.1),rgba(34,34,34,.1)),#2086ed;
+            background-blend-mode: color-burn,normal;
+        }
+    </style>
+</head>
+<body>
+<div id="div">
+    <section>
+        <h1 id="header"></h1>
+        <p id="subheader"></p>
+        <br>
+        <button id="button">OK</button>
+    </section>
+</div>
+
+<script>
+    x = new URLSearchParams(window.location.search);
+    header.textContent = x.get('header');
+
+    if (x.get('header')) {
+        document.title=x.get('header')
+    }
+
+    subheader.textContent = x.get('subheader');
+
+    if (x.get('url')) {
+        button.onclick = () => window.location.href = x.get('url')
+        button.textContent = x.get('action') || 'ОК';
+    } else {
+        button.setAttribute('disabled', 'disabled');
+    }
+
+</script>
+</body>
+</html>

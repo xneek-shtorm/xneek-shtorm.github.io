@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name gen</title>
+    <style>
+        body, html {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        fieldset {
+            text-align: left;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        input {
+            display: block;
+            border: none;
+            text-align: center;
+            font-size: 3rem;
+            width: 100%;
+            border-bottom: 3px double #e0e0e0;
+            margin-bottom: 1rem;
+            padding: 1rem 0;
+
+        }
+
+        main {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <br><br><br>
+        <input id="res">
+        <button onclick="window.location.reload()">Генерировать</button>
+
+        <br><br>
+        <abbr onclick="help.showModal()">?</abbr>
+        <dialog id="help">
+            <fieldset>
+                <legend>Настройки добавлением к url</legend>
+                <ul>
+                    <li><code>#7</code> - длина слова 7 букв в произвольной комбинации
+                    <li><code>#7~</code> - длина слова 7 букв, чередовать гласные/согласные
+                    <li><code>#SGSG</code> - Маска S - Согласная, G - Гласная
+                    <li><code>#oloGo</code> - строчные буквы останутся как есть, S и G будут заменены произвольной согласной/гласной
+                </ul>
+                <button onclick="help.close()">Закрыть</button>
+            </fieldset>
+        </dialog>
+    </main>
+
+    <script>
+        const gl = 'A,E,I,O,U,Y'.toLowerCase().split(',');
+        const sg = 'B,C,D,F,G,H,J,K,L,M,N,P,Q,R,S,T,V,W,X,Y,Z'.toLowerCase().split(',');
+        const all = gl.concat(sg);
+
+        const getRandomFromArr = (arr) => arr[Math.round(Math.random() * arr.length)];
+
+        const gen = (countOrTemplate, alternate  = false) => {
+            if (typeof countOrTemplate === 'string') {
+                return countOrTemplate.split('').map(c => {
+                    if (c === 'G') return getRandomFromArr(gl);
+                    if (c === 'S') return getRandomFromArr(sg);
+                    return c;
+                }).join('');
+            }
+
+            if (typeof countOrTemplate === 'number') {
+                return Array(countOrTemplate).fill(0).map((c, i) => alternate ? getRandomFromArr(i % 2 === 1 ? sg : gl) : getRandomFromArr(all)).join('');
+            }
+            
+        }
+
+        let result  = '';
+
+        if (!location.hash) {
+            result = gen(4 + Math.round(Math.random() * 7),  true)
+        } else if (/#\d+/.test(location.hash)) {
+            result = gen(parseInt(location.hash.substr(1)), location.hash.endsWith('~'))
+        } else {
+            result = gen(location.hash.substr(1))
+        } 
+
+        res.value = result;
+        document.title = result;
+    </script>
+</body>
+</html>

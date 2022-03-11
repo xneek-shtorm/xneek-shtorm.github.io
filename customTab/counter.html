@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Omni Counter</title>
+    <style>
+        * {
+            font-family: monospace;
+        }
+
+        input {
+            padding: 8px 12px;
+        }
+
+        fieldset {
+            padding: 16px;
+            border-radius: 4px;
+            border-style: solid;
+            border-width: 1px;
+            min-width: 400px;
+            background: aliceblue;
+        }
+
+        summary {
+            color: cadetblue;
+        }
+
+        html {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100%;
+            background: #f8f8f8;
+        }
+
+        textarea {
+            width: 100%;
+            display: block;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <form id="form">
+        Counter: <input type="number" id="counterInp" value="0" min="0" max="1000" />
+        <input type="submit">
+        <input type="reset">
+    </form>
+
+    <br>
+    <br>
+    <fieldset>
+        <legend>Каждую секунду +1</legend>
+        <button id="timerBtnStart">start</button>
+        <button id="timerBtnStop">stop</button>
+    </fieldset>
+
+    <script>
+
+        window.counter = 0;
+
+        const sendPostMessage = (str) => {
+            if (window.parent) {
+                window.parent.postMessage(str, document.referrer.length > 0 ? document.referrer : undefined);
+                return;
+            }
+            window.postMessage(str);
+            console.warn('Send post message', str);
+        }
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+
+            const command = 'OmniSetCounter';
+            const commandData = {
+                siteId: siteId.value,
+                count: counterInp.value
+            };
+            const str = JSON.stringify({ action: command, payload: commandData });
+            sendPostMessage(str);
+        }
+
+
+
+        timerBtnStart.onclick = () => {
+            if (window.timerCounter) return;
+            window.timerCounter = setInterval(() => {
+                counterInp.value = (Number(counterInp.value) ||0) + 1;
+                form.submit()
+            }, 1000)
+        }
+
+        timerBtnStop.onclick = () => {
+            clearTimeout(window.timerCounter);
+        }
+
+    </script>
+</body>
+</html>
