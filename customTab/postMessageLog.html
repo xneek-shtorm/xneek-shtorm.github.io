@@ -24,17 +24,6 @@
     <textarea id="txt"></textarea>
 
     <script>
-        const logEl = document.getElementById('txt');
-        logEl.ondblclick = () => {
-            logEl.textContent = ''
-        }
-
-        const addLog = (str) => {
-            logEl.textContent += str + '\n';
-            logEl.scrollTop = 9999999999;
-        }
-    </script>
-    <script>
         const sendPostMessage = (data) => {
             if (window.parent) {
                 window.parent.postMessage(data, document.referrer.length > 0 ? document.referrer : undefined);
@@ -45,35 +34,36 @@
             console.warn('Send post message', data);
         }
 
-
-        const iframeEl = document.getElementById('iframe');
-        iframeEl.contentWindow.onload = () => {
-            addLog('Child frame onload');
-            sendPostMessage(JSON.stringify({ action: 'OmniChildReady', payload: null }))
+        const logEl = document.getElementById('txt');
+        logEl.ondblclick = () => {
+            logEl.textContent = ''
         }
 
+        const addLog = (str) => {
+            logEl.textContent += str + '\n';
+            logEl.scrollTop = 9999999999;
+        }
 
-
-        function postMessageListener(event) {
-            // if (event.origin != 'http://ourTrustedDomain.ru') {
-            //     // что-то прислали с неизвестного домена - проигнорируем..
-            //     return;
-            // }
-
-            const { action = null, payload = null } = JSON.parse(event.data);
-
-            switch (action) {
-                case 'OmniRequestChanged':
-                    addLog('>> ' + payload)
-                    console.info('Received OmniRequestChanged event with data', payload);
-                    break;
-
-                default:
-                    console.warn('Received not Omni event')
+        logEl.onkeydown = (e) => {
+            if (e.keyCode === 13) {
+                strings = logEl.value.split('\n');
+                const lastString = strings[strings.length - 1].trim();
+                console.log({lastString, strings});
+                if (lastString.length) {
+                    if (lastString.startsWith('--json')) {
+                        const strParts = lastString.split(/\s/);
+                        sendPostMessage(strParts[1].trim())
+                    } else {
+                        sendPostMessage(lastString)
+                    }
+                }
             }
         }
 
-        window.addEventListener("message", postMessageListener);
+
+        window.addEventListener("message", (event) => {
+            addLog('>> ' + JSON.stringify(event.data));
+        });
     </script>
 </body>
 </html>
