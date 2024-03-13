@@ -52,7 +52,22 @@
                 if (lastString.length) {
                     if (lastString.startsWith('--json')) {
                         const strParts = lastString.split(/\s/);
-                        sendPostMessage(strParts[1].trim())
+                        try {
+                            const obj = JSON.parse(strParts[1].trim());
+                            sendPostMessage(obj)
+                        } catch (e) {
+                            addLog('ERR: ' + e.message);
+                        }
+                        
+                    } else if (lastString.startsWith('--eval')) {
+                        const strParts = lastString.split(/\s/);
+                        try {
+                            const obj = eval(strParts[1].trim());
+                            sendPostMessage(obj)
+                        } catch (e) {
+                            addLog('ERR: ' + e.message);
+                        }
+                        
                     } else {
                         sendPostMessage(lastString)
                     }
