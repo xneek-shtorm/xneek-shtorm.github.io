@@ -31,6 +31,7 @@
                 return;
             }
             window.postMessage(data);
+            addLog('Send postmessage undefoot ' + data);
             console.warn('Send post message', data);
         }
 
