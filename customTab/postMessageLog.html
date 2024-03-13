@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Omni post-message frame</title>
+    <style>
+        html, body { margin: 0; padding: 0;  width: 100%; height: 100%;}
+        textarea {display: block;
+            width: 100%;
+            font-family: 'Courier New', Courier, monospace;
+            height: 100vh;
+            overflow-y: auto;
+            background: #444;
+            color: limegreen;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="txt"></textarea>
+
+    <script>
+        const logEl = document.getElementById('txt');
+        logEl.ondblclick = () => {
+            logEl.textContent = ''
+        }
+
+        const addLog = (str) => {
+            logEl.textContent += str + '\n';
+            logEl.scrollTop = 9999999999;
+        }
+    </script>
+    <script>
+        const sendPostMessage = (data) => {
+            if (window.parent) {
+                window.parent.postMessage(data, document.referrer.length > 0 ? document.referrer : undefined);
+                addLog('< Send postmessage to parrent ' + data);
+                return;
+            }
+            window.postMessage(data);
+            console.warn('Send post message', data);
+        }
+
+
+        const iframeEl = document.getElementById('iframe');
+        iframeEl.contentWindow.onload = () => {
+            addLog('Child frame onload');
+            sendPostMessage(JSON.stringify({ action: 'OmniChildReady', payload: null }))
+        }
+
+
+
+        function postMessageListener(event) {
+            // if (event.origin != 'http://ourTrustedDomain.ru') {
+            //     // что-то прислали с неизвестного домена - проигнорируем..
+            //     return;
+            // }
+
+            const { action = null, payload = null } = JSON.parse(event.data);
+
+            switch (action) {
+                case 'OmniRequestChanged':
+                    addLog('>> ' + payload)
+                    console.info('Received OmniRequestChanged event with data', payload);
+                    break;
+
+                default:
+                    console.warn('Received not Omni event')
+            }
+        }
+
+        window.addEventListener("message", postMessageListener);
+    </script>
+</body>
+</html>
