@@ -21,8 +21,8 @@
             //     // что-то прислали с неизвестного домена - проигнорируем..
             //     return;
             // }
-
-        if (event.source.location.includes('client-create.html')) {
+        const evaddr = event.source.location;
+        if (evaddr && evaddr.indexOf('client-create.html')) {
           alert('FROM MFE TO OMNI\n' + JSON.stringify(event.data,null,'  '));
           return;
         }
