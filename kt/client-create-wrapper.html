@@ -36,8 +36,20 @@
                 }
             }
 
+            iframe.contentWindow.onload = () => {
+                iframe.contentWindow.postMessage({
+                  authorization: document.cookie,
+                  authentificationType: 'KEYCLOAK',
+                  postMessageType: 'INIT',
+                  parentUrl: windwo.location.href, 
+                  communicationId: payload.requestData.id,
+                  communicationChannelId: payload.requestData.channelType,
+                  сommunicationChannelAddr: payload.requestData.originator
+                });
+                sendPostMessage(JSON.stringify({ action: 'OmniChildReady', payload: null }))
+            }
             iframe.src = `client-create.html?type=${type}`;
-            iframe.onload = '';
+
 
             break;
    
