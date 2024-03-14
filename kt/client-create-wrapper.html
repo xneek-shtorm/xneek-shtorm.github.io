@@ -46,7 +46,7 @@
                   communicationChannelId: payload.requestData.channelType,
                   сommunicationChannelAddr: payload.requestData.originator
                 });
-                sendPostMessage(JSON.stringify({ action: 'OmniChildReady', payload: null }))
+                console.info('fif loaded')
             }
             iframe.src = `client-create.html?type=${type}`;
 
@@ -99,7 +99,6 @@
         }
 
         window.onload = () => {
-            addLog('wrapper onload');
             sendOmniPostMessage('OmniChildReady');
         }
 
