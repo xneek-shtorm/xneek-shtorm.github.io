@@ -22,6 +22,11 @@
             //     return;
             // }
 
+        if (event.source.location.includes('client-create.html')) {
+          alert('FROM MFE TO OMNI\n' + JSON.stringify(event.data,null,'  '));
+          return;
+        }
+
         const { action = null, payload = null } = JSON.parse(event.data);
         switch (action) {
           case 'OmniRequestChanged':

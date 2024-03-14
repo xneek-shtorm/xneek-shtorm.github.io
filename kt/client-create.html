@@ -107,7 +107,7 @@
             console.debug(e);
 
             if (e.data.communicationId) {
-              store.communicationId = +e.data.communicationId;
+              store.communicationId = e.data.communicationId;
 
               info.innerHTML = `From <span>${e.data.parentUrl}</span>
               by request <span>#${e.data.communicationId}</span>&nbsp;
