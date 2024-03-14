@@ -16,7 +16,7 @@
     <iframe id="iframe">Iframe is not supported</iframe>
     <script>
       function postMessageListener(event) {
-        console.log({ eventOrigin: event.origin, referer: document.referrer })
+        console.log({ eventOrigin: event.origin, referer: document.referrer, event })
             // if (event.origin != 'http://ourTrustedDomain.ru') {
             //     // что-то прислали с неизвестного домена - проигнорируем..
             //     return;
@@ -29,7 +29,7 @@
             let type = 'unknown';
             if (payload.contactPersonsData && payload.contactPersonsData[0]?.customAttributes) {
                 const personType = payload.contactPersonsData[0].customAttributes.find((a) => a.code === 'PersonType');
-                if (personType === '0') { 
+                if (personType?.value === '0') { 
                     type = 'fl'
                 } else if (personType === '1') { 
                     type = 'ul'
@@ -37,6 +37,7 @@
             }
 
             iframe.src = `client-create.html?type=${type}`;
+            iframe.onload = '';
 
             break;
    
@@ -84,6 +85,12 @@
             window.postMessage(str);
             console.warn('Send  omni post message', str);
         }
+
+        window.onload = () => {
+            addLog('wrapper onload');
+            sendOmniPostMessage('OmniChildReady');
+        }
+
 
     </script>
 </body>
