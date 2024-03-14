@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KT</title>
+    <style>
+        iframe {
+            border: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="iframe">Iframe is not supported</iframe>
+    <script>
+      function postMessageListener(event) {
+        console.log({ eventOrigin: event.origin, referer: document.referrer })
+            // if (event.origin != 'http://ourTrustedDomain.ru') {
+            //     // что-то прислали с неизвестного домена - проигнорируем..
+            //     return;
+            // }
+
+        const { action = null, payload = null } = JSON.parse(event.data);
+        switch (action) {
+          case 'OmniRequestChanged':
+            console.warn('Received OmniRequestChanged event with data', payload);
+            let type = 'unknown';
+            if (payload.contactPersonsData && payload.contactPersonsData[0]?.customAttributes) {
+                const personType = payload.contactPersonsData[0].customAttributes.find((a) => a.code === 'PersonType');
+                if (personType === '0') { 
+                    type = 'fl'
+                } else if (personType === '1') { 
+                    type = 'ul'
+                }
+            }
+
+            iframe.src = `client-create.html?type=${type}`;
+
+            break;
+   
+
+// requestDataPre.innerHTML = [
+//     ['Заголовок', payload.requestData.title],
+//     ['Внутренний id', payload.requestData.id],
+//     ['Внешний id', payload.requestData.externalId],
+//     ['Канал', payload.requestData.channelType],
+//     ['Адрес', payload.requestData.originator],
+//     ['Дата регистрации', new Date(payload.requestData.timeRegistered).toLocaleString()],
+//     ['Тематики', payload.requestSubjectLinks?.map(s => s.subjectName).join(' | ') ?? '-']
+// ].map(([k, v]) => `
+//     <div class="row">
+//         <div class="col-6 text-right text-muted">${k}</div>
+//         <div class="col-6 text-warning">${v}</div>
+//     </div>`
+// ).join('\n');
+
+
+// clientDataPre.innerHTML = [
+//     ['Имя', payload.contactPersonsData[0].firstName],
+//     ['Фамилия', payload.contactPersonsData[0].lastName],
+// ].map(([k, v]) => `
+//     <div class="row">
+//         <div class="col-6 text-right text-muted">${k}</div>
+//         <div class="col-6 text-right text-info">${v}</div>
+//     </div>`
+// ).join('\n');
+
+
+                default:
+                    console.warn('Received not Omni event', e.data)
+            }
+        }
+
+        window.addEventListener("message", postMessageListener);
+
+        const sendOmniPostMessage = (action, commandData = null) => {
+            const str = JSON.stringify({ action: command, payload: commandData });
+            if (window.parent) {
+                window.parent.postMessage(str, document.referrer.length > 0 ? document.referrer : undefined);
+                return;
+            }
+            window.postMessage(str);
+            console.warn('Send  omni post message', str);
+        }
+
+    </script>
+</body>
+</html>

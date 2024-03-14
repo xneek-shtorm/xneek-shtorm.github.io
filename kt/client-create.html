@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KT Client create</title>
+    <style>
+      body {
+        font-family:Verdana, Geneva, Tahoma, sans-serif
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      form label {
+        display: block;
+      }
+      form label span {
+        font-size: 0.8em;
+        color: #777777;
+        display: block;
+      }
+      form label input {
+        display: block;
+      }
+
+      sup {
+        color: red;
+        text-transform: uppercase;
+        font-size: 0.5em;
+      }
+      h1 {
+        margin-bottom: 0;
+      }
+
+      h1 + small {
+        display: inline-block;
+        margin-bottom: 16px;
+        margin-top: 6px;
+        background: bisque;
+        padding: 4px 8px;
+      }
+
+      h1 + small span {
+        color: brown;
+        font-weight: bold;
+      }
+
+    </style>
+</head>
+<body>
+    <h1>
+      KT Client create
+      <sup id="typeSup"></sup>
+    </h1>
+    <small id="info"></small>
+    <div id="res"></div>
+
+  
+    <form method="dialog" id="flForm" style="display: none;">
+      <label>
+        <span>firstName</span>
+        <input name="firstName" required autofocus>
+      </label>
+      <label>
+        <span>middleName</span>
+        <input name="middleName">
+      </label>
+      <label>
+        <span>lastName</span>
+        <input name="lastName" required>
+      </label>
+
+      <footer>
+        <input type="submit" value="save">
+      </footer>
+    </form>
+
+
+
+    <form method="dialog" id="ulForm" style="display: none;">
+      <label>
+        <span>Organization Name Ru</span>
+        <input name="organizationNameRu" required autofocus>
+      </label>
+      <label>
+        <span>Organization Name Kz</span>
+        <input name="organizationNameKz" required>
+      </label>
+
+      <footer>
+        <input type="submit" value="save">
+      </footer>
+    </form>
+
+
+    <script>
+        const store = {};
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type'); // ul / fl
+
+        const res = document.getElementById('res');
+        window.onmessage = (e) => {
+            console.debug(e);
+
+            if (e.data.communicationId) {
+              store.communicationId = +e.data.communicationId;
+
+              info.innerHTML = `From <span>${e.data.parentUrl}</span>
+              by request <span>#${e.data.communicationId}</span>&nbsp;
+              (${e.data.communicationChannelId}, ${e.data.сommunicationChannelAddr})`
+              
+              if (type === 'ul') { ulForm.elements.forEach(el => el.disabled = false); }
+              if (type === 'fl') { flForm.elements.forEach(el => el.disabled = false); }
+            }
+
+        }
+
+        flForm.onsubmit = (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+
+          const model = {
+            resultCode: 0,
+            resultMessage: 'ok',
+            communicationId: store.communicationId,
+            customerId: performance.now(),
+            firstName: formData.get('firstName'),
+            middleName: formData.get('middleName'),
+            lastName: formData.get('lastName')
+          }
+
+          console.debug(model, document.referrer);
+          window.parent.postMessage(model, document.referrer.length > 0 ? document.referrer : undefined);
+        }
+
+        ulForm.onsubmit = (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+
+          const model = {
+            resultCode: 0,
+            resultMessage: 'ok',
+            communicationId: store.communicationId,
+            customerId: performance.now(),
+            organizationNameKz: formData.get('organizationNameKz'),
+            organizationNameRu: formData.get('organizationNameRu')
+          }
+
+          console.debug(model, document.referrer);
+          window.parent.postMessage(model, document.referrer.length > 0 ? document.referrer : undefined);
+        }
+
+        if (type) {
+          typeSup.textContent = type;
+          if (type === 'ul') ulForm.style.display = '';
+          if (type === 'fl') flForm.style.display = '';
+        }
+
+        Array.from(flForm.elements).forEach(el => el.disabled = true);
+        Array.from(ulForm.elements).forEach(el => el.disabled = true);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KT Client</title>
+</head>
+<body>
+    <h1>KT Client</h1>
+    <div id="res"></div>
+
+    <script>
+        const res = document.getElementById('res');
+        window.onmessage = (e) => {
+            console.debug(e);
+            res.innerHTML += `<fieldset>
+                <legend>${new Date().toLocaleString()} ${e.origin}</legend>
+                <pre>${JSON.stringify(e.data, null, '  ')}</pre>
+            </fieldset>`;
+        }
+    </script>
+</body>
+</html>
