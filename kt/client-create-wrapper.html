@@ -36,7 +36,7 @@
                 }
             }
 
-            iframe.contentWindow.onload = () => {
+            iframe.onload = () => {
                 iframe.contentWindow.postMessage({
                   authorization: document.cookie,
                   authentificationType: 'KEYCLOAK',
@@ -48,9 +48,7 @@
                 });
                 console.info('fif loaded')
             }
-            iframe.onload = () => {
-              console.info('fif loaded outside')
-            }
+
             iframe.src = `client-create.html?type=${type}`;
 
 
