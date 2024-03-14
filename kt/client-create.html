@@ -113,8 +113,8 @@
               by request <span>#${e.data.communicationId}</span>&nbsp;
               (${e.data.communicationChannelId}, ${e.data.сommunicationChannelAddr})`
               
-              if (type === 'ul') { ulForm.elements.forEach(el => el.disabled = false); }
-              if (type === 'fl') { flForm.elements.forEach(el => el.disabled = false); }
+              if (type === 'ul') { Array.from(ulForm.elements).forEach(el => el.disabled = false); }
+              if (type === 'fl') { Array.from(flForm.elements).forEach(el => el.disabled = false); }
             }
 
         }
