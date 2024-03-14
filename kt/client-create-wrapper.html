@@ -88,7 +88,7 @@
 
         window.addEventListener("message", postMessageListener);
 
-        const sendOmniPostMessage = (action, commandData = null) => {
+        const sendOmniPostMessage = (command, commandData = null) => {
             const str = JSON.stringify({ action: command, payload: commandData });
             if (window.parent) {
                 window.parent.postMessage(str, document.referrer.length > 0 ? document.referrer : undefined);
