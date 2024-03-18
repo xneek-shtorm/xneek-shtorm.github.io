@@ -145,7 +145,7 @@
             resultCode: 0,
             resultMessage: 'ok',
             communicationId: store.communicationId,
-            customerId: performance.now(),
+            customerId: Math.round(performance.now()),
             organizationNameKz: formData.get('organizationNameKz'),
             organizationNameRu: formData.get('organizationNameRu')
           }
