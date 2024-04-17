@@ -1,51 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Omni child ready</title>
-</head>
-<body>
-
-    <summary>Omni iframe test</summary>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Product child ready</title>
+  </head>
+  <body>
+    <summary>Product iframe test</summary>
 
     <form id="iframeurlform">
-        <input type="url" required style="width:100%" placeholder="iframeurl" id="iframeurlinput">
+      <input
+        type="url"
+        required
+        style="width: 100%"
+        placeholder="iframeurl"
+        id="iframeurlinput"
+      />
     </form>
     <iframe
-            border="1"
-            frameborder="1"
-            width="100%"
-            height="400"
-            id="iframe"
+      border="1"
+      frameborder="1"
+      width="100%"
+      height="400"
+      id="iframe"
     ></iframe>
 
-
-
-<script>
-
-    iframeurlform.onsubmit = (e) => {
+    <script>
+      iframeurlform.onsubmit = (e) => {
         e.preventDefault();
         setIframeUrl(iframeurlinput.value);
-    }
+      };
 
-    function setIframeUrl(url) {
+      function setIframeUrl(url) {
         const iframe = document.getElementById('iframe');
         localStorage.setItem('iframeUrl', url);
         iframe.setAttribute('src', url);
-    }
+      }
 
-    const currentIframeUrl = localStorage.getItem('iframeUrl');
-    if (currentIframeUrl.length) {
+      const currentIframeUrl = localStorage.getItem('iframeUrl');
+      if (currentIframeUrl.length) {
         document.getElementById('iframeurlinput').value = currentIframeUrl;
-        setIframeUrl(localStorage.getItem('iframeUrl'))
-    }
+        setIframeUrl(localStorage.getItem('iframeUrl'));
+      }
 
-
-
-    function postMessageListener(event) {
+      function postMessageListener(event) {
         // if (event.origin != 'http://ourTrustedDomain.ru') {
         //     // что-то прислали с неизвестного домена - проигнорируем..
         //     return;
@@ -54,30 +56,27 @@
         const { action = null, payload = null } = JSON.parse(event.data);
 
         switch (action) {
-            case 'OmniChildReady':
-                console.log('OmniChildReady received')
-                iframe.contentWindow.postMessage(
-                    JSON.stringify(
-                        {
-                            action: 'OmniRequestChanged',
-                            payload: {requestData:{id:1, externalId:'pingPong'}},
-                        },
-                        null,
-                        '  '
-                    ),
-                    iframe.src
-                );
-                break;
+          case 'ProductChildReady':
+            console.log('ProductChildReady received');
+            iframe.contentWindow.postMessage(
+              JSON.stringify(
+                {
+                  action: 'ProductRequestChanged',
+                  payload: { requestData: { id: 1, externalId: 'pingPong' } },
+                },
+                null,
+                '  ',
+              ),
+              iframe.src,
+            );
+            break;
 
-            default:
-                console.warn('Received not Omni event', event.data);
-
+          default:
+            console.warn('Received not Product event', event.data);
         }
+      }
 
-
-    }
-
-    window.addEventListener("message", postMessageListener);
-</script>
-</body>
+      window.addEventListener('message', postMessageListener);
+    </script>
+  </body>
 </html>
