@@ -1,116 +1,128 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Omni post-message frame</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Product post-message frame</title>
     <style>
-        html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
-        pre {
-            font-family: 'Courier New', Courier, monospace;
-            max-height: 400px;
-            overflow-y: scroll;
-        }
-        section {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-        }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      pre {
+        font-family: 'Courier New', Courier, monospace;
+        max-height: 400px;
+        overflow-y: scroll;
+      }
+      section {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+      }
 
-        main {
-            resize: horizontal;
-            overflow: hidden;
-            border-right: 3px double #adadad;
-            width: 50vw;
-            padding: 20px;
-        }
-        aside {
-            background: #f8f8f8;
-            flex-grow: 1;
-            padding: 10px;
-        }
+      main {
+        resize: horizontal;
+        overflow: hidden;
+        border-right: 3px double #adadad;
+        width: 50vw;
+        padding: 20px;
+      }
+      aside {
+        background: #f8f8f8;
+        flex-grow: 1;
+        padding: 10px;
+      }
 
-        iframe {
-            border: 1px solid red;
-            width: 100%;
-            height: 50vh;
-            background: #fff;
-        }
+      iframe {
+        border: 1px solid red;
+        width: 100%;
+        height: 50vh;
+        background: #fff;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <section>
-        <main>
-            <pre id="log"></pre>
-        </main>
-        <aside>
-            <iframe src="postMessageLog.html" id="iframe"></iframe>
-        </aside>
+      <main>
+        <pre id="log"></pre>
+      </main>
+      <aside>
+        <iframe src="postMessageLog.html" id="iframe"></iframe>
+      </aside>
     </section>
 
     <script>
-        const logEl = document.getElementById('log');
-        logEl.ondblclick = () => {
-            logEl.textContent = ''
-        }
+      const logEl = document.getElementById('log');
+      logEl.ondblclick = () => {
+        logEl.textContent = '';
+      };
 
-        const addLog = (str) => {
-            logEl.textContent += str + '\n';
-            logEl.scrollTop = 9999999999;
-        }
+      const addLog = (str) => {
+        logEl.textContent += str + '\n';
+        logEl.scrollTop = 9999999999;
+      };
     </script>
     <script>
-        const sendPostMessage = (data) => {
-            if (window.parent) {
-                window.parent.postMessage(data, document.referrer.length > 0 ? document.referrer : undefined);
-                addLog('< Send postmessage to parrent ' + data);
-                return;
-            }
-            window.postMessage(data);
-            console.warn('Send post message', data);
+      const sendPostMessage = (data) => {
+        if (window.parent) {
+          window.parent.postMessage(
+            data,
+            document.referrer.length > 0 ? document.referrer : undefined,
+          );
+          addLog('< Send postmessage to parrent ' + data);
+          return;
         }
+        window.postMessage(data);
+        console.warn('Send post message', data);
+      };
 
+      const iframeEl = document.getElementById('iframe');
+      iframeEl.contentWindow.onload = () => {
+        addLog('Child frame onload');
+        sendPostMessage(
+          JSON.stringify({ action: 'ProductChildReady', payload: null }),
+        );
+      };
 
-        const iframeEl = document.getElementById('iframe');
-        iframeEl.contentWindow.onload = () => {
-            addLog('Child frame onload');
-            sendPostMessage(JSON.stringify({ action: 'OmniChildReady', payload: null }))
+      function postMessageListener(event) {
+        // if (event.origin != 'http://ourTrustedDomain.ru') {
+        //     // что-то прислали с неизвестного домена - проигнорируем..
+        //     return;
+        // }
+
+        const { action = null, payload = null } = JSON.parse(event.data);
+
+        switch (action) {
+          case 'ProductRequestChanged':
+            console.info(
+              'Received ProductRequestChanged event with data',
+              payload,
+            );
+            addLog('>> ' + action + ': ' + JSON.stringify(payload));
+
+            iframeEl.contentWindow.postMessage({
+              authorization: 'xxx',
+              authenticationType: 'KEYCLOAK',
+              postMessageType: 'INIT',
+              customerId: payload.requestData.externalId,
+              communicationId: payload.requestData.id,
+              communicationChannelId: payload.requestData.channelType,
+              communicationChannelAddr: payload.requestData.originator,
+            });
+            break;
+
+          default:
+            console.warn('Received not Product event');
         }
+      }
 
-
-
-        function postMessageListener(event) {
-            // if (event.origin != 'http://ourTrustedDomain.ru') {
-            //     // что-то прислали с неизвестного домена - проигнорируем..
-            //     return;
-            // }
-
-            const { action = null, payload = null } = JSON.parse(event.data);
-
-            switch (action) {
-                case 'OmniRequestChanged':
-                    console.info('Received OmniRequestChanged event with data', payload);
-                    addLog('>> ' + action + ': '+ JSON.stringify(payload))
-
-                    iframeEl.contentWindow.postMessage({
-                        authorization: 'xxx',
-                        authenticationType: 'KEYCLOAK',
-                        postMessageType: 'INIT',
-                        customerId: payload.requestData.externalId,
-                        communicationId: payload.requestData.id,
-                        communicationChannelId: payload.requestData.channelType,
-                        communicationChannelAddr: payload.requestData.originator
-                    })
-                    break;
-
-                default:
-                    console.warn('Received not Omni event')
-            }
-        }
-
-        window.addEventListener("message", postMessageListener);
+      window.addEventListener('message', postMessageListener);
     </script>
-</body>
+  </body>
 </html>

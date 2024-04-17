@@ -1,114 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KT</title>
     <style>
-        iframe {
-            border: 0;
-            width: 100vw;
-            height: 100vh;
-        }
+      iframe {
+        border: 0;
+        width: 100vw;
+        height: 100vh;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <iframe id="iframe">Iframe is not supported</iframe>
     <script>
       function postMessageListener(event) {
-        console.log({ eventOrigin: event.origin, referer: document.referrer, event })
-            // if (event.origin != 'http://ourTrustedDomain.ru') {
-            //     // что-то прислали с неизвестного домена - проигнорируем..
-            //     return;
-            // }
-   
+        console.log({
+          eventOrigin: event.origin,
+          referer: document.referrer,
+          event,
+        });
+        // if (event.origin != 'http://ourTrustedDomain.ru') {
+        //     // что-то прислали с неизвестного домена - проигнорируем..
+        //     return;
+        // }
+
         if (event?.data?.communicationId) {
-          alert('FROM MFE TO OMNI\n' + JSON.stringify(event.data,null,'  '));
+          alert('FROM MFE TO PRODUCT\n' + JSON.stringify(event.data, null, '  '));
           return;
         }
 
         const { action = null, payload = null } = JSON.parse(event.data);
         switch (action) {
-          case 'OmniRequestChanged':
-            console.warn('Received OmniRequestChanged event with data', payload);
+          case 'ProductRequestChanged':
+            console.warn(
+              'Received ProductRequestChanged event with data',
+              payload,
+            );
             let type = 'unknown';
-            if (payload.contactPersonsData && payload.contactPersonsData[0]?.customAttributes) {
-                const personType = payload.contactPersonsData[0].customAttributes.find((a) => a.code === 'PersonType');
-                if (personType?.value === '0') { 
-                    type = 'fl'
-                } else if (personType === '1') { 
-                    type = 'ul'
-                }
+            if (
+              payload.contactPersonsData &&
+              payload.contactPersonsData[0]?.customAttributes
+            ) {
+              const personType =
+                payload.contactPersonsData[0].customAttributes.find(
+                  (a) => a.code === 'PersonType',
+                );
+              if (personType?.value === '0') {
+                type = 'fl';
+              } else if (personType === '1') {
+                type = 'ul';
+              }
             }
 
             iframe.onload = () => {
-                iframe.contentWindow.postMessage({
-                  authorization: document.cookie,
-                  authentificationType: 'KEYCLOAK',
-                  postMessageType: 'INIT',
-                  parentUrl: window.location.href, 
-                  communicationId: payload.requestData.id,
-                  communicationChannelId: payload.requestData.channelType,
-                  сommunicationChannelAddr: payload.requestData.originator
-                });
-                console.info('fif loaded')
-            }
+              iframe.contentWindow.postMessage({
+                authorization: document.cookie,
+                authentificationType: 'KEYCLOAK',
+                postMessageType: 'INIT',
+                parentUrl: window.location.href,
+                communicationId: payload.requestData.id,
+                communicationChannelId: payload.requestData.channelType,
+                сommunicationChannelAddr: payload.requestData.originator,
+              });
+              console.info('fif loaded');
+            };
 
             iframe.src = `client-create.html?type=${type}`;
 
-
             break;
-   
 
-// requestDataPre.innerHTML = [
-//     ['Заголовок', payload.requestData.title],
-//     ['Внутренний id', payload.requestData.id],
-//     ['Внешний id', payload.requestData.externalId],
-//     ['Канал', payload.requestData.channelType],
-//     ['Адрес', payload.requestData.originator],
-//     ['Дата регистрации', new Date(payload.requestData.timeRegistered).toLocaleString()],
-//     ['Тематики', payload.requestSubjectLinks?.map(s => s.subjectName).join(' | ') ?? '-']
-// ].map(([k, v]) => `
-//     <div class="row">
-//         <div class="col-6 text-right text-muted">${k}</div>
-//         <div class="col-6 text-warning">${v}</div>
-//     </div>`
-// ).join('\n');
+          // requestDataPre.innerHTML = [
+          //     ['Заголовок', payload.requestData.title],
+          //     ['Внутренний id', payload.requestData.id],
+          //     ['Внешний id', payload.requestData.externalId],
+          //     ['Канал', payload.requestData.channelType],
+          //     ['Адрес', payload.requestData.originator],
+          //     ['Дата регистрации', new Date(payload.requestData.timeRegistered).toLocaleString()],
+          //     ['Тематики', payload.requestSubjectLinks?.map(s => s.subjectName).join(' | ') ?? '-']
+          // ].map(([k, v]) => `
+          //     <div class="row">
+          //         <div class="col-6 text-right text-muted">${k}</div>
+          //         <div class="col-6 text-warning">${v}</div>
+          //     </div>`
+          // ).join('\n');
 
+          // clientDataPre.innerHTML = [
+          //     ['Имя', payload.contactPersonsData[0].firstName],
+          //     ['Фамилия', payload.contactPersonsData[0].lastName],
+          // ].map(([k, v]) => `
+          //     <div class="row">
+          //         <div class="col-6 text-right text-muted">${k}</div>
+          //         <div class="col-6 text-right text-info">${v}</div>
+          //     </div>`
+          // ).join('\n');
 
-// clientDataPre.innerHTML = [
-//     ['Имя', payload.contactPersonsData[0].firstName],
-//     ['Фамилия', payload.contactPersonsData[0].lastName],
-// ].map(([k, v]) => `
-//     <div class="row">
-//         <div class="col-6 text-right text-muted">${k}</div>
-//         <div class="col-6 text-right text-info">${v}</div>
-//     </div>`
-// ).join('\n');
-
-
-                default:
-                    console.warn('Received not Omni event', event.data)
-            }
+          default:
+            console.warn('Received not Product event', event.data);
         }
+      }
 
-        window.addEventListener("message", postMessageListener);
+      window.addEventListener('message', postMessageListener);
 
-        const sendOmniPostMessage = (command, commandData = null) => {
-            const str = JSON.stringify({ action: command, payload: commandData });
-            if (window.parent) {
-                window.parent.postMessage(str, document.referrer.length > 0 ? document.referrer : undefined);
-                return;
-            }
-            window.postMessage(str);
-            console.warn('Send  omni post message', str);
+      const sendProductPostMessage = (command, commandData = null) => {
+        const str = JSON.stringify({ action: command, payload: commandData });
+        if (window.parent) {
+          window.parent.postMessage(
+            str,
+            document.referrer.length > 0 ? document.referrer : undefined,
+          );
+          return;
         }
+        window.postMessage(str);
+        console.warn('Send  product post message', str);
+      };
 
-        window.onload = () => {
-            sendOmniPostMessage('OmniChildReady');
-        }
-
-
+      window.onload = () => {
+        sendProductPostMessage('ProductChildReady');
+      };
     </script>
-</body>
+  </body>
 </html>
