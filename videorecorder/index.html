@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Recorder</title>
+</head>
+<body>
+  <button id="start">Start</button>
+  <button id="stop">Stop</button>
+  <script>
+    async function record() {
+      const constraints = {
+        audio : {
+          mandatory: {
+              echoCancellation: true,
+              chromeMediaSource: 'desktop'
+            }
+        },
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            maxFrameRate: 16
+          },
+
+        }
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
+      mediaRecorder.ondataavailable = (e) => {
+        recorderChunks.push(e.data);
+      }
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(
+          recorderChunks,
+          saveBlobOptions
+        )
+
+        const fixedBlob = await window.libs.fixWebmDuration1(blob);
+        const videoBuffer = Buffer.from(await fixedBlob.arrayBuffer());
+        recorderChunks = [];
+
+        const nameParts = [
+          new Date().toISOString(),
+          `screen-record`
+        ];
+
+        console.log("saveBlob", {
+          name: `${nameParts.join('-')}.webm`,
+          data: videoBuffer,
+        });
+      }
+
+      mediaRecorder.start();
+
+      stop.onclick = () => {
+        mediaRecorder.stop();
+      }
+
+    }
+
+    start.onclick = () => {
+      record()
+    }
+  </script>
+</body>
+</html>
