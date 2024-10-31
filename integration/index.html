@@ -27,18 +27,19 @@
   ></iframe>
   <script>
     const iframe= document.getElementById('integration-iframe');
-    
+
     const log = (...args) => console.log('🎃 integration', ...args);
     
     const sendProductPostMessage = (command, commandData = null) => {
       const str = JSON.stringify({ action: command, payload: commandData });
       if (window.parent) {
-        window.parent.postMessage(str);
+        const ref = document.referrer.length > 0 ? document.referrer : undefined;
+        window.parent.postMessage(str,ref);
         log('sendProductPostMessage to parent', str);
         return;
       }
       window.postMessage(str);
-      log('sendProductPostMessage postMessage', str);
+      log('sendProductPostMessage postMessage', str, ref);
     };
 
     const ProductEvent = {
