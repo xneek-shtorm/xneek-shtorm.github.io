@@ -57,6 +57,9 @@
 
       if (isProductEvent) {
         const { action, payload } = JSON.parse(event.data);
+
+        log('handle product PostMessage', action, payload);
+
         window.integrationPayload = payload;
 
         if (action === ProductEvent.ProductRequestChanged) {
