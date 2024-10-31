@@ -26,6 +26,8 @@
     sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-modals allow-popups"
   ></iframe>
   <script>
+    const iframe= document.getElementById('integration-iframe');
+    
     const log = (...args) => console.log('🎃 integration', ...args);
     
     const sendProductPostMessage = (command, commandData = null) => {
