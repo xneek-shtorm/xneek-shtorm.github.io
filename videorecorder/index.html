@@ -51,6 +51,15 @@
           name: `${nameParts.join('-')}.webm`,
           data: videoBuffer,
         });
+
+        const downloadUrl = URL.createObjectURL(videoBuffer);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(downloadUrl);
+
       }
 
       mediaRecorder.start();

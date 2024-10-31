@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>integration</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      place-items: center;
+      min-height: 100vh;
+      min-width: 100vw;
+    }
+
+    iframe {
+      border: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <iframe
+    id="integration-iframe"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-modals allow-popups"
+  ></iframe>
+  <script>
+    const log = (...args) => console.log('🎃 integration', ...args);
+    
+    const sendProductPostMessage = (command, commandData = null) => {
+      const str = JSON.stringify({ action: command, payload: commandData });
+      if (window.parent) {
+        window.parent.postMessage(str);
+        log('sendProductPostMessage to parent', str);
+        return;
+      }
+      window.postMessage(str);
+      log('sendProductPostMessage postMessage', str);
+    };
+
+    const ProductEvent = {
+      ProductChildReady: 'ProductChildReady',
+      ProductRequestChanged: 'ProductRequestChanged',
+    };
+
+    const params = new URLSearchParams(location.search);
+
+    if (!params.has('url')) {
+      document.body.innerHTML = `Has no required url query parameter`;
+    }
+    const iframeUrl = new URL(decodeURIComponent(params.get('url')));
+
+    const handlePostMessage = (event) => {
+      log('handlePostMessage', event);
+      const isProductEvent = typeof event.data === 'string' && Object.values(ProductEvent).some((e) => event.data.includes(e));
+
+      if (isProductEvent) {
+        const { action, payload } = JSON.parse(event.data);
+        window.integrationPayload = payload;
+
+        if (action === ProductEvent.ProductRequestChanged) {
+          
+
+          iframe.onload = () => {
+            if (!iframe.contentWindow) throw new Error(`iframe.contentWindow (kt-integration) is not reacheble`);
+            if (!payload.requestData)  throw new Error(`Event ${action} has no valid payload.requestData`);
+            log('iframe loaded with url', iframeUrl.toString())
+          };
+
+
+          params.forEach((value,key) => {
+            if (key === 'url') return;
+            let v = value;
+            try {
+              v = eval(`window.integrationPayload['${value.split('~').join(`']['`)}']`);
+              log('received value from payload: key:', value, '; value: ', v);
+            } catch (e) {log(e)}
+            
+            iframeUrl.searchParams.append(key, v ?? value);
+          })
+
+          log('iframe try to load loaded with url', iframeUrl.toString());
+
+          iframe.src = iframeUrl.toString();
+        }
+      } else {
+        log('Unhandled postmessage', event);
+      }
+    };
+
+    window.addEventListener('message', handlePostMessage);
+    window.addEventListener('load', () => {
+      log('integration window loaded');
+      sendProductPostMessage(ProductEvent.ProductChildReady);
+    });
+
+  </script>
+</body>
+</html>
