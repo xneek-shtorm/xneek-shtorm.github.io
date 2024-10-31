@@ -79,7 +79,7 @@
             if (key === 'url') return;
             let v = value;
             try {
-              v = eval(`window.integrationPayload['${value.split('~').join(`']['`)}']`);
+              v = eval(`window.integrationPayload[${value.split('~').map((x) => (/\d+/.test(x) ? x : `'${x}'`)).join(`][`)}]`);
               log('received value from payload: key:', value, '; value: ', v);
             } catch (e) {log(e)}
             
