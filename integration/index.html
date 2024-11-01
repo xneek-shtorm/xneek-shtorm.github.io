@@ -74,6 +74,31 @@
             log('iframe loaded with url', iframeUrl.toString())
           };
 
+          const getValueFromChain = (rawChain, scope) => {
+            const parts = rawChain.split('~');
+            const chain = [];
+            
+            parts.forEach((x) => {
+              if (/\d+/.test(x)) {
+                chain.push(`[${x}]`);
+              } else if (/\*.+/.test(x)) {
+                const [k,v] = x.substring(1).split('=');
+                const findIndexCode = `${scope}?.${chain.join(`?.`)}?.findIndex((a)=>(a['${k}']=='${v}'))`;
+                return chain.push(`[${findIndexCode}]`)
+              } else {
+                chain.push(x);
+              }
+            });
+
+            const path = `${scope}?.${chain.join(`?.`)}`;
+
+            try {
+              return eval(path)
+            } catch (e) {
+              log('WARN. Failed to get value from path', path, rawChain)
+              return '';
+            }
+          }
 
           params.forEach((value,key) => {
             if (key === 'url') return;
