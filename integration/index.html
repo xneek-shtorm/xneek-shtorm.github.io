@@ -102,12 +102,8 @@
 
           params.forEach((value,key) => {
             if (key === 'url') return;
-            let v = value;
-            try {
-              v = eval(`window.integrationPayload[${value.split('~').map((x) => (/\d+/.test(x) ? x : `'${x}'`)).join(`][`)}]`);
-              log('received value from payload: key:', value, '; value: ', v);
-            } catch (e) {log(e)}
-            
+            const v = getValueFromChain(value, 'window.integrationPayload');
+            log('received value from payload: key:', value, '; value: ', v);
             iframeUrl.searchParams.append(key, v ?? value);
           })
 
