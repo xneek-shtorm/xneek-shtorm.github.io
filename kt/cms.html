@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KT Client create</title>
+    <style>
+      body {
+        font-family:Verdana, Geneva, Tahoma, sans-serif
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      form label {
+        display: block;
+      }
+      form label span {
+        font-size: 0.8em;
+        color: #777777;
+        display: block;
+      }
+      form label input, form label select {
+        display: block;
+      }
+
+      sup {
+        color: red;
+        text-transform: uppercase;
+        font-size: 0.5em;
+      }
+      h1 {
+        margin-bottom: 0;
+      }
+
+      h1 + small {
+        display: inline-block;
+        margin-bottom: 16px;
+        margin-top: 6px;
+        background: bisque;
+        padding: 4px 8px;
+      }
+
+      h1 + small span {
+        color: brown;
+        font-weight: bold;
+      }
+
+    </style>
+</head>
+<body>
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0;">
+      <strong>
+        KT Fake CMS
+      </strong>
+      <button onclick="formDialog.showModal()">
+        Add new
+      </button>
+    </header>
+    <small id="info"></small>
+    <div id="res"></div>
+
+    <table border="1" width="100%">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>type</th>
+          <th>firstName</th>
+          <th>middleName</th>
+          <th>lastName</th>
+          <th>organizationNameRu</th>
+          <th>organizationNameKz</th>
+          <th>comment</th>
+          <th>created</th>
+          <th>updated</th>
+        </tr>
+      </thead>
+      <tbody id="clientsTbody"></tbody>
+    </table>
+
+    <dialog id="formDialog">
+      <form method="dialog" id="clientForm">
+        <label>
+          <span>type</span>
+          <select name="type" required style="width: 100%;">
+            <option value="fl">fl</option>
+            <option value="ul">ul</option>
+            <option value="ip">ip</option>
+          </select>
+        </label>
+        <label>
+          <span>firstName</span>
+          <input name="firstName">
+        </label>
+        <label>
+          <span>middleName</span>
+          <input name="middleName">
+        </label>
+        <label>
+          <span>lastName</span>
+          <input name="lastName">
+        </label>
+        <label>
+          <span>Organization Name Ru</span>
+          <input name="organizationNameRu">
+        </label>
+        <label>
+          <span>Organization Name Kz</span>
+          <input name="organizationNameKz">
+        </label>
+        <label>
+          <span>comment</span>
+          <input name="comment">
+        </label>
+
+        <input name="id" type="hidden">
+        <input name="created" type="hidden">
+  
+        <footer>
+          <input type="reset" value="cancel" onclick="formDialog.close()">
+          <input type="submit" value="save">
+        </footer>
+      </form>
+    </dialog>
+
+
+    <script>
+        const store = {};
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type'); // ul / fl
+
+        const res = document.getElementById('res');
+        window.onmessage = (e) => {
+            console.debug(e);
+
+            if (e.data.communicationId) {
+              store.communicationId = e.data.communicationId;
+
+              // info.innerHTML = `From <span>${e.data.parentUrl}</span>
+              // by request <span>#${e.data.communicationId}</span>&nbsp;
+              // (${e.data.communicationChannelId}, ${e.data.сommunicationChannelAddr})`
+              
+              // if (type === 'ul') { Array.from(ulForm.elements).forEach(el => el.disabled = false); }
+              // if (type === 'fl') { Array.from(flForm.elements).forEach(el => el.disabled = false); }
+            }
+
+        }
+
+        const clientForm = document.getElementById('clientForm');
+
+        clientForm.onsubmit = async (e) => {
+          e.preventDefault();
+         
+          const formData = new FormData(e.target);
+
+          let currentId = formData.get('id');
+
+          Array.from(clientForm.elements).forEach(el => el.disabled = true);
+          const all = await window.db.get('kt/clients') ?? [];
+          if (!currentId) {
+            
+            if (all?.length) {
+              const last = all[all.length - 1];
+              currentId = last.id + 1;
+            } else {
+              currentId = 1000;
+            }
+          }
+
+          const model = {
+            id: currentId,
+            firstName: formData.get('firstName'),
+            middleName: formData.get('middleName'),
+            lastName: formData.get('lastName'),
+            organizationNameKz: formData.get('organizationNameKz'),
+            organizationNameRu: formData.get('organizationNameRu'),
+            comment: formData.get('comment'),
+            type: formData.get('type'),
+            created: formData.get('created') || new Date().toISOString(),
+            updated: formData.get('created') ? new Date().toISOString() : null,
+          }
+
+          await window.db.set('kt/clients', [...all, model])
+
+          const postMessageModel = {
+            ...model,
+            resultCode: 0,
+            resultMessage: 'ok',
+            communicationId: store.communicationId,
+            customerId: model.id,
+          }
+
+          console.debug(model, document.referrer);
+          window.parent.postMessage(model, document.referrer.length > 0 ? document.referrer : undefined);
+          Array.from(clientForm.elements).forEach(el => el.disabled = false);
+          formDialog.close();
+          getTableData()
+        }
+
+
+        // if (type) {
+        //   typeSup.textContent = type;
+        //   if (type === 'ul') ulForm.style.display = '';
+        //   if (type === 'fl') flForm.style.display = '';
+        // }
+
+        // Array.from(flForm.elements).forEach(el => el.disabled = true);
+        // Array.from(ulForm.elements).forEach(el => el.disabled = true);
+
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+      import { getDatabase, ref, set, child, get, push, increment, onValue, update } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js'
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBPsm-WRf0Ply4xOoTjEoNkPU_hafCjLeI",
+        authDomain: "xneek-shtorm.firebaseapp.com",
+        databaseURL: "https://xneek-shtorm-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "xneek-shtorm",
+        storageBucket: "xneek-shtorm.appspot.com",
+        messagingSenderId: "199911586749",
+        appId: "1:199911586749:web:79b3bd0c2b09d4b35370d4"
+      };
+    
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      window.db = {
+        set: async (path, data) => {
+          return await set(ref(database, path), data);
+        },
+        get: async (path) => {
+          const snapshot = await get(child(ref(database), path));
+          if (snapshot.exists()) {
+            return snapshot.val()
+          }
+
+          return null;
+        },
+        update: async (pathValueMap) => {
+          return update(ref(database), pathValueMap);
+        },
+        getUniqueKey: async (path) => {
+          return await push(child(ref(database), path)).key
+        },
+        increment: async (count = 1) => {
+          return increment(count);
+        }        
+      }
+
+      function getTableData() {
+        document.getElementById('clientsTbody').innerHTML = `<tr><td colspan="50" align="center">Loading...</td></tr>`;
+        window.db.get('kt/clients').then((data) => {
+          document.getElementById('clientsTbody').innerHTML = data?.map((d) => {
+            return `
+              <tr>
+                <td>${d.id}</td>
+                <td>${d.type}</td>
+                <td>${d.firstName}</td>
+                <td>${d.middleName}</td>
+                <td>${d.lastName}</td>
+                <td>${d.organizationNameRu}</td>
+                <td>${d.organizationNameKz}</td>
+                <td>${d.comment}</td>
+                <td>${d.created}</td>
+                <td>${d.updated ?? '—'}</td>
+              </tr>
+            `;
+          }).join('\n');
+        })
+      }
+
+      getTableData()
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script type="text/javascript">
+window.integrationPayload = {
+  "requestData": {
+    "id": 29756,
+    "externalId": "1092",
+    "timeCreated": "2024-03-12T13:36:03Z",
+    "timeRegistered": "2024-03-12T13:35:48.575279Z",
+    "timeClosed": null,
+    "title": "Консультация по тарифному плану",
+    "channelType": "Telegram",
+    "plainText": null,
+    "source": "External channel",
+    "originator": "134014947",
+    "originatorId": "62ec76f2-3e2c-4923-b4d1-a0731512dbc7",
+    "originAddressId": "62ec76f2-3e2c-4923-b4d1-a0731512dbc7",
+    "parentId": null,
+    "customAttributes": [
+      {
+        "type": "Binary",
+        "code": "LastContactInfoJson",
+        "value": "eyJBZGRyZXNzIjoieG5lZWsuc2h0b3JtQGdtYWlsLmNvbSIsIkNoYW5uZWxJZCI6MX0="
+      },
+      {
+        "type": "Bool",
+        "code": "IsCustomerAlreadyNotified",
+        "value": "True"
+      },
+      {
+        "type": "DateTime",
+        "code": "MarketingWorkerEndDate",
+        "value": "03/29/2024 11:14:23"
+      },
+      {
+        "type": "DateTime",
+        "code": "TimeDecisionEscalation",
+        "value": "03/15/2024 10:15:52"
+      },
+      {
+        "type": "DateTime",
+        "code": "TargetDecisionTime",
+        "value": "03/12/2024 13:36:05"
+      },
+      {
+        "type": "DateTime",
+        "code": "TargetResponseTime",
+        "value": "03/12/2024 13:37:03"
+      },
+      {
+        "type": "DateTime",
+        "code": "TimeLastOperatorMessage",
+        "value": "10/24/2024 10:07:01"
+      },
+      {
+        "type": "Guid",
+        "code": "RequestGuidId",
+        "value": "21bfa718-8ebc-45c1-9d3a-557f29bbd9ad"
+      },
+      {
+        "type": "String",
+        "code": "CustomerType",
+        "value": "Физическое лицо"
+      },
+      {
+        "type": "String",
+        "code": "CustomerDatabaseType",
+        "value": "5"
+      },
+      {
+        "type": "String",
+        "code": "SenderName",
+        "value": "xneek"
+      },
+      {
+        "type": "String",
+        "code": "ScriptsCodesAlreadyComplete",
+        "value": "[]"
+      }
+    ]
+  },
+  "contactPersonsData": [
+    {
+      "firstName": "Николай",
+      "lastName": "Федосеев",
+      "middleName": "",
+      "isDeleted": true,
+      "contactAddresses": [
+        {
+          "id": "21fb63fa-61bc-49b6-b3ac-8bb751e1c48d",
+          "addressString": "79374490163",
+          "channelId": 111,
+          "addressType": "InfobipWhatsApp",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "d42515a9-bccc-4003-8db0-8e5bf31522b7",
+          "addressString": "xneek.shtorm@gmail.com",
+          "channelId": 1,
+          "addressType": "Exchange",
+          "isDeleted": false,
+          "isVerified": false
+        }
+      ],
+      "customAttributes": [
+        {
+          "type": "Long",
+          "code": "PersonType",
+          "value": "1"
+        },
+        {
+          "type": "String",
+          "code": "RegionName",
+          "value": "Астана"
+        },
+        {
+          "type": "String",
+          "code": "ClientId",
+          "value": "1005001"
+        },
+        {
+          "type": "String",
+          "code": "Company",
+          "value": "eeee"
+        }
+      ]
+    }
+  ],
+  "requestSubjectsLinks": [
+    {
+      "requestId": 29756,
+      "subjectId": 21,
+      "subjectName": ""
+    }
+  ]
+};
+
+
+const getValueFromChain = (rawChain, scope) => {
+  const parts = rawChain.split('~');
+  const chain = [];
+  
+  parts.forEach((x) => {
+    if (/\d+/.test(x)) {
+      chain.push(`[${x}]`);
+    } else if (/\*.+/.test(x)) {
+      const [k,v] = x.substring(1).split('=');
+      const findIndexCode = `${scope}?.${chain.join(`?.`)}?.findIndex((a)=>(a['${k}']=='${v}'))`;
+      return chain.push(`[${findIndexCode}]`)
+    } else {
+      chain.push(x);
+    }
+  });
+
+  const path = `${scope}?.${chain.join(`?.`)}`;
+
+  try {
+    return eval(path)
+  } catch (e) {
+    console.warn('Failed to get value from path', path, rawChain)
+    return '';
+  }
+}
+
+console.log(getValueFromChain('requestData~id', 'window.integrationPayload'));
+console.log(getValueFromChain('requestData~customAttributes~*code=CustomerType~value', 'window.integrationPayload'));
+console.log(getValueFromChain('contactPersonsData~0~firstName', 'window.integrationPayload'));
+  </script>
+  
+</body>
+</html>

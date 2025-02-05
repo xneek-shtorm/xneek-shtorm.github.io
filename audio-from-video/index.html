@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content=
+          "width=device-width, initial-scale=1.0">
+    <title>Audio Extractor</title>
+</head>
+
+<body>
+    <input type="file" id="videoInput" accept="video/*">
+    <script>
+document.getElementById('videoInput')
+    .addEventListener('change', handleFileSelect);
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        extractAndPlayAudio(file);
+    }
+}
+
+function extractAndPlayAudio(videoFile) {
+    const audioContext = 
+        new (window.AudioContext || window.webkitAudioContext)();
+    const reader = new FileReader();
+
+    reader.onload = function () {
+        const arrayBuffer = reader.result;
+        audioContext.decodeAudioData(arrayBuffer, function (buffer) {
+            playAudio(buffer);
+        }, function (error) {
+            console.error('Error decoding audio: ', error);
+        });
+    };
+
+    reader.readAsArrayBuffer(videoFile);
+}
+
+function playAudio(buffer) {
+    const audioContext = 
+        new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start();
+}
+    </script>
+
+</body>
+
+</html>
