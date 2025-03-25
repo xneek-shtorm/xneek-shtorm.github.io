@@ -9,23 +9,38 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Product post-message receiver</title>
     <style>
-      #list {
-        color: dimgrey;
+      html, body {
+        padding: 0;
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       }
 
       button {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
         padding: 12px 24px;
         margin-bottom: 6px;
         cursor: pointer;
+        border: none;
+        color: #121a33;
+        background: white;
+        font-weight: bold;
+      }
+
+      button:hover {
+        background: #f5f8ff;
+      }
+
+      button:active {
+        background: #e5edff;
       }
 
       small {
         display: block;
-        margin-top: 1px;
-        color: orange;
-        font-family: 'Courier New', Courier, monospace;
+        color: #4471f2;
+        font-weight: bold;
       }
     </style>
   </head>
