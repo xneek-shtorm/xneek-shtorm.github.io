@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Product post-message receiver</title>
+    <style>
+      #list {
+        color: dimgrey;
+      }
+
+      button {
+        display: block;
+        width: 100%;
+        padding: 12px 24px;
+        margin-bottom: 6px;
+        cursor: pointer;
+      }
+
+      small {
+        display: block;
+        margin-top: 1px;
+        color: orange;
+        font-family: 'Courier New', Courier, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="list"></div>
+
+    <script>
+
+      const data = [
+        {
+          title: 'Соцфонд РФ',
+          number: '88001000001'
+        },
+        {
+          title: 'Сравни.РУ',
+          number: '88006000001'
+        },
+        {
+          title: 'МТС',
+          number: '88002500990'
+        },
+        {
+          title: 'Ростелеком',
+          number: '88001811888'
+        },
+        {
+          title: 'Сбербанк',
+          number: '88005005550'
+        }
+      ]
+
+      data.forEach(({ title, number }) => {
+        const btn = document.createElement('button');
+        btn.textContent = title;
+
+        const small = document.createElement('small');
+        small.textContent = number;
+        btn.appendChild(small);
+
+        btn.title = number;
+        list.appendChild(btn);
+
+        btn.addEventListener('click', () => {
+          run(number);
+        });
+      })
+
+
+      const sendPostMessage = (str) => {
+        if (window.parent) {
+          window.parent.postMessage(
+            str,
+            document.referrer.length > 0 ? document.referrer : undefined,
+          );
+          return;
+        }
+        window.postMessage(str);
+        console.warn('Send post message', str);
+      };
+
+      function run(num){
+        console.log('Address book call', num)
+          const str = JSON.stringify({ action: 'ContactSelected', payload: num });
+          sendPostMessage(str);
+      };
+    </script>
+  </body>
+</html>
