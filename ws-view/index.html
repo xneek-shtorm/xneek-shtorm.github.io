@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View WS</title>
+  <style>
+    body { font-family: monospace; }
+    td {vertical-align: top;}
+    table {
+      border-collapse: collapse;
+    }
+    pre {
+      margin: 0;
+      padding: 0;
+    }
+    form {
+      display: block;
+    }
+    textarea {
+      display: block;
+      width: 100%;
+      margin: 3px 0;
+    }
+
+    .out {
+      background: #eefeee;
+    }
+
+    .in {
+      background: #eeeefe;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <form id="form">
+    <textarea id="text" placeholder="Логи сокетов сюда"></textarea>
+    <div style="display: flex; gap:16px">
+    <label>
+      <input id="nokeepalive" type="checkbox">
+      ignore keep-alive
+    </label>
+
+    <label>
+      <input id="noempty" type="checkbox">
+      ignore empty
+    </label>
+
+    <input type="submit" style="margin-left: auto;">
+
+    </div>
+  </form>
+  <br>
+  <table cellspacing="0" cellpadding="0" width="100%" border="1">
+    <tbody id="res"></tbody>
+  </table>
+  
+  <script>
+    form.onsubmit = (e) => {
+      const all = [];
+      e.preventDefault();
+      res.innerHTML = '';
+      const rows = text.value.trim().split('\n');
+      rows.forEach((row) => {
+        const x = row.trim().split('\t')
+        
+        const  [dir, date, data]= x
+        const tr = document.createElement('tr');
+        const td1 = document.createElement('td');
+        td1.textContent = (dir === '>' ? '↑' : '↓') + ' ' + new Date(date).toLocaleTimeString() ;
+        
+        tr.appendChild(td1);
+        const td3 = document.createElement('td');
+        const pre = document.createElement('pre');
+
+
+        const dt = JSON.parse(JSON.parse(data).payload.replace('\u001e', ''));
+
+        if (nokeepalive.checked && dt.type == 6) return;
+        if (noempty.checked && Object.keys(dt).length == 0) return;
+   
+
+        pre.textContent = JSON.stringify(dt, null,'  ') ;
+        td3.appendChild(pre)
+        tr.appendChild(td3);
+
+        tr.classList.add(dir === '>' ? 'out' : 'in')
+        all.push({...dt,  date, dir});
+
+        res.appendChild(tr);
+      })
+
+      console.log(all);
+
+    }
+  </script>
+</body>
+</html>
