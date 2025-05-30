@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    table {border-collapse: collapse;}
+    td {
+      max-width: 300px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    * {
+      font-family: 'Courier New', Courier, monospace;
+    }
+  </style>
+</head>
+<body>
+   <input id="fileInput" type="file" accept="*.har">
+
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <td>_resourceType</td>
+        <td>request.url</td>
+        <td>request.method</td>
+        <td>response.status</td>
+        <td>response._transferSize</td>
+        <td>serverIPAddress</td>
+        <td>startedDateTime</td>
+        <td>time</td>
+        <td>timings.connect</td>
+        <td>timings.dns</td>
+        <td>timings.receive</td>
+        <td>timings.send</td>
+        <td>timings.ssl</td>
+        <td>timings.wait</td>
+        <td>WHERE1</td>
+        <td>WHERE2</td>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+  </table>
+
+  <script src="script.js"></script>
+</body>
+</html>
