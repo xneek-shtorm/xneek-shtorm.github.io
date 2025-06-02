@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>HAR to table</title>
   <style>
     table {border-collapse: collapse;}
     td {
@@ -15,6 +15,25 @@
     * {
       font-family: 'Courier New', Courier, monospace;
     }
+
+    .double-url-and-method {
+      background-color: rgba(255,0,0,0.05);
+    }
+    .double-url-and-method-and-initiator {
+      color: darkred;
+      font-weight: bolder;
+    }
+
+    .number {
+      text-wrap: nowrap;
+      text-align: right;
+      padding-right: 5px;
+    }
+
+    .nowrap {
+      text-wrap: nowrap;
+    }
+
   </style>
 </head>
 <body>
@@ -23,22 +42,23 @@
   <table border="1" width="100%">
     <thead>
       <tr>
-        <td>_resourceType</td>
-        <td>request.url</td>
-        <td>request.method</td>
-        <td>response.status</td>
-        <td>response._transferSize</td>
-        <td>serverIPAddress</td>
-        <td>startedDateTime</td>
-        <td>time</td>
-        <td>timings.connect</td>
-        <td>timings.dns</td>
-        <td>timings.receive</td>
-        <td>timings.send</td>
-        <td>timings.ssl</td>
-        <td>timings.wait</td>
-        <td>WHERE1</td>
-        <td>WHERE2</td>
+        <th>№пп</th>
+        <th>_resourceType</th>
+        <th>request.url</th>
+        <th>method</th>
+        <th>status</th>
+        <th>size</th>
+        <th>serverIPAddress</th>
+        <th>startedDateTime</th>
+        <th>time</th>
+        <th>timings.connect</th>
+        <th>timings.dns</th>
+        <th>timings.receive</th>
+        <th>timings.send</th>
+        <th>timings.ssl</th>
+        <th>timings.wait</th>
+        <th>WHERE1</th>
+        <th>WHERE2</th>
       </tr>
     </thead>
     <tbody id="tbody">
