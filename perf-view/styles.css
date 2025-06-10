@@ -1,0 +1,86 @@
+   body { font-family: monospace; margin: 0;padding: 0; }
+    td {vertical-align: top;}
+    th {
+      background-color: lightcyan;
+    }
+    table {
+      border-collapse: collapse;
+    }
+    pre {
+      margin: 0;
+      color: inherit;
+      padding: 0;
+      white-space: break-spaces;
+    }
+    form label {
+      box-shadow: 4px 0 2px rgba(0,0,0,0.3333);
+      padding: 6px;
+      padding-right: 16px;
+    }
+    textarea {
+      display: block;
+      width: 100%;
+      margin: 3px 0;
+    }
+
+    .out {
+      color: green;
+
+      sup {
+        color: blue;
+      }
+
+    }
+
+    .in {
+      color: blue;
+
+      sup {
+        color: green;
+      }
+
+    }
+
+    .keep * {
+      font-size: 0.8em;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: white;
+      box-shadow: 0 1px #000000;
+    }
+
+
+tbody tr td:first-child, tbody tr th:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    box-shadow: 3px 3px #000000;
+    z-index: 3;
+    padding: 0 4px;
+
+}
+
+tbody.withhover tr:hover td {
+  background-color: rgba(255,255,0, 0.12)!important;
+}
+
+td.out, th.out {
+  border-left:1px solid black;
+}
+
+td.in, th.in {
+  border-left:1px solid #e0e0e0;
+}
+
+pre + pre, pre+details, details+pre, details+details {
+  margin-top: 4px; border-top: 1px dashed #adadad;
+}
+

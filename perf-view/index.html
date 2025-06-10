@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perf test View WS</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <form id="form">
+
+    
+    <div style="display: flex; gap:16px">
+      <label>
+        Файлы логов:
+        <input type="file" multiple id="filesInp" />
+      </label>
+      <label>
+        keep-alive:
+        <select id="keepalive">
+          <option value="asis">as is</option>
+          <option value="ignore">ignore</option>
+          <option value="replace">replace</option>
+        </select>
+      </label>
+      <label>
+        init:
+        <select id="init">
+          <option value="asis">as is</option>
+          <option value="ignore">ignore</option>
+          <option value="replace">replace</option>
+      </select>
+      </label>
+      <label>
+        <input id="noempty" type="checkbox">
+        ignore empty
+      </label>
+
+      <label>
+        <input id="collapseByTarget" type="checkbox">
+        collapse by target
+      </label>
+
+      <label>
+        Реплейсы (tab-separated):
+        <textarea rows="1" id="replacesInp"></textarea>
+      </label>
+
+            <label>
+        фильтры:
+        <input id="filters" placeholder="One|Two|More"/>
+      </label>
+
+
+      <input type="submit" style="margin-left: auto;">
+    </div>
+  </form>
+  <br>
+  <table cellspacing="0" cellpadding="0" width="100%" border="1">
+    <thead id="thead"></thead>
+    <tbody id="res"></tbody>
+  </table>
+<script src="https://cdn.jsdelivr.net/npm/@js-temporal/polyfill/dist/temporal-polyfill.js"></script>
+  
+  <script src="./scripts.js">
+    
+  </script>
+</body>
+</html>
