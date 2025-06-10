@@ -37,7 +37,7 @@ form.onsubmit = async (e) => {
 
   res.innerHTML = '';
   thead.innerHTML = '';
-
+let startedDateTime;
   const entries = []; // {name: '', rows: ''[]}
   const files = Array.from(filesInp.files);
   for (const file of files) {
@@ -53,6 +53,7 @@ form.onsubmit = async (e) => {
         }
 
         const startDate = new Date(ws.startedDateTime);
+        startedDateTime = ws.startedDateTime
         const rowsE = [];
         ws._webSocketMessages.forEach((m) => {
           rowsE.push([
@@ -295,7 +296,7 @@ form.onsubmit = async (e) => {
 
       const th1 = document.createElement('th');
       th1.rowSpan = 2;
-      th1.textContent = 'time'
+      th1.textContent = startedDateTime ? new Date(startedDateTime) .toLocaleString()+'+' : 'time'
       thr1.appendChild(th1);
       
       let ind = 0;
