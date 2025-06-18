@@ -91,7 +91,7 @@
         
         const sendCounterInfo = () => {
             const str = JSON.stringify({ action: 'ProductSetCounter', payload: {
-                     siteId: 'requestCloseConditionally', count: exampleFormControl.value?.length > 0 ? '' : (searchParams.get('attention') ?? '⚠️')
+                     siteId: 'requestCloseConditionally', count: exampleFormControl.value?.length > 0 ? 0 : 1
             } }, null, '  ');
             sendPostMessage(str);     
         }
