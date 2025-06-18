@@ -57,6 +57,7 @@
                 <input class="form-control" id="exampleFormControl"  rows="3" required>
               </div>
               <footer class="d-flex justify-content-between">
+                <div id="res"></div>
                 <!--<button type="reset" class="btn btn-danger">Словно произошла ошибка</button>-->
                 <button type="submit" id="submitButton" class="m-l-auto btn btn-success" style="margin-left: auto;">Сохранить</button>
               </footer>
@@ -67,6 +68,14 @@
 
 
     <script>
+        const sendPostMessage = (str) => {
+            if (window.parent) {
+                window.parent.postMessage(str, document.referrer.length > 0 ? document.referrer : undefined);
+                return;
+            }
+            window.postMessage(str);
+            console.warn('Send post message', str);
+        }
 
         const searchParams = new URLSearchParams(location.search);
 
@@ -80,7 +89,12 @@
             submitButton.textContent = 'Сохранить и продолжить'
         }
         
-
+        const sendCounterInfo = () => {
+            const str = JSON.stringify({ action: 'ProductSetCounter', payload: {
+                     siteId: 'requestCloseConditionally', count: exampleFormControl.value?.length > 0 ? '' : (searchParams.get('attention') ?? '⚠️')
+            } }, null, '  ');
+            sendPostMessage(str);     
+        }
         function postMessageListener(event) {
             // if (event.origin != 'http://ourTrustedDomain.ru') {
             //     // что-то прислали с неизвестного домена - проигнорируем..
@@ -125,6 +139,8 @@
                     } else {
                         exampleFormControl.focus();
                     }
+
+                    sendCounterInfo();
                     
 
                     exampleFormControl.onchange = () => {
@@ -148,14 +164,6 @@
 
         // Sending
 
-        const sendPostMessage = (str) => {
-            if (window.parent) {
-                window.parent.postMessage(str, document.referrer.length > 0 ? document.referrer : undefined);
-                return;
-            }
-            window.postMessage(str);
-            console.warn('Send post message', str);
-        }
 
 
         setTimeout(() => {
@@ -168,11 +176,18 @@
 
         }, loadingTimeout);
 
+
+
+
         sampleForm.onsubmit = (e) => {
             e.preventDefault();
             if (searchParams.get('checkMode')) {
                 const str = JSON.stringify({ action: 'ProductRequestActionProcessed', payload: exampleFormControl.value }, null, '  ');
                 sendPostMessage(str);
+            } else {
+                sendCounterInfo();
+                res.textContent = '✅ Сохранено'
+                setTimeout(() => {res.textContent = ''}, 1500);
             }
         }
 
