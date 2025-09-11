@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo tasks</title>
+  <link rel="stylesheet" href="tasks-demo.css">
+</head>
+<body>
+  <header>
+    <aside style="float: right;">
+      <button id="refreshBtn">🔄️</button>
+      <button id="addTaskBtn">➕ New</button>
+    </aside>
+    <h1 id="pageTitle">New tasks on top</h1>
+  </header>
+  <ul id="tasks_list"></ul>
+
+  <dialog id="taskDialog">
+    <form method="dialog" id="taskForm">
+      <h4>Task form</h4>
+      
+      <input name="name" autofocus placeholder="name" required>
+      <label style="margin-left: 2rem;">
+        <input name="complete"  type="checkbox">
+        completed
+      </label>
+      <textarea name="description" required placeholder="description" rows="3"></textarea>
+      <textarea name="metadata" required placeholder="metadata" rows="10"></textarea>
+
+      <input name="id" type="hidden">
+      <input name="createdAt" type="hidden">
+      <input name="updatedAt" type="hidden">
+
+   
+      <footer style="text-align: right;">
+        <input type="reset" value="Cancel">
+        <input type="submit" value="Save">
+      </footer>
+    </form>
+  </dialog>
+
+
+  <script src="firebase.js" type="module"></script>
+  <script src="tasks-demo.js" type="module"></script>
+</body>
+</html>

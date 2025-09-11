@@ -1,0 +1,55 @@
+html, body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+input, textarea {
+  padding: 4px 8px;
+  border-radius: 3px;
+  border:1px solid #a3a3a3;
+  &:focus-within {
+    outline: 1px solid lightskyblue;
+  }
+}
+
+h4 {margin-top: 0;}
+
+textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 320px;
+  margin: 12px 0;
+}
+
+dialog {
+  border:1px solid #a3a3a3;
+  border-radius: 8px;
+}
+
+ul, li {
+  padding: 0;
+  margin: 0;
+}
+
+ul > li > a {
+  text-decoration: none;
+  display: block;
+  padding: 12px 16px;
+  border: 1px #e0e0e0 solid;
+  border-radius: 4px;
+  background: linear-gradient(#f8f8f8, #f0f0f0);
+  margin-bottom: 2px;
+  color: inherit;
+
+  em {
+    margin-left: 1em;
+    font-size: 0.8em;
+    opacity: 0.8;
+  }
+
+  small {
+    display: block;
+    opacity: 0.5;
+    font-size: 0.6em;
+  }
+}
