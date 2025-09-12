@@ -8,7 +8,7 @@ function loadTasks() {
   tasks_list.innerHTML = 'Loading...';
   getData(`tasks/${room}`).then((res) => {
     if (!res) {
-      tasks_list.innerHTML = 'Has no tasks';
+      tasks_list.innerHTML = `Has no tasks in room «${room}»`;
       return;
     };
     const arr = Object.values(res).reverse();
@@ -20,6 +20,13 @@ function loadTasks() {
 }
 
 function loadOneTask(id) {
+  if (id === 'new') {
+    taskForm.reset();
+    taskDialog.showModal();
+    return;
+  }
+
+
   getData(`tasks/${room}/${id}`).then((taskData) => {
     taskForm.elements.id.value = taskData.id;
     taskForm.elements.name.value = taskData.name;
@@ -35,7 +42,7 @@ function loadOneTask(id) {
 
 
 addTaskBtn.onclick = () => {
-  taskDialog.showModal()
+  window.location.href = '#new'
 }
 refreshBtn.onclick = () => {
   loadTasks()
@@ -84,7 +91,6 @@ taskForm.onsubmit = () => {
 }
 
 taskForm.onreset = () => {
-  
   taskDialog.close();
 }
 
