@@ -2,15 +2,15 @@ import { getData, getNextKey, setData } from './firebase.js';
 import { Item, Placeholder, RoomFooter } from './ui.js';
 
 const sp = new URLSearchParams(window.location.search);
-const room = sp.get('room') || 'all';
+const project = sp.get('project') || 'all';
 
 function loadTasks() {
   tasks_list.innerHTML = '';
   tasks_list.append(new Placeholder(`Loading...`));
-  getData(`tasks/${room}`).then((res) => {
+  getData(`tasks/${project}`).then((res) => {
     if (!res) {
       tasks_list.innerHTML = '';
-      tasks_list.append(new Placeholder(`Has no tasks in room «${room}»`));
+      tasks_list.append(new Placeholder(`Has no tasks in project «${project}»`));
       return;
     };
     const arr = Object.values(res).reverse();
@@ -29,7 +29,7 @@ function loadOneTask(id) {
   }
 
 
-  getData(`tasks/${room}/${id}`).then((taskData) => {
+  getData(`tasks/${project}/${id}`).then((taskData) => {
     taskForm.elements.id.value = taskData.id;
     taskForm.elements.name.value = taskData.name;
     taskForm.elements.complete.checked = taskData.isComplete;
@@ -77,7 +77,7 @@ taskForm.onsubmit = () => {
     data.createdAt = new Date().toISOString();
   }
 
-  setData(`tasks/${room}/${id}`, data).then(() => {
+  setData(`tasks/${project}/${id}`, data).then(() => {
     
     const temp = taskForm.innerHTML;
     taskForm.innerHTML = `✅ Successfully saved`;
@@ -104,12 +104,12 @@ function init() {
   if (window.location.hash.length > 1) {
     loadOneTask(window.location.hash.substring(1));
   } else {
-    pageTitle.textContent = `Tasks of ${room}`;
-    document.title = `Tasks of ${room}`;
+    pageTitle.textContent = `Tasks of ${project}`;
+    document.title = `Tasks of ${project}`;
   }
 
   pageFooter.innerHTML = '';
-  pageFooter.append(new RoomFooter(room));
+  pageFooter.append(new RoomFooter(project));
   
 }
 

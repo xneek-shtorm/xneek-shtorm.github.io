@@ -39,16 +39,16 @@ export class Placeholder {
   }
 }
 export class RoomFooter {
-  constructor(room) {
+  constructor(project) {
     const span = document.createElement('span');
-    span.textContent = `Current room is: «${room}». `;
+    span.textContent = `Current project is: «${project}». `;
     const a = document.createElement('a');
     a.textContent = 'Create new';
     a.href='javascript:void(0)';
     a.onclick = () => {
-      const name = prompt('Room name', room);
+      const name = prompt('Room name', project);
       if (name) {
-        window.location.href = `?room=${name.replace(/\s+/g, '_')}`
+        window.location.href = `?project=${name.replace(/\s+/g, '_')}`
       }
     }
     span.append(a);
