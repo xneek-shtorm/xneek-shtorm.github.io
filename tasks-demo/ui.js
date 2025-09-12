@@ -28,3 +28,30 @@ export class Item {
       return li;
   }
 }
+
+export class Placeholder {
+  constructor(text) {
+      const span = document.createElement('span');
+      span.classList.add('placeholder');
+      span.textContent = text
+
+      return span;
+  }
+}
+export class RoomFooter {
+  constructor(room) {
+    const span = document.createElement('span');
+    span.textContent = `Current room is: «${room}». `;
+    const a = document.createElement('a');
+    a.textContent = 'Create new';
+    a.href='javascript:void(0)';
+    a.onclick = () => {
+      const name = prompt('Room name', room);
+      if (name) {
+        window.location.href = `?room=${name.replace(/\s+/g, '_')}`
+      }
+    }
+    span.append(a);
+    return span;
+  }
+}

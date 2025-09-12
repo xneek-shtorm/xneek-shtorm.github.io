@@ -1,14 +1,16 @@
 import { getData, getNextKey, setData } from './firebase.js';
-import { Item } from './ui.js';
+import { Item, Placeholder, RoomFooter } from './ui.js';
 
 const sp = new URLSearchParams(window.location.search);
 const room = sp.get('room') || 'all';
 
 function loadTasks() {
-  tasks_list.innerHTML = 'Loading...';
+  tasks_list.innerHTML = '';
+  tasks_list.append(new Placeholder(`Loading...`));
   getData(`tasks/${room}`).then((res) => {
     if (!res) {
-      tasks_list.innerHTML = `Has no tasks in room «${room}»`;
+      tasks_list.innerHTML = '';
+      tasks_list.append(new Placeholder(`Has no tasks in room «${room}»`));
       return;
     };
     const arr = Object.values(res).reverse();
@@ -105,6 +107,9 @@ function init() {
     pageTitle.textContent = `Tasks of ${room}`;
     document.title = `Tasks of ${room}`;
   }
+
+  pageFooter.innerHTML = '';
+  pageFooter.append(new RoomFooter(room));
   
 }
 

@@ -8,11 +8,11 @@
 </head>
 <body>
   <header>
-    <aside style="float: right;">
-      <button id="refreshBtn">🔄️</button>
-      <button id="addTaskBtn">➕ New</button>
-    </aside>
     <h1 id="pageTitle">New tasks on top</h1>
+    <aside>
+      <button id="refreshBtn" title="Reload">🔄️</button>
+      <button id="addTaskBtn" title="Add">➕</button>
+    </aside>
   </header>
   <ul id="tasks_list"></ul>
 
@@ -32,14 +32,13 @@
       <input name="createdAt" type="hidden">
       <input name="updatedAt" type="hidden">
 
-   
       <footer style="text-align: right;">
         <input type="reset" value="Cancel">
         <input type="submit" value="Save">
       </footer>
     </form>
   </dialog>
-
+  <footer id="pageFooter"></footer>
 
   <script src="firebase.js" type="module"></script>
   <script src="tasks-demo.js" type="module"></script>
