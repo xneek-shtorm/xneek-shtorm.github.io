@@ -51,12 +51,12 @@ function makeCustomLogicWithRequestData(fullRequestData){
       const operator = fullRequestData.operatorData;
       taskForm.elements.name.value = `Обслуживание клиента ${contactPerson.firstName ?? ''} ${contactPerson.lastName ?? ''} оператором ${operator.firstName ?? ''} ${operator.lastName ?? ''}`;
       taskForm.elements.description.value = `Заголовок: ${fullRequestData.requestData.title};
-        Внутренний id: ${fullRequestData.requestData.id};
-        Внешний id: ${fullRequestData.requestData.externalId};
-        Канал: ${fullRequestData.requestData.channelType};
-        Адрес: ${fullRequestData.requestData.originator};
-        Дата регистрации: ${new Date(fullRequestData.requestData.timeRegistered).toLocaleString()};
-        Тематики: ${fullRequestData.requestSubjectLinks?.map(s => s.subjectName).join(' | ') ?? '-'};`
+Внутренний id: ${fullRequestData.requestData.id};
+Внешний id: ${fullRequestData.requestData.externalId};
+Канал: ${fullRequestData.requestData.channelType};
+Адрес: ${fullRequestData.requestData.originator};
+Дата регистрации: ${new Date(fullRequestData.requestData.timeRegistered).toLocaleString()};
+Тематики: ${fullRequestData.requestSubjectLinks?.map(s => s.subjectName).join(' | ') ?? '-'};`
       taskForm.elements.metadata.value = JSON.stringify(fullRequestData, null, '  ');
 
       taskForm.addEventListener('submit', () => {
