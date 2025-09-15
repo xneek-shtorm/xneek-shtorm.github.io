@@ -1,5 +1,4 @@
-(() => {
-  // Пример интеграции
+// Пример интеграции
 const searchParams = new URLSearchParams(window.location.search);
 // Идентификатор сайта, нужен для работы со счетчиком-индикатором. Должен совпадать с id из настройки custom-sites-tabs
 const siteId = searchParams.get('site-id') || 'tasks-demo-integration';
@@ -23,7 +22,7 @@ function handlePostMessage(event) {
     if (!project || !(/avelana-\d+/.test(project))) {
       // Если нет корректного проекта, редиректим на нужный requestId
       searchParams.set('project', `avelana-${payload.requestData.id}`);
-      console.log('Redirect to', `?${searchParams.toString()}`)
+      console.log('Redirect to', `${window.location.pathname}?${searchParams.toString()}`)
       window.location.href = `?${searchParams.toString()}`;
     } else {
       makeCustomLogicWithRequestData(payload)
@@ -103,5 +102,3 @@ function makeCustomLogicWithRequestData(fullRequestData){
     }
   }
 }
-
-})()
