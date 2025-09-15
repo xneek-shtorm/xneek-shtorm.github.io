@@ -22,6 +22,7 @@ function handlePostMessage(event) {
       // Если нет корректного проекта, редиректим на нужный requestId
       searchParams.set('project', `avelana-${payload.requestData.id}`);
       searchParams.set('check-not-empty', checkNotEmpty);
+      console.log('Redirect to', `?${searchParams.toString()}`)
       window.location.href = `?${searchParams.toString()}`;
     } else {
       makeCustomLogicWithRequestData(payload)
