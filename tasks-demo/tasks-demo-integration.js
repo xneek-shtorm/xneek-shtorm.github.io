@@ -10,25 +10,13 @@ function sendIntegrationMessage(action, payload = null) {
   if (!window.parent) throw new Error('Не обнаружено родительское окно для отправки post-message');
   const msg = JSON.stringify({ action, payload });
   window.parent.postMessage(msg, document.referrer.length > 0 ? document.referrer : undefined);
-  console.debug('sendIntegrationMessage', msg, location.search)
 };
 
 /** Обработчик сообщений post-message поучаемых от хост системы */
 function handlePostMessage(event) {
   const { action = null, payload = null } = JSON.parse(event.data);
-console.debug('handlePostMessage', event.data, location.search)
   if (action === 'ProductRequestChanged') {
-
-    if (!project || !(/avelana-\d+/.test(project))) {
-      // Если нет корректного проекта, редиректим на нужный requestId
-      searchParams.set('project', `avelana-${payload.requestData.id}`);
-      console.log('Redirect to', )
-      window.location.href = `${window.location.pathname}?${searchParams.toString()}`;
-    } else {
-      makeCustomLogicWithRequestData(payload)
-    }
-
-    
+    makeCustomLogicWithRequestData(payload)    
   }
 }
 
@@ -95,7 +83,6 @@ function makeCustomLogicWithRequestData(fullRequestData){
     // Сбросим счетчик-индикатор в хост-системе чтобы не привлекать внимание
     sendIntegrationMessage('ProductSetCounter', { siteId, count: 0 });
 
-    console.log('xneek', {checkNotEmpty, siteId, project, href: window.location.href})
     // Если сайт открыт в режиме проверки на непустой список - отправляем сообщение о том, что проверка
     if (checkNotEmpty) {
       sendIntegrationMessage('ProductRequestActionProcessed');
