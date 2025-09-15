@@ -72,7 +72,7 @@ function makeCustomLogicWithRequestData(fullRequestData){
     }, 1000)
 
 
-    if (checkNotEmpty) sendIntegrationMessage('ProductRequestActionError', 'Требуется хотя бы одна задача для завершения обращения');
+    //if (checkNotEmpty) sendIntegrationMessage('ProductRequestActionError', 'Требуется хотя бы одна задача для завершения обращения');
 
   } else {
     // Сбросим счетчик-индикатор в хост-системе чтобы не привлекать внимание
