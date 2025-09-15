@@ -46,9 +46,12 @@ export class RoomFooter {
     a.textContent = 'Create new';
     a.href='javascript:void(0)';
     a.onclick = () => {
+
       const name = prompt('Room name', project);
       if (name) {
-        window.location.href = `?project=${name.replace(/\s+/g, '_')}`
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set('project', name.replace(/\s+/g, '_'));
+        window.location.href = `?${searchParams.toString()}`
       }
     }
     span.append(a);

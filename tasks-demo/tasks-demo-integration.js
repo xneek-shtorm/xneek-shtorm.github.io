@@ -42,29 +42,35 @@ function makeCustomLogicWithRequestData(fullRequestData){
     // Откроем форму добавления новой задачи
     document.getElementById('addTaskBtn').click();
 
-    // Заполним форму данными из хост-системы
-    const taskForm = document.getElementById('taskForm');
-    const contactPerson = fullRequestData.contactPersonsData[0];
-    const operator = fullRequestData.operatorData;
-    taskForm.elements.name.value = `Обслуживание клиента ${contactPerson.firstName ?? ''} ${contactPerson.lastName ?? ''} оператором ${operator.firstName ?? ''} ${operator.lastName ?? ''}`;
-    taskForm.elements.description.value = `Заголовок: ${fullRequestData.requestData.title};
-      Внутренний id: ${fullRequestData.requestData.id};
-      Внешний id: ${fullRequestData.requestData.externalId};
-      Канал: ${fullRequestData.requestData.channelType};
-      Адрес: ${fullRequestData.requestData.originator};
-      Дата регистрации: ${new Date(fullRequestData.requestData.timeRegistered).toLocaleString()};
-      Тематики: ${fullRequestData.requestSubjectLinks?.map(s => s.subjectName).join(' | ') ?? '-'};`
-    taskForm.elements.metadata.value = JSON.stringify(fullRequestData, null, '  ');
 
-    taskForm.addEventListener('submit', () => {
-      setTimeout(() => {
-        // Через секунду после отправки формы выполняем проверку на наличие задач снова, чтобы обновить состояние
-        makeCustomLogicWithRequestData(fullRequestData)
-      }, 1000);
-    })
+    setTimeout(() => {
 
-    // При необходимости можно сохранить автоматически
-    // taskForm.submit();
+      // Заполним форму данными из хост-системы
+      const taskForm = document.getElementById('taskForm');
+      const contactPerson = fullRequestData.contactPersonsData[0];
+      const operator = fullRequestData.operatorData;
+      taskForm.elements.name.value = `Обслуживание клиента ${contactPerson.firstName ?? ''} ${contactPerson.lastName ?? ''} оператором ${operator.firstName ?? ''} ${operator.lastName ?? ''}`;
+      taskForm.elements.description.value = `Заголовок: ${fullRequestData.requestData.title};
+        Внутренний id: ${fullRequestData.requestData.id};
+        Внешний id: ${fullRequestData.requestData.externalId};
+        Канал: ${fullRequestData.requestData.channelType};
+        Адрес: ${fullRequestData.requestData.originator};
+        Дата регистрации: ${new Date(fullRequestData.requestData.timeRegistered).toLocaleString()};
+        Тематики: ${fullRequestData.requestSubjectLinks?.map(s => s.subjectName).join(' | ') ?? '-'};`
+      taskForm.elements.metadata.value = JSON.stringify(fullRequestData, null, '  ');
+
+      taskForm.addEventListener('submit', () => {
+        setTimeout(() => {
+          // Через секунду после отправки формы выполняем проверку на наличие задач снова, чтобы обновить состояние
+          makeCustomLogicWithRequestData(fullRequestData)
+        }, 1000);
+      })
+
+      // При необходимости можно сохранить автоматически
+      // taskForm.submit();
+
+    }, 1000)
+
 
     if (checkNotEmpty) sendIntegrationMessage('ProductRequestActionError', 'Требуется хотя бы одна задача для завершения обращения');
 
