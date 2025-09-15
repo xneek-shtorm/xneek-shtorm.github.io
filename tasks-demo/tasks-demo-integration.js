@@ -1,4 +1,5 @@
-// Пример интеграции
+(() => {
+  // Пример интеграции
 const searchParams = new URLSearchParams(window.location.search);
 // Идентификатор сайта, нужен для работы со счетчиком-индикатором. Должен совпадать с id из настройки custom-sites-tabs
 const siteId = searchParams.get('site-id') || 'tasks-demo-integration';
@@ -102,3 +103,5 @@ function makeCustomLogicWithRequestData(fullRequestData){
     }
   }
 }
+
+})()
