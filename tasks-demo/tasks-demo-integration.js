@@ -10,7 +10,7 @@ function sendIntegrationMessage(action, payload = null) {
   if (!window.parent) throw new Error('Не обнаружено родительское окно для отправки post-message');
   const msg = JSON.stringify({ action, payload });
   window.parent.postMessage(msg, document.referrer.length > 0 ? document.referrer : undefined);
-  console.debug('sendIntegrationMessage', msg)
+  console.debug('sendIntegrationMessage', msg, location.search)
 };
 
 /** Обработчик сообщений post-message поучаемых от хост системы */
