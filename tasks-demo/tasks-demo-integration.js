@@ -17,7 +17,16 @@ function handlePostMessage(event) {
   const { action = null, payload = null } = JSON.parse(event.data);
 
   if (action === 'ProductRequestChanged') {
-    makeCustomLogicWithRequestData(payload)
+
+    if (!(/avelana-\d+/.test(searchParams.get('project')))) {
+      // Если нет корректного проекта, редиректим на нужный requestId
+      searchParams.set('project', `avelana-${fullRequestData.requestData.id}`);
+      window.location.href = `?${searchParams.toString()}`;
+    } else {
+      makeCustomLogicWithRequestData(payload)
+    }
+
+    
   }
 }
 
@@ -32,12 +41,7 @@ setTimeout(() => {
 
 
 function makeCustomLogicWithRequestData(fullRequestData){
-  if (!(/avelana-\d+/.test(searchParams.get('project')))) {
-    // Если запуск в режиме проверки, и нет корректного проекта, редиректим на нужный requestId
-    searchParams.set('project', `avelana-${fullRequestData.requestData.id}`);
-    window.location.href = `?${searchParams.toString()}`;
-    return;
-  }
+ 
 
 
   // Получаем элементы задач
