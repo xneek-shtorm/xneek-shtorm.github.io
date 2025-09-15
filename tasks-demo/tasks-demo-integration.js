@@ -87,7 +87,7 @@ function makeCustomLogicWithRequestData(fullRequestData){
     sendIntegrationMessage('ProductSetCounter', { siteId, count: 0 });
 
     // Если сайт открыт в режиме проверки на непустой список - отправляем сообщение о том, что проверка
-    if (checkNotEmpty) {
+    if (Boolean(searchParams.get('check-not-empty'))) {
       sendIntegrationMessage('ProductRequestActionProcessed');
     }
   }
