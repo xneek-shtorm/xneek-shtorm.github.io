@@ -3,6 +3,7 @@ const searchParams = new URLSearchParams(window.location.search);
 // Идентификатор сайта, нужен для работы со счетчиком-индикатором. Должен совпадать с id из настройки custom-sites-tabs
 const siteId = searchParams.get('site-id') || 'tasks-demo-integration';
 const checkNotEmpty = Boolean(searchParams.get('check-not-empty'));
+const project = searchParams.get('project');
 
 /** Вспомогательная функция для отправки сообщения в формате action + payload */
 function sendIntegrationMessage(action, payload = null) {
@@ -18,7 +19,7 @@ function handlePostMessage(event) {
 
   if (action === 'ProductRequestChanged') {
 
-    if (!(/avelana-\d+/.test(searchParams.get('project')))) {
+    if (!project || !(/avelana-\d+/.test(project))) {
       // Если нет корректного проекта, редиректим на нужный requestId
       searchParams.set('project', `avelana-${payload.requestData.id}`);
       console.log('Redirect to', `?${searchParams.toString()}`)
@@ -43,7 +44,7 @@ window.addEventListener('load', () => {
 
 
 
-function makeCustomLogicWithRequestData(fullRequestData, checkMode=false){
+function makeCustomLogicWithRequestData(fullRequestData){
  
 
 
@@ -94,7 +95,7 @@ function makeCustomLogicWithRequestData(fullRequestData, checkMode=false){
     // Сбросим счетчик-индикатор в хост-системе чтобы не привлекать внимание
     sendIntegrationMessage('ProductSetCounter', { siteId, count: 0 });
 
-    console.log('xneek', {checkNotEmpty, siteId})
+    console.log('xneek', {checkNotEmpty, siteId, project, href: window.location.href})
     // Если сайт открыт в режиме проверки на непустой список - отправляем сообщение о том, что проверка
     if (checkNotEmpty) {
       sendIntegrationMessage('ProductRequestActionProcessed');
