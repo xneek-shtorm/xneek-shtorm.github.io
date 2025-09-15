@@ -31,7 +31,7 @@ setTimeout(() => {
 
 
 function makeCustomLogicWithRequestData(fullRequestData){
-  if (checkNotEmpty && !searchParams.get('project')?.test(/avelana-\d+/)) {
+  if (checkNotEmpty && !/avelana-\d+/.test(searchParams.get('project'))) {
     // Если запуск в режиме проверки, и нет корректного проекта, редиректим на нужный requestId
     searchParams.set('project', `avelana-${fullRequestData.requestData.id}`);
     window.location.href = `?${searchParams.toString()}`
