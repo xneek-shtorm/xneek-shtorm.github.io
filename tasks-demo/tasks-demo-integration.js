@@ -16,7 +16,7 @@ function sendIntegrationMessage(action, payload = null) {
 /** Обработчик сообщений post-message поучаемых от хост системы */
 function handlePostMessage(event) {
   const { action = null, payload = null } = JSON.parse(event.data);
-
+console.debug('handlePostMessage', event.data, location.search)
   if (action === 'ProductRequestChanged') {
 
     if (!project || !(/avelana-\d+/.test(project))) {
