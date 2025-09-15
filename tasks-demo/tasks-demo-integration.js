@@ -21,7 +21,6 @@ function handlePostMessage(event) {
     if (!(/avelana-\d+/.test(searchParams.get('project')))) {
       // Если нет корректного проекта, редиректим на нужный requestId
       searchParams.set('project', `avelana-${payload.requestData.id}`);
-      searchParams.set('check-not-empty', checkNotEmpty);
       console.log('Redirect to', `?${searchParams.toString()}`)
       window.location.href = `?${searchParams.toString()}`;
     } else {
@@ -34,11 +33,13 @@ function handlePostMessage(event) {
 
 window.addEventListener('message', handlePostMessage);
 
-setTimeout(() => {
-  // Сообщаем о готовности принимать сообщения от хост-системы
-  // В ответ на это сообщение хост-система в событии ProductRequestChanged пришлет данные текущего обращения (если такое имеется)
-  sendIntegrationMessage('ProductChildReady');
-}, 1000);
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    // Сообщаем о готовности принимать сообщения от хост-системы
+    // В ответ на это сообщение хост-система в событии ProductRequestChanged пришлет данные текущего обращения (если такое имеется)
+    sendIntegrationMessage('ProductChildReady');
+  }, 1000);
+})
 
 
 
@@ -93,6 +94,7 @@ function makeCustomLogicWithRequestData(fullRequestData, checkMode=false){
     // Сбросим счетчик-индикатор в хост-системе чтобы не привлекать внимание
     sendIntegrationMessage('ProductSetCounter', { siteId, count: 0 });
 
+    console.log('xneek', {checkNotEmpty, siteId})
     // Если сайт открыт в режиме проверки на непустой список - отправляем сообщение о том, что проверка
     if (checkNotEmpty) {
       sendIntegrationMessage('ProductRequestActionProcessed');
