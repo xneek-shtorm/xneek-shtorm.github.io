@@ -36,7 +36,6 @@ function makeCustomLogicWithRequestData(fullRequestData){
     // Если запуск в режиме проверки, и нет корректного проекта, редиректим на нужный requestId
     searchParams.set('project', `avelana-${fullRequestData.requestData.id}`);
     window.location.href = `?${searchParams.toString()}`;
-    window.location.reload();
     return;
   }
 
