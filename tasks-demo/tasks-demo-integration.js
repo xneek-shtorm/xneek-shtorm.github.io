@@ -90,7 +90,7 @@ function makeCustomLogicWithRequestData(fullRequestData){
   } else {
     // Сбросим счетчик-индикатор в хост-системе чтобы не привлекать внимание
     sendIntegrationMessage('ProductSetCounter', { siteId, count: 0 });
-console.log('xneek', Boolean(searchParams.get('check-not-empty')))
+console.log('xneek', Boolean(searchParams.get('check-not-empty'), searchParams.get('check-not-empty'), searchParams.entries))
     // Если сайт открыт в режиме проверки на непустой список - отправляем сообщение о том, что проверка
     if (checkNotEmpty) {
       sendIntegrationMessage('ProductRequestActionProcessed');
