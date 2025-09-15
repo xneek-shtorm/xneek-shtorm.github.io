@@ -20,8 +20,8 @@ function handlePostMessage(event) {
 
     if (!(/avelana-\d+/.test(searchParams.get('project')))) {
       // Если нет корректного проекта, редиректим на нужный requestId
-      const url = new URL(window.location.href);
-      url.searchParams.set('project', `avelana-${payload.requestData.id}`);
+      searchParams.set('project', `avelana-${payload.requestData.id}`);
+      searchParams.set('check-not-empty', checkNotEmpty);
       window.location.href = `?${searchParams.toString()}`;
     } else {
       makeCustomLogicWithRequestData(payload)
@@ -91,10 +91,9 @@ function makeCustomLogicWithRequestData(fullRequestData, checkMode=false){
   } else {
     // Сбросим счетчик-индикатор в хост-системе чтобы не привлекать внимание
     sendIntegrationMessage('ProductSetCounter', { siteId, count: 0 });
-const searchParams = new URLSearchParams(window.location.search);
-console.log('xneek', searchParams, searchParams.entries(), window.location.search, window.location.href)
+
     // Если сайт открыт в режиме проверки на непустой список - отправляем сообщение о том, что проверка
-    if (searchParams.get('check-not-empty')) {
+    if (checkNotEmpty) {
       sendIntegrationMessage('ProductRequestActionProcessed');
     }
   }
