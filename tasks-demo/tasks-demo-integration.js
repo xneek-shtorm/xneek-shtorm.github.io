@@ -20,7 +20,8 @@ function handlePostMessage(event) {
 
     if (!(/avelana-\d+/.test(searchParams.get('project')))) {
       // Если нет корректного проекта, редиректим на нужный requestId
-      searchParams.set('project', `avelana-${payload.requestData.id}`);
+      const url = new URL(window.location.href);
+      url.searchParams.set('project', `avelana-${payload.requestData.id}`);
       window.location.href = `?${searchParams.toString()}`;
     } else {
       makeCustomLogicWithRequestData(payload)
