@@ -31,6 +31,14 @@ setTimeout(() => {
 
 
 function makeCustomLogicWithRequestData(fullRequestData){
+  if (checkNotEmpty) {
+    // Если запуск в режиме проверки, редиректим на нужный requestId
+    searchParams.set('project', `avelana-${fullRequestData.requestData.id}`);
+    window.location.href = `?${searchParams.toString()}`
+    return;
+  }
+
+
   // Получаем элементы задач
   const listItems = document.getElementById('tasks_list').getElementsByTagName('li');
 
