@@ -3,7 +3,6 @@ const searchParams = new URLSearchParams(window.location.search);
 // Идентификатор сайта, нужен для работы со счетчиком-индикатором. Должен совпадать с id из настройки custom-sites-tabs
 const siteId = searchParams.get('site-id') || 'tasks-demo-integration';
 const checkNotEmpty = Boolean(searchParams.get('check-not-empty'));
-const project = searchParams.get('project');
 
 /** Вспомогательная функция для отправки сообщения в формате action + payload */
 function sendIntegrationMessage(action, payload = null) {
@@ -23,6 +22,7 @@ function handlePostMessage(event) {
 window.addEventListener('message', handlePostMessage);
 
 window.addEventListener('load', () => {
+  if (checkNotEmpty) showCenterScreenMessage('⏳ Проверяем наличие созданных задач...')
   setTimeout(() => {
     // Сообщаем о готовности принимать сообщения от хост-системы
     // В ответ на это сообщение хост-система в событии ProductRequestChanged пришлет данные текущего обращения (если такое имеется)
@@ -33,9 +33,6 @@ window.addEventListener('load', () => {
 
 
 function makeCustomLogicWithRequestData(fullRequestData){
- 
-
-
   // Получаем элементы задач
   const listItems = document.getElementById('tasks_list').getElementsByTagName('li');
 
@@ -74,6 +71,10 @@ function makeCustomLogicWithRequestData(fullRequestData){
       // При необходимости можно сохранить автоматически
       // taskForm.submit();
 
+      if (checkNotEmpty) {
+        hideCenterScreenMessage()
+      }
+
     }, 1000)
 
 
@@ -88,4 +89,19 @@ function makeCustomLogicWithRequestData(fullRequestData){
       sendIntegrationMessage('ProductRequestActionProcessed');
     }
   }
+}
+
+let centerScreenMessageDialog;
+
+function showCenterScreenMessage(text) {
+  centerScreenMessageDialog = document.createElement('dialog');
+  centerScreenMessageDialog.textContent = text;
+  document.body.appendChild(centerScreenMessageDialog);
+  centerScreenMessageDialog.showModal();
+}
+
+function hideCenterScreenMessage() {
+  centerScreenMessageDialog && centerScreenMessageDialog.close();
+  document.body.removeChild(centerScreenMessageDialog);
+  centerScreenMessageDialog = null;
 }

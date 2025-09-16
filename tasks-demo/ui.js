@@ -1,6 +1,7 @@
 export class Item {
   constructor(taskData) {
       const li = document.createElement('li');
+      li.classList.add(taskData.isComplete ? 'completed' : 'uncompleted')
 
       const a = document.createElement('a');
       a.href = `#${taskData.id}`
