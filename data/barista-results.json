@@ -6,6 +6,8 @@
             "dob": "1990-05-21",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2012-08-31",
                     "id": 1,
                     "isBoss": false,
@@ -21,6 +23,26 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                        {
+                            "bonus": 15990,
+                            "charter": true,
+                            "date": "2020-12-27",
+                            "name": "Лучший вспениватель молока на новогоднем корпоративе"
+                        },
+                        {
+                            "bonus": 5000,
+                            "charter": false,
+                            "date": "2021-05-27",
+                            "name": "Лучший мидл среди джунов"
+                        },
+                        {
+                            "bonus": 50000,
+                            "charter": true,
+                            "date": "2022-05-27",
+                            "name": "Бариста года"
+                        }
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": true,
@@ -70,6 +92,14 @@
             "dob": "1988-12-15",
             "experience": [
                 {
+                    "awards": [
+                        {
+                            "bonus": 0,
+                            "charter": false,
+                            "date": "2023-01-27",
+                            "name": "Похлопывание по плечу"
+                        }
+                    ],
                     "finish": "2020-11-30",
                     "id": 1,
                     "isBoss": true,
@@ -113,6 +143,8 @@
             "dob": "1995-07-03",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2021-02-28",
                     "id": 1,
                     "isBoss": false,
@@ -128,6 +160,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": true,
@@ -187,6 +221,8 @@
             "dob": "1992-11-28",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 1,
                     "isBoss": true,
@@ -234,6 +270,8 @@
             "dob": "1987-03-14",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2020-05-20",
                     "id": 1,
                     "isBoss": false,
@@ -280,6 +318,8 @@
             "dob": "1993-08-22",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2022-12-31",
                     "id": 1,
                     "isBoss": false,
@@ -295,6 +335,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": false,
@@ -352,6 +394,8 @@
             "dob": "1991-06-30",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2018-03-15",
                     "id": 1,
                     "isBoss": false,
@@ -366,6 +410,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": "2021-08-10",
                     "id": 2,
                     "isBoss": true,
@@ -380,6 +426,8 @@
                     "subordinates": 3
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 3,
                     "isBoss": true,
@@ -455,6 +503,8 @@
             "dob": "1994-01-25",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2019-11-30",
                     "id": 1,
                     "isBoss": false,
@@ -470,6 +520,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": "2022-06-20",
                     "id": 2,
                     "isBoss": true,
@@ -485,6 +537,8 @@
                     "subordinates": 4
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 3,
                     "isBoss": true,
@@ -533,6 +587,8 @@
             "dob": "1996-09-12",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 1,
                     "isBoss": false,
@@ -607,6 +663,8 @@
             "dob": "1990-07-19",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2017-05-15",
                     "id": 1,
                     "isBoss": false,
@@ -621,6 +679,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": false,
@@ -673,6 +733,8 @@
             "dob": "1993-03-08",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2019-12-31",
                     "id": 1,
                     "isBoss": false,
@@ -687,6 +749,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": true,
@@ -762,6 +826,8 @@
             "dob": "1995-02-27",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2020-07-20",
                     "id": 1,
                     "isBoss": false,
@@ -776,6 +842,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": true,
@@ -826,6 +894,8 @@
             "dob": "1992-11-03",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2018-04-15",
                     "id": 1,
                     "isBoss": false,
@@ -840,6 +910,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": true,
@@ -914,6 +986,8 @@
             "dob": "1994-04-14",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2021-02-28",
                     "id": 1,
                     "isBoss": false,
@@ -929,6 +1003,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 2,
                     "isBoss": false,
@@ -979,6 +1055,8 @@
             "dob": "1991-08-07",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2017-09-30",
                     "id": 1,
                     "isBoss": false,
@@ -993,6 +1071,8 @@
                     "subordinates": 0
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": "2022-05-20",
                     "id": 2,
                     "isBoss": true,
@@ -1008,6 +1088,8 @@
                     "subordinates": 4
                 },
                 {
+                    "awards": [
+                    ],
                     "finish": null,
                     "id": 3,
                     "isBoss": true,
@@ -1053,6 +1135,8 @@
             "dob": "1997-12-30",
             "experience": [
                 {
+                    "awards": [
+                    ],
                     "finish": "2021-06-30",
                     "id": 1,
                     "isBoss": false,

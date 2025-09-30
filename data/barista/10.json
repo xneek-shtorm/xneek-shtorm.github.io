@@ -36,6 +36,7 @@
       "salary": 52000,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Приготовление кофе",
         "Обслуживание клиентов",

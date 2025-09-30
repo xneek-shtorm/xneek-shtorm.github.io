@@ -34,6 +34,7 @@
       "salary": 35000,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Подготовка ингредиентов",
         "Мытье посуды",

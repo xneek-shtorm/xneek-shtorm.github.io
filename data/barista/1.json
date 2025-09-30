@@ -36,6 +36,7 @@
       "salary": 49999.99,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Следил за временем",
         "Звал всех на кофебрейки",
@@ -51,6 +52,26 @@
       "salary": 100000,
       "subordinates": 3,
       "isBoss": true,
+      "awards": [
+        {
+          "name": "Лучший вспениватель молока на новогоднем корпоративе",
+          "date": "2020-12-27",
+          "bonus": 15990,
+          "charter": true
+        },
+        {
+          "name": "Лучший мидл среди джунов",
+          "date": "2021-05-27",
+          "bonus": 5000,
+          "charter": false
+        },
+        {
+          "name": "Бариста года",
+          "date": "2022-05-27",
+          "bonus": 50000,
+          "charter": true
+        }
+      ],
       "responsibilities": [
         "Варил кофе",
         "Вспенивал молоко"

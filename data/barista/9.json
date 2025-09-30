@@ -32,6 +32,7 @@
       "salary": 48000,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Приготовление кофе",
         "Работа с кассой",
@@ -47,6 +48,7 @@
       "salary": 65000,
       "subordinates": 4,
       "isBoss": true,
+      "awards": [],
       "responsibilities": [
         "Управление сменой",
         "Контроль качества",
@@ -62,6 +64,7 @@
       "salary": 95000,
       "subordinates": 8,
       "isBoss": true,
+      "awards": [],
       "responsibilities": [
         "Разработка меню",
         "Обжарка кофе",

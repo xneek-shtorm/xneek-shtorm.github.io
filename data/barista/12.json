@@ -38,6 +38,7 @@
       "salary": 42000,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Приготовление кофе",
         "Работа с клиентами"
@@ -52,6 +53,7 @@
       "salary": 68000,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Создание латте-арта",
         "Проведение мастер-классов",

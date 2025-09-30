@@ -30,6 +30,7 @@
       "salary": 120000,
       "subordinates": 8,
       "isBoss": true,
+      "awards": [],
       "responsibilities": [
         "Управление кофейней",
         "Разработка меню",

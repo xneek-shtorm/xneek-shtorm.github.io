@@ -37,6 +37,7 @@
       "salary": 49000,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Приготовление кофе",
         "Работа с клиентами",
@@ -52,6 +53,7 @@
       "salary": 71000,
       "subordinates": 0,
       "isBoss": false,
+      "awards": [],
       "responsibilities": [
         "Обучение новых бариста",
         "Контроль качества",

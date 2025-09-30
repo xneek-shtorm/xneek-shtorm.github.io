@@ -1,736 +1,1180 @@
 [
-  {
-    "id": 1,
-    "name": "Иванов Иван Иванович",
-    "dob": "1990-05-21",
-    "sertifiedBarista": true,
-    "skills": ["americano", "espresso", "latte"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-29T18:00:32Z",
-    "places": {
-      "home": {
-        "address": "Пенза, ул. Московская, д. 69, кв. 43",
-        "coordinates": [53.12001, 45.00002]
-      },
-      "work": {
-        "address": "Пенза, ул. Кирова, д. 28",
-        "coordinates": [53.12321, 45.001235]
-      }
-    },
-    "experience": [
-      {
+    {
+        "coffeeWithShugar": true,
+        "dob": "1990-05-21",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2012-08-31",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Джун бариста",
+                "name": "ООО Ололо",
+                "responsibilities": [
+                    "Следил за временем",
+                    "Звал всех на кофебрейки",
+                    "Принимал участие в приготовлении эспрессо"
+                ],
+                "salary": 49999.99,
+                "start": "2010-01-01",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                    {
+                        "bonus": 15990,
+                        "charter": true,
+                        "date": "2020-12-27",
+                        "name": "Лучший вспениватель молока на новогоднем корпоративе"
+                    },
+                    {
+                        "bonus": 5000,
+                        "charter": false,
+                        "date": "2021-05-27",
+                        "name": "Лучший мидл среди джунов"
+                    },
+                    {
+                        "bonus": 50000,
+                        "charter": true,
+                        "date": "2022-05-27",
+                        "name": "Бариста года"
+                    }
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Мидл бариста",
+                "name": "ООО Трололо",
+                "responsibilities": [
+                    "Варил кофе",
+                    "Вспенивал молоко"
+                ],
+                "salary": 100000,
+                "start": "2012-09-01",
+                "subordinates": 3
+            }
+        ],
         "id": 1,
-        "name": "ООО Ололо",
-        "jobTitle": "Джун бариста",
-        "start": "2010-01-01",
-        "finish": "2012-08-31",
-        "salary": 49999.99,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Следил за временем", "Звал всех на кофебрейки", "Принимал участие в приготовлении эспрессо"]
-      },
-      {
+        "lastCofee": "2025-09-29T18:00:32Z",
+        "name": "Иванов Иван Иванович",
+        "places": {
+            "home": {
+                "address": "Пенза, ул. Московская, д. 69, кв. 43",
+                "coordinates": [
+                    53.12001,
+                    45.00002
+                ]
+            },
+            "work": {
+                "address": "Пенза, ул. Кирова, д. 28",
+                "coordinates": [
+                    53.12321,
+                    45.001235
+                ]
+            }
+        },
+        "referralIds": [
+            2,
+            3
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "americano",
+            "espresso",
+            "latte"
+        ]
+    },
+    {
+        "coffeeWithShugar": false,
+        "dob": "1988-12-15",
+        "experience": [
+            {
+                "awards": [
+                    {
+                        "bonus": 0,
+                        "charter": false,
+                        "date": "2023-01-27",
+                        "name": "Похлопывание по плечу"
+                    }
+                ],
+                "finish": "2020-11-30",
+                "id": 1,
+                "isBoss": true,
+                "jobTitle": "Бариста",
+                "name": "Кофейня 'У Анны'",
+                "responsibilities": [
+                    "Обучение новых сотрудников",
+                    "Контроль качества",
+                    "Разработка новых рецептов"
+                ],
+                "salary": 65000,
+                "start": "2015-03-01",
+                "subordinates": 2
+            }
+        ],
         "id": 2,
-        "name": "ООО Трололо",
-        "jobTitle": "Мидл бариста",
-        "start": "2012-09-01",
-        "finish": null,
-        "salary": 100000,
-        "subordinates": 3,
-        "isBoss": true,
-        "responsibilities": ["Варил кофе", "Вспенивал молоко"]
-      }
-    ],
-    "referralIds": [2, 3]
-  },
-  {
-    "id": 2,
-    "name": "Петрова Анна Сергеевна",
-    "dob": "1988-12-15",
-    "sertifiedBarista": false,
-    "skills": ["cappuccino", "flat white"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-28T09:15:22Z",
-    "places": {
-      "home": {
-        "address": "Москва, ул. Тверская, д. 15, кв. 12",
-        "coordinates": [55.76001, 37.61759]
-      }
+        "lastCofee": "2025-09-28T09:15:22Z",
+        "name": "Петрова Анна Сергеевна",
+        "places": {
+            "home": {
+                "address": "Москва, ул. Тверская, д. 15, кв. 12",
+                "coordinates": [
+                    55.76001,
+                    37.61759
+                ]
+            }
+        },
+        "referralIds": [
+            1,
+            4,
+            5
+        ],
+        "sertifiedBarista": false,
+        "skills": [
+            "cappuccino",
+            "flat white"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Кофейня 'У Анны'",
-        "jobTitle": "Бариста",
-        "start": "2015-03-01",
-        "finish": "2020-11-30",
-        "salary": 65000,
-        "subordinates": 2,
-        "isBoss": true,
-        "responsibilities": ["Обучение новых сотрудников", "Контроль качества", "Разработка новых рецептов"]
-      }
-    ],
-    "referralIds": [1, 4, 5]
-  },
-  {
-    "id": 3,
-    "name": "Сидоров Алексей Петрович",
-    "dob": "1995-07-03",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "macchiato", "ristretto", "cold brew"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-30T07:30:45Z",
-    "places": {
-      "home": {
-        "address": "Санкт-Петербург, Невский пр., д. 45, кв. 78",
-        "coordinates": [59.93583, 30.32587]
-      },
-      "work": {
-        "address": "Санкт-Петербург, ул. Садовая, д. 12",
-        "coordinates": [59.93111, 30.32098]
-      },
-      "secondWork": {
-        "address": "Санкт-Петербург, Лиговский пр., д. 89",
-        "coordinates": [59.92876, 30.35892]
-      }
-    },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Starbucks",
-        "jobTitle": "Бариста",
-        "start": "2018-06-15",
-        "finish": "2021-02-28",
-        "salary": 55000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Обслуживание клиентов", "Уборка рабочего места"]
-      },
-      {
-        "id": 2,
-        "name": "Coffeeman",
-        "jobTitle": "Старший бариста",
-        "start": "2021-03-01",
-        "finish": null,
-        "salary": 85000,
-        "subordinates": 5,
-        "isBoss": true,
-        "responsibilities": ["Управление сменой", "Контроль качества", "Обучение персонала", "Заказ расходных материалов"]
-      }
-    ],
-    "referralIds": [1, 6]
-  },
-  {
-    "id": 4,
-    "name": "Козлова Мария Дмитриевна",
-    "dob": "1992-11-28",
-    "sertifiedBarista": true,
-    "skills": ["latte", "cappuccino", "mocha", "affogato"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-29T14:20:18Z",
-    "places": {
-      "home": {
-        "address": "Екатеринбург, ул. Ленина, д. 33, кв. 21",
-        "coordinates": [56.83801, 60.59747]
-      }
-    },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Кофейня 'Мария'",
-        "jobTitle": "Владелец-бариста",
-        "start": "2017-09-10",
-        "finish": null,
-        "salary": 120000,
-        "subordinates": 8,
-        "isBoss": true,
-        "responsibilities": ["Управление кофейней", "Разработка меню", "Обучение персонала", "Закупка оборудования"]
-      }
-    ],
-    "referralIds": [2, 7, 8, 9]
-  },
-  {
-    "id": 5,
-    "name": "Николаев Денис Олегович",
-    "dob": "1987-03-14",
-    "sertifiedBarista": false,
-    "skills": ["americano"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-27T16:45:33Z",
-    "places": {
-      "home": {
-        "address": "Новосибирск, ул. Кирова, д. 56, кв. 34",
-        "coordinates": [55.03020, 82.92043]
-      },
-      "work": {
-        "address": "Новосибирск, Красный пр., д. 77",
-        "coordinates": [55.02847, 82.92249]
-      }
-    },
-    "experience": [
-      {
-        "id": 1,
-        "name": "ООО 'Вкусный кофе'",
-        "jobTitle": "Помощник бариста",
-        "start": "2019-01-15",
-        "finish": "2020-05-20",
-        "salary": 35000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Подготовка ингредиентов", "Мытье посуды", "Поддержание чистоты"]
-      }
-    ],
-    "referralIds": []
-  },
-  {
-    "id": 6,
-    "name": "Орлова Екатерина Викторовна",
-    "dob": "1993-08-22",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "latte", "cappuccino", "flat white", "macchiato", "cold brew", "pour over"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-30T08:10:05Z",
-    "places": {
-      "home": {
-        "address": "Казань, ул. Баумана, д. 23, кв. 15",
-        "coordinates": [55.79494, 49.10531]
-      },
-      "work": {
-        "address": "Казань, ул. Пушкина, д. 44",
-        "coordinates": [55.79123, 49.12245]
-      }
-    },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Coffee Lab",
-        "jobTitle": "Бариста-исследователь",
-        "start": "2016-04-01",
-        "finish": "2022-12-31",
-        "salary": 75000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Разработка новых рецептов", "Тестирование сортов кофе", "Проведение дегустаций"]
-      },
-      {
-        "id": 2,
-        "name": "Specialty Coffee Association",
-        "jobTitle": "Кофе-тренер",
-        "start": "2023-01-15",
-        "finish": null,
-        "salary": 110000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Обучение бариста", "Проведение мастер-классов", "Судья на чемпионатах"]
-      }
-    ],
-    "referralIds": [3, 10, 11, 12, 13]
-  },
-  {
-    "id": 7,
-    "name": "Волков Павел Игоревич",
-    "dob": "1991-06-30",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "americano", "cappuccino"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-29T22:15:47Z",
-    "places": {
-      "home": {
-        "address": "Ростов-на-Дону, ул. Большая Садовая, д. 67, кв. 9",
-        "coordinates": [47.22265, 39.71868]
-      }
-    },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Кофейня 'У Павла'",
-        "jobTitle": "Бариста",
-        "start": "2014-07-01",
-        "finish": "2018-03-15",
-        "salary": 45000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Обслуживание клиентов"]
-      },
-      {
-        "id": 2,
-        "name": "Coffee Time",
-        "jobTitle": "Сменный руководитель",
-        "start": "2018-03-20",
-        "finish": "2021-08-10",
-        "salary": 60000,
-        "subordinates": 3,
-        "isBoss": true,
-        "responsibilities": ["Управление сменой", "Обучение новых сотрудников"]
-      },
-      {
+    {
+        "coffeeWithShugar": true,
+        "dob": "1995-07-03",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2021-02-28",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Starbucks",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Обслуживание клиентов",
+                    "Уборка рабочего места"
+                ],
+                "salary": 55000,
+                "start": "2018-06-15",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Старший бариста",
+                "name": "Coffeeman",
+                "responsibilities": [
+                    "Управление сменой",
+                    "Контроль качества",
+                    "Обучение персонала",
+                    "Заказ расходных материалов"
+                ],
+                "salary": 85000,
+                "start": "2021-03-01",
+                "subordinates": 5
+            }
+        ],
         "id": 3,
-        "name": "Bean There",
-        "jobTitle": "Управляющий",
-        "start": "2021-08-15",
-        "finish": null,
-        "salary": 90000,
-        "subordinates": 12,
-        "isBoss": true,
-        "responsibilities": ["Управление кофейней", "Найм персонала", "Финансовый учет"]
-      }
-    ],
-    "referralIds": [4, 14]
-  },
-  {
-    "id": 8,
-    "name": "Смирнова Ольга Александровна",
-    "dob": "1989-04-18",
-    "sertifiedBarista": false,
-    "skills": ["latte"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-28T11:30:22Z",
-    "places": {
-      "home": {
-        "address": "Воронеж, пр. Революции, д. 39, кв. 6",
-        "coordinates": [51.66070, 39.20029]
-      },
-      "work": {
-        "address": "Воронеж, ул. Плехановская, д. 25",
-        "coordinates": [51.66198, 39.20345]
-      }
+        "lastCofee": "2025-09-30T07:30:45Z",
+        "name": "Сидоров Алексей Петрович",
+        "places": {
+            "home": {
+                "address": "Санкт-Петербург, Невский пр., д. 45, кв. 78",
+                "coordinates": [
+                    59.93583,
+                    30.32587
+                ]
+            },
+            "secondWork": {
+                "address": "Санкт-Петербург, Лиговский пр., д. 89",
+                "coordinates": [
+                    59.92876,
+                    30.35892
+                ]
+            },
+            "work": {
+                "address": "Санкт-Петербург, ул. Садовая, д. 12",
+                "coordinates": [
+                    59.93111,
+                    30.32098
+                ]
+            }
+        },
+        "referralIds": [
+            1,
+            6
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "macchiato",
+            "ristretto",
+            "cold brew"
+        ]
     },
-    "experience": [],
-    "referralIds": [4]
-  },
-  {
-    "id": 9,
-    "name": "Кузнецов Артем Владимирович",
-    "dob": "1994-01-25",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "americano", "cappuccino", "latte", "flat white", "mocha"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-30T06:45:19Z",
-    "places": {
-      "home": {
-        "address": "Краснодар, ул. Красная, д. 88, кв. 32",
-        "coordinates": [45.04016, 38.97596]
-      }
+    {
+        "coffeeWithShugar": false,
+        "dob": "1992-11-28",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 1,
+                "isBoss": true,
+                "jobTitle": "Владелец-бариста",
+                "name": "Кофейня 'Мария'",
+                "responsibilities": [
+                    "Управление кофейней",
+                    "Разработка меню",
+                    "Обучение персонала",
+                    "Закупка оборудования"
+                ],
+                "salary": 120000,
+                "start": "2017-09-10",
+                "subordinates": 8
+            }
+        ],
+        "id": 4,
+        "lastCofee": "2025-09-29T14:20:18Z",
+        "name": "Козлова Мария Дмитриевна",
+        "places": {
+            "home": {
+                "address": "Екатеринбург, ул. Ленина, д. 33, кв. 21",
+                "coordinates": [
+                    56.83801,
+                    60.59747
+                ]
+            }
+        },
+        "referralIds": [
+            2,
+            7,
+            8,
+            9
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "latte",
+            "cappuccino",
+            "mocha",
+            "affogato"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Coffee House",
-        "jobTitle": "Бариста",
-        "start": "2015-08-10",
-        "finish": "2019-11-30",
-        "salary": 48000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Работа с кассой", "Обслуживание клиентов"]
-      },
-      {
-        "id": 2,
-        "name": "Urban Coffee",
-        "jobTitle": "Старший бариста",
-        "start": "2019-12-15",
-        "finish": "2022-06-20",
-        "salary": 65000,
-        "subordinates": 4,
-        "isBoss": true,
-        "responsibilities": ["Управление сменой", "Контроль качества", "Обучение персонала"]
-      },
-      {
-        "id": 3,
-        "name": "Art Coffee Roasters",
-        "jobTitle": "Шеф-бариста",
-        "start": "2022-07-01",
-        "finish": null,
-        "salary": 95000,
-        "subordinates": 8,
-        "isBoss": true,
-        "responsibilities": ["Разработка меню", "Обжарка кофе", "Обучение персонала", "Контроль качества"]
-      }
-    ],
-    "referralIds": [4, 15, 16]
-  },
-  {
-    "id": 10,
-    "name": "Попова Ирина Станиславовна",
-    "dob": "1996-09-12",
-    "sertifiedBarista": true,
-    "skills": ["cappuccino", "latte", "flat white"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-29T19:25:14Z",
-    "places": {
-      "home": {
-        "address": "Уфа, ул. Ленина, д. 42, кв. 18",
-        "coordinates": [54.73515, 55.95873]
-      },
-      "work": {
-        "address": "Уфа, пр. Октября, д. 77",
-        "coordinates": [54.73342, 55.95781]
-      }
+    {
+        "coffeeWithShugar": true,
+        "dob": "1987-03-14",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2020-05-20",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Помощник бариста",
+                "name": "ООО 'Вкусный кофе'",
+                "responsibilities": [
+                    "Подготовка ингредиентов",
+                    "Мытье посуды",
+                    "Поддержание чистоты"
+                ],
+                "salary": 35000,
+                "start": "2019-01-15",
+                "subordinates": 0
+            }
+        ],
+        "id": 5,
+        "lastCofee": "2025-09-27T16:45:33Z",
+        "name": "Николаев Денис Олегович",
+        "places": {
+            "home": {
+                "address": "Новосибирск, ул. Кирова, д. 56, кв. 34",
+                "coordinates": [
+                    55.0302,
+                    82.92043
+                ]
+            },
+            "work": {
+                "address": "Новосибирск, Красный пр., д. 77",
+                "coordinates": [
+                    55.02847,
+                    82.92249
+                ]
+            }
+        },
+        "referralIds": [
+        ],
+        "sertifiedBarista": false,
+        "skills": [
+            "americano"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Кофейня 'Ирина'",
-        "jobTitle": "Бариста",
-        "start": "2017-05-20",
-        "finish": null,
-        "salary": 52000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Обслуживание клиентов", "Поддержание чистоты"]
-      }
-    ],
-    "referralIds": [6]
-  },
-  {
-    "id": 11,
-    "name": "Соколов Михаил Андреевич",
-    "dob": "1985-12-05",
-    "sertifiedBarista": false,
-    "skills": ["americano"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-27T08:50:33Z",
-    "places": {
-      "home": {
-        "address": "Пермь, ул. Сибирская, д. 29, кв. 11",
-        "coordinates": [58.01046, 56.22944]
-      }
+    {
+        "coffeeWithShugar": false,
+        "dob": "1993-08-22",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2022-12-31",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста-исследователь",
+                "name": "Coffee Lab",
+                "responsibilities": [
+                    "Разработка новых рецептов",
+                    "Тестирование сортов кофе",
+                    "Проведение дегустаций"
+                ],
+                "salary": 75000,
+                "start": "2016-04-01",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": false,
+                "jobTitle": "Кофе-тренер",
+                "name": "Specialty Coffee Association",
+                "responsibilities": [
+                    "Обучение бариста",
+                    "Проведение мастер-классов",
+                    "Судья на чемпионатах"
+                ],
+                "salary": 110000,
+                "start": "2023-01-15",
+                "subordinates": 0
+            }
+        ],
+        "id": 6,
+        "lastCofee": "2025-09-30T08:10:05Z",
+        "name": "Орлова Екатерина Викторовна",
+        "places": {
+            "home": {
+                "address": "Казань, ул. Баумана, д. 23, кв. 15",
+                "coordinates": [
+                    55.79494,
+                    49.10531
+                ]
+            },
+            "work": {
+                "address": "Казань, ул. Пушкина, д. 44",
+                "coordinates": [
+                    55.79123,
+                    49.12245
+                ]
+            }
+        },
+        "referralIds": [
+            3,
+            10,
+            11,
+            12,
+            13
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "latte",
+            "cappuccino",
+            "flat white",
+            "macchiato",
+            "cold brew",
+            "pour over"
+        ]
     },
-    "experience": [],
-    "referralIds": [6]
-  },
-  {
-    "id": 12,
-    "name": "Новикова Татьяна Борисовна",
-    "dob": "1990-07-19",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "latte", "cappuccino", "macchiato", "cold brew"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-30T10:05:27Z",
-    "places": {
-      "home": {
-        "address": "Волгоград, пр. Ленина, д. 53, кв. 24",
-        "coordinates": [48.71939, 44.50183]
-      },
-      "work": {
-        "address": "Волгоград, ул. Рабоче-Крестьянская, д. 18",
-        "coordinates": [48.71675, 44.50392]
-      }
+    {
+        "coffeeWithShugar": true,
+        "dob": "1991-06-30",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2018-03-15",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Кофейня 'У Павла'",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Обслуживание клиентов"
+                ],
+                "salary": 45000,
+                "start": "2014-07-01",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": "2021-08-10",
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Сменный руководитель",
+                "name": "Coffee Time",
+                "responsibilities": [
+                    "Управление сменой",
+                    "Обучение новых сотрудников"
+                ],
+                "salary": 60000,
+                "start": "2018-03-20",
+                "subordinates": 3
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 3,
+                "isBoss": true,
+                "jobTitle": "Управляющий",
+                "name": "Bean There",
+                "responsibilities": [
+                    "Управление кофейней",
+                    "Найм персонала",
+                    "Финансовый учет"
+                ],
+                "salary": 90000,
+                "start": "2021-08-15",
+                "subordinates": 12
+            }
+        ],
+        "id": 7,
+        "lastCofee": "2025-09-29T22:15:47Z",
+        "name": "Волков Павел Игоревич",
+        "places": {
+            "home": {
+                "address": "Ростов-на-Дону, ул. Большая Садовая, д. 67, кв. 9",
+                "coordinates": [
+                    47.22265,
+                    39.71868
+                ]
+            }
+        },
+        "referralIds": [
+            4,
+            14
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "americano",
+            "cappuccino"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Volga Coffee",
-        "jobTitle": "Бариста",
-        "start": "2013-02-10",
-        "finish": "2017-05-15",
-        "salary": 42000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Работа с клиентами"]
-      },
-      {
-        "id": 2,
-        "name": "Coffee Art Studio",
-        "jobTitle": "Бариста-художник",
-        "start": "2017-06-01",
-        "finish": null,
-        "salary": 68000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Создание латте-арта", "Проведение мастер-классов", "Разработка дизайнов"]
-      }
-    ],
-    "referralIds": [6, 17]
-  },
-  {
-    "id": 13,
-    "name": "Морозов Дмитрий Сергеевич",
-    "dob": "1993-03-08",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "americano", "cappuccino", "latte", "flat white"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-29T15:40:11Z",
-    "places": {
-      "home": {
-        "address": "Красноярск, ул. Карла Маркса, д. 95, кв. 7",
-        "coordinates": [56.01056, 92.85257]
-      }
+    {
+        "coffeeWithShugar": true,
+        "dob": "1989-04-18",
+        "experience": [
+        ],
+        "id": 8,
+        "lastCofee": "2025-09-28T11:30:22Z",
+        "name": "Смирнова Ольга Александровна",
+        "places": {
+            "home": {
+                "address": "Воронеж, пр. Революции, д. 39, кв. 6",
+                "coordinates": [
+                    51.6607,
+                    39.20029
+                ]
+            },
+            "work": {
+                "address": "Воронеж, ул. Плехановская, д. 25",
+                "coordinates": [
+                    51.66198,
+                    39.20345
+                ]
+            }
+        },
+        "referralIds": [
+            4
+        ],
+        "sertifiedBarista": false,
+        "skills": [
+            "latte"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Сибирский кофе",
-        "jobTitle": "Бариста",
-        "start": "2014-09-01",
-        "finish": "2019-12-31",
-        "salary": 47000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Обслуживание клиентов"]
-      },
-      {
-        "id": 2,
-        "name": "Coffee Masters",
-        "jobTitle": "Управляющий бариста",
-        "start": "2020-01-15",
-        "finish": null,
-        "salary": 78000,
-        "subordinates": 6,
-        "isBoss": true,
-        "responsibilities": ["Управление персоналом", "Контроль качества", "Обучение новых сотрудников"]
-      }
-    ],
-    "referralIds": [6]
-  },
-  {
-    "id": 14,
-    "name": "Федорова Елена Викторовна",
-    "dob": "1988-10-15",
-    "sertifiedBarista": false,
-    "skills": [],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-26T12:20:44Z",
-    "places": {
-      "home": {
-        "address": "Самара, ул. Куйбышева, д. 71, кв. 13",
-        "coordinates": [53.19906, 50.14039]
-      },
-      "work": {
-        "address": "Самара, ул. Гагарина, д. 33",
-        "coordinates": [53.20234, 50.14218]
-      }
+    {
+        "coffeeWithShugar": false,
+        "dob": "1994-01-25",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2019-11-30",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Coffee House",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Работа с кассой",
+                    "Обслуживание клиентов"
+                ],
+                "salary": 48000,
+                "start": "2015-08-10",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": "2022-06-20",
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Старший бариста",
+                "name": "Urban Coffee",
+                "responsibilities": [
+                    "Управление сменой",
+                    "Контроль качества",
+                    "Обучение персонала"
+                ],
+                "salary": 65000,
+                "start": "2019-12-15",
+                "subordinates": 4
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 3,
+                "isBoss": true,
+                "jobTitle": "Шеф-бариста",
+                "name": "Art Coffee Roasters",
+                "responsibilities": [
+                    "Разработка меню",
+                    "Обжарка кофе",
+                    "Обучение персонала",
+                    "Контроль качества"
+                ],
+                "salary": 95000,
+                "start": "2022-07-01",
+                "subordinates": 8
+            }
+        ],
+        "id": 9,
+        "lastCofee": "2025-09-30T06:45:19Z",
+        "name": "Кузнецов Артем Владимирович",
+        "places": {
+            "home": {
+                "address": "Краснодар, ул. Красная, д. 88, кв. 32",
+                "coordinates": [
+                    45.04016,
+                    38.97596
+                ]
+            }
+        },
+        "referralIds": [
+            4,
+            15,
+            16
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "americano",
+            "cappuccino",
+            "latte",
+            "flat white",
+            "mocha"
+        ]
     },
-    "experience": [],
-    "referralIds": [7]
-  },
-  {
-    "id": 15,
-    "name": "Григорьев Андрей Павлович",
-    "dob": "1995-02-27",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "americano", "cappuccino", "latte", "mocha", "affogato", "pour over"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-30T07:15:38Z",
-    "places": {
-      "home": {
-        "address": "Омск, ул. Лермонтова, д. 44, кв. 29",
-        "coordinates": [54.98485, 73.36746]
-      }
+    {
+        "coffeeWithShugar": true,
+        "dob": "1996-09-12",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Кофейня 'Ирина'",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Обслуживание клиентов",
+                    "Поддержание чистоты"
+                ],
+                "salary": 52000,
+                "start": "2017-05-20",
+                "subordinates": 0
+            }
+        ],
+        "id": 10,
+        "lastCofee": "2025-09-29T19:25:14Z",
+        "name": "Попова Ирина Станиславовна",
+        "places": {
+            "home": {
+                "address": "Уфа, ул. Ленина, д. 42, кв. 18",
+                "coordinates": [
+                    54.73515,
+                    55.95873
+                ]
+            },
+            "work": {
+                "address": "Уфа, пр. Октября, д. 77",
+                "coordinates": [
+                    54.73342,
+                    55.95781
+                ]
+            }
+        },
+        "referralIds": [
+            6
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "cappuccino",
+            "latte",
+            "flat white"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Coffee Planet",
-        "jobTitle": "Бариста",
-        "start": "2016-03-15",
-        "finish": "2020-07-20",
-        "salary": 45000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Работа с клиентами"]
-      },
-      {
-        "id": 2,
-        "name": "Specialty Coffee Omsk",
-        "jobTitle": "Шеф-бариста",
-        "start": "2020-08-01",
-        "finish": null,
-        "salary": 82000,
-        "subordinates": 5,
-        "isBoss": true,
-        "responsibilities": ["Управление кофейней", "Обучение персонала", "Контроль качества", "Разработка меню"]
-      }
-    ],
-    "referralIds": [9, 18, 19, 20]
-  },
-  {
-    "id": 16,
-    "name": "Лебедева Наталья Игоревна",
-    "dob": "1992-11-03",
-    "sertifiedBarista": true,
-    "skills": ["latte", "cappuccino", "flat white"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-29T21:30:52Z",
-    "places": {
-      "home": {
-        "address": "Челябинск, пр. Ленина, д. 39, кв. 16",
-        "coordinates": [55.15990, 61.40255]
-      },
-      "work": {
-        "address": "Челябинск, ул. Кирова, д. 82",
-        "coordinates": [55.16127, 61.40038]
-      }
+    {
+        "coffeeWithShugar": true,
+        "dob": "1985-12-05",
+        "experience": [
+        ],
+        "id": 11,
+        "lastCofee": "2025-09-27T08:50:33Z",
+        "name": "Соколов Михаил Андреевич",
+        "places": {
+            "home": {
+                "address": "Пермь, ул. Сибирская, д. 29, кв. 11",
+                "coordinates": [
+                    58.01046,
+                    56.22944
+                ]
+            }
+        },
+        "referralIds": [
+            6
+        ],
+        "sertifiedBarista": false,
+        "skills": [
+            "americano"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Уральская кофейня",
-        "jobTitle": "Бариста",
-        "start": "2014-07-10",
-        "finish": "2018-04-15",
-        "salary": 43000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Обслуживание клиентов"]
-      },
-      {
-        "id": 2,
-        "name": "Coffee Style",
-        "jobTitle": "Старший бариста",
-        "start": "2018-05-01",
-        "finish": null,
-        "salary": 62000,
-        "subordinates": 3,
-        "isBoss": true,
-        "responsibilities": ["Управление сменой", "Обучение персонала", "Контроль качества"]
-      }
-    ],
-    "referralIds": [9]
-  },
-  {
-    "id": 17,
-    "name": "Ковалев Алексей Дмитриевич",
-    "dob": "1987-06-21",
-    "sertifiedBarista": false,
-    "skills": ["americano"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-28T17:45:29Z",
-    "places": {
-      "home": {
-        "address": "Рязань, ул. Почтовая, д. 26, кв. 8",
-        "coordinates": [54.62983, 39.74197]
-      }
+    {
+        "coffeeWithShugar": false,
+        "dob": "1990-07-19",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2017-05-15",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Volga Coffee",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Работа с клиентами"
+                ],
+                "salary": 42000,
+                "start": "2013-02-10",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": false,
+                "jobTitle": "Бариста-художник",
+                "name": "Coffee Art Studio",
+                "responsibilities": [
+                    "Создание латте-арта",
+                    "Проведение мастер-классов",
+                    "Разработка дизайнов"
+                ],
+                "salary": 68000,
+                "start": "2017-06-01",
+                "subordinates": 0
+            }
+        ],
+        "id": 12,
+        "lastCofee": "2025-09-30T10:05:27Z",
+        "name": "Новикова Татьяна Борисовна",
+        "places": {
+            "home": {
+                "address": "Волгоград, пр. Ленина, д. 53, кв. 24",
+                "coordinates": [
+                    48.71939,
+                    44.50183
+                ]
+            },
+            "work": {
+                "address": "Волгоград, ул. Рабоче-Крестьянская, д. 18",
+                "coordinates": [
+                    48.71675,
+                    44.50392
+                ]
+            }
+        },
+        "referralIds": [
+            6,
+            17
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "latte",
+            "cappuccino",
+            "macchiato",
+            "cold brew"
+        ]
     },
-    "experience": [],
-    "referralIds": [12]
-  },
-  {
-    "id": 18,
-    "name": "Зайцева Ольга Владимировна",
-    "dob": "1994-04-14",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "cappuccino", "latte", "macchiato"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-30T09:20:16Z",
-    "places": {
-      "home": {
-        "address": "Тюмень, ул. Республики, д. 58, кв. 22",
-        "coordinates": [57.15299, 65.54122]
-      },
-      "work": {
-        "address": "Тюмень, ул. Первомайская, д. 31",
-        "coordinates": [57.15432, 65.54309]
-      }
+    {
+        "coffeeWithShugar": true,
+        "dob": "1993-03-08",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2019-12-31",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Сибирский кофе",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Обслуживание клиентов"
+                ],
+                "salary": 47000,
+                "start": "2014-09-01",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Управляющий бариста",
+                "name": "Coffee Masters",
+                "responsibilities": [
+                    "Управление персоналом",
+                    "Контроль качества",
+                    "Обучение новых сотрудников"
+                ],
+                "salary": 78000,
+                "start": "2020-01-15",
+                "subordinates": 6
+            }
+        ],
+        "id": 13,
+        "lastCofee": "2025-09-29T15:40:11Z",
+        "name": "Морозов Дмитрий Сергеевич",
+        "places": {
+            "home": {
+                "address": "Красноярск, ул. Карла Маркса, д. 95, кв. 7",
+                "coordinates": [
+                    56.01056,
+                    92.85257
+                ]
+            }
+        },
+        "referralIds": [
+            6
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "americano",
+            "cappuccino",
+            "latte",
+            "flat white"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Сибирские традиции",
-        "jobTitle": "Бариста",
-        "start": "2015-11-01",
-        "finish": "2021-02-28",
-        "salary": 49000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Работа с клиентами", "Поддержание чистоты"]
-      },
-      {
-        "id": 2,
-        "name": "Coffee Culture",
-        "jobTitle": "Бариста-тренер",
-        "start": "2021-03-15",
-        "finish": null,
-        "salary": 71000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Обучение новых бариста", "Контроль качества", "Проведение мастер-классов"]
-      }
-    ],
-    "referralIds": [15]
-  },
-  {
-    "id": 19,
-    "name": "Медведев Сергей Николаевич",
-    "dob": "1991-08-07",
-    "sertifiedBarista": true,
-    "skills": ["espresso", "americano", "cappuccino", "latte", "flat white", "cold brew"],
-    "coffeeWithShugar": true,
-    "lastCofee": "2025-09-29T13:55:41Z",
-    "places": {
-      "home": {
-        "address": "Иркутск, ул. Литвинова, д. 17, кв. 5",
-        "coordinates": [52.28639, 104.28066]
-      }
+    {
+        "coffeeWithShugar": false,
+        "dob": "1988-10-15",
+        "experience": [
+        ],
+        "id": 14,
+        "lastCofee": "2025-09-26T12:20:44Z",
+        "name": "Федорова Елена Викторовна",
+        "places": {
+            "home": {
+                "address": "Самара, ул. Куйбышева, д. 71, кв. 13",
+                "coordinates": [
+                    53.19906,
+                    50.14039
+                ]
+            },
+            "work": {
+                "address": "Самара, ул. Гагарина, д. 33",
+                "coordinates": [
+                    53.20234,
+                    50.14218
+                ]
+            }
+        },
+        "referralIds": [
+            7
+        ],
+        "sertifiedBarista": false,
+        "skills": [
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Байкальский кофе",
-        "jobTitle": "Бариста",
-        "start": "2013-04-20",
-        "finish": "2017-09-30",
-        "salary": 44000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Приготовление кофе", "Обслуживание клиентов"]
-      },
-      {
-        "id": 2,
-        "name": "Coffee Expert",
-        "jobTitle": "Старший бариста",
-        "start": "2017-10-15",
-        "finish": "2022-05-20",
-        "salary": 60000,
-        "subordinates": 4,
-        "isBoss": true,
-        "responsibilities": ["Управление сменой", "Обучение персонала", "Контроль качества"]
-      },
-      {
-        "id": 3,
-        "name": "Профи Кофе",
-        "jobTitle": "Управляющий",
-        "start": "2022-06-01",
-        "finish": null,
-        "salary": 88000,
-        "subordinates": 10,
-        "isBoss": true,
-        "responsibilities": ["Управление сетью кофеен", "Найм персонала", "Финансовое планирование"]
-      }
-    ],
-    "referralIds": [15]
-  },
-  {
-    "id": 20,
-    "name": "Павлова Анна Алексеевна",
-    "dob": "1997-12-30",
-    "sertifiedBarista": false,
-    "skills": ["latte"],
-    "coffeeWithShugar": false,
-    "lastCofee": "2025-09-27T10:10:25Z",
-    "places": {
-      "home": {
-        "address": "Томск, пр. Кирова, д. 63, кв. 19",
-        "coordinates": [56.48463, 84.94716]
-      },
-      "work": {
-        "address": "Томск, ул. Герцена, д. 12",
-        "coordinates": [56.48725, 84.94903]
-      }
+    {
+        "coffeeWithShugar": false,
+        "dob": "1995-02-27",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2020-07-20",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Coffee Planet",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Работа с клиентами"
+                ],
+                "salary": 45000,
+                "start": "2016-03-15",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Шеф-бариста",
+                "name": "Specialty Coffee Omsk",
+                "responsibilities": [
+                    "Управление кофейней",
+                    "Обучение персонала",
+                    "Контроль качества",
+                    "Разработка меню"
+                ],
+                "salary": 82000,
+                "start": "2020-08-01",
+                "subordinates": 5
+            }
+        ],
+        "id": 15,
+        "lastCofee": "2025-09-30T07:15:38Z",
+        "name": "Григорьев Андрей Павлович",
+        "places": {
+            "home": {
+                "address": "Омск, ул. Лермонтова, д. 44, кв. 29",
+                "coordinates": [
+                    54.98485,
+                    73.36746
+                ]
+            }
+        },
+        "referralIds": [
+            9,
+            18,
+            19,
+            20
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "americano",
+            "cappuccino",
+            "latte",
+            "mocha",
+            "affogato",
+            "pour over"
+        ]
     },
-    "experience": [
-      {
-        "id": 1,
-        "name": "Студенческая кофейня",
-        "jobTitle": "Помощник бариста",
-        "start": "2018-09-01",
-        "finish": "2021-06-30",
-        "salary": 32000,
-        "subordinates": 0,
-        "isBoss": false,
-        "responsibilities": ["Подготовка рабочего места", "Мытье посуды", "Поддержание чистоты"]
-      }
-    ],
-    "referralIds": [15]
-  }
+    {
+        "coffeeWithShugar": true,
+        "dob": "1992-11-03",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2018-04-15",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Уральская кофейня",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Обслуживание клиентов"
+                ],
+                "salary": 43000,
+                "start": "2014-07-10",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Старший бариста",
+                "name": "Coffee Style",
+                "responsibilities": [
+                    "Управление сменой",
+                    "Обучение персонала",
+                    "Контроль качества"
+                ],
+                "salary": 62000,
+                "start": "2018-05-01",
+                "subordinates": 3
+            }
+        ],
+        "id": 16,
+        "lastCofee": "2025-09-29T21:30:52Z",
+        "name": "Лебедева Наталья Игоревна",
+        "places": {
+            "home": {
+                "address": "Челябинск, пр. Ленина, д. 39, кв. 16",
+                "coordinates": [
+                    55.1599,
+                    61.40255
+                ]
+            },
+            "work": {
+                "address": "Челябинск, ул. Кирова, д. 82",
+                "coordinates": [
+                    55.16127,
+                    61.40038
+                ]
+            }
+        },
+        "referralIds": [
+            9
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "latte",
+            "cappuccino",
+            "flat white"
+        ]
+    },
+    {
+        "coffeeWithShugar": true,
+        "dob": "1987-06-21",
+        "experience": [
+        ],
+        "id": 17,
+        "lastCofee": "2025-09-28T17:45:29Z",
+        "name": "Ковалев Алексей Дмитриевич",
+        "places": {
+            "home": {
+                "address": "Рязань, ул. Почтовая, д. 26, кв. 8",
+                "coordinates": [
+                    54.62983,
+                    39.74197
+                ]
+            }
+        },
+        "referralIds": [
+            12
+        ],
+        "sertifiedBarista": false,
+        "skills": [
+            "americano"
+        ]
+    },
+    {
+        "coffeeWithShugar": false,
+        "dob": "1994-04-14",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2021-02-28",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Сибирские традиции",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Работа с клиентами",
+                    "Поддержание чистоты"
+                ],
+                "salary": 49000,
+                "start": "2015-11-01",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 2,
+                "isBoss": false,
+                "jobTitle": "Бариста-тренер",
+                "name": "Coffee Culture",
+                "responsibilities": [
+                    "Обучение новых бариста",
+                    "Контроль качества",
+                    "Проведение мастер-классов"
+                ],
+                "salary": 71000,
+                "start": "2021-03-15",
+                "subordinates": 0
+            }
+        ],
+        "id": 18,
+        "lastCofee": "2025-09-30T09:20:16Z",
+        "name": "Зайцева Ольга Владимировна",
+        "places": {
+            "home": {
+                "address": "Тюмень, ул. Республики, д. 58, кв. 22",
+                "coordinates": [
+                    57.15299,
+                    65.54122
+                ]
+            },
+            "work": {
+                "address": "Тюмень, ул. Первомайская, д. 31",
+                "coordinates": [
+                    57.15432,
+                    65.54309
+                ]
+            }
+        },
+        "referralIds": [
+            15
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "cappuccino",
+            "latte",
+            "macchiato"
+        ]
+    },
+    {
+        "coffeeWithShugar": true,
+        "dob": "1991-08-07",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2017-09-30",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Бариста",
+                "name": "Байкальский кофе",
+                "responsibilities": [
+                    "Приготовление кофе",
+                    "Обслуживание клиентов"
+                ],
+                "salary": 44000,
+                "start": "2013-04-20",
+                "subordinates": 0
+            },
+            {
+                "awards": [
+                ],
+                "finish": "2022-05-20",
+                "id": 2,
+                "isBoss": true,
+                "jobTitle": "Старший бариста",
+                "name": "Coffee Expert",
+                "responsibilities": [
+                    "Управление сменой",
+                    "Обучение персонала",
+                    "Контроль качества"
+                ],
+                "salary": 60000,
+                "start": "2017-10-15",
+                "subordinates": 4
+            },
+            {
+                "awards": [
+                ],
+                "finish": null,
+                "id": 3,
+                "isBoss": true,
+                "jobTitle": "Управляющий",
+                "name": "Профи Кофе",
+                "responsibilities": [
+                    "Управление сетью кофеен",
+                    "Найм персонала",
+                    "Финансовое планирование"
+                ],
+                "salary": 88000,
+                "start": "2022-06-01",
+                "subordinates": 10
+            }
+        ],
+        "id": 19,
+        "lastCofee": "2025-09-29T13:55:41Z",
+        "name": "Медведев Сергей Николаевич",
+        "places": {
+            "home": {
+                "address": "Иркутск, ул. Литвинова, д. 17, кв. 5",
+                "coordinates": [
+                    52.28639,
+                    104.28066
+                ]
+            }
+        },
+        "referralIds": [
+            15
+        ],
+        "sertifiedBarista": true,
+        "skills": [
+            "espresso",
+            "americano",
+            "cappuccino",
+            "latte",
+            "flat white",
+            "cold brew"
+        ]
+    },
+    {
+        "coffeeWithShugar": false,
+        "dob": "1997-12-30",
+        "experience": [
+            {
+                "awards": [
+                ],
+                "finish": "2021-06-30",
+                "id": 1,
+                "isBoss": false,
+                "jobTitle": "Помощник бариста",
+                "name": "Студенческая кофейня",
+                "responsibilities": [
+                    "Подготовка рабочего места",
+                    "Мытье посуды",
+                    "Поддержание чистоты"
+                ],
+                "salary": 32000,
+                "start": "2018-09-01",
+                "subordinates": 0
+            }
+        ],
+        "id": 20,
+        "lastCofee": "2025-09-27T10:10:25Z",
+        "name": "Павлова Анна Алексеевна",
+        "places": {
+            "home": {
+                "address": "Томск, пр. Кирова, д. 63, кв. 19",
+                "coordinates": [
+                    56.48463,
+                    84.94716
+                ]
+            },
+            "work": {
+                "address": "Томск, ул. Герцена, д. 12",
+                "coordinates": [
+                    56.48725,
+                    84.94903
+                ]
+            }
+        },
+        "referralIds": [
+            15
+        ],
+        "sertifiedBarista": false,
+        "skills": [
+            "latte"
+        ]
+    }
 ]
