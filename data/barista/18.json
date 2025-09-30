@@ -1,0 +1,65 @@
+{
+  "id": 18,
+  "name": "Зайцева Ольга Владимировна",
+  "dob": "1994-04-14",
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "cappuccino",
+    "latte",
+    "macchiato"
+  ],
+  "coffeeWithShugar": false,
+  "lastCofee": "2025-09-30T09:20:16Z",
+  "places": {
+    "home": {
+      "address": "Тюмень, ул. Республики, д. 58, кв. 22",
+      "coordinates": [
+        57.15299,
+        65.54122
+      ]
+    },
+    "work": {
+      "address": "Тюмень, ул. Первомайская, д. 31",
+      "coordinates": [
+        57.15432,
+        65.54309
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "Сибирские традиции",
+      "jobTitle": "Бариста",
+      "start": "2015-11-01",
+      "finish": "2021-02-28",
+      "salary": 49000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Приготовление кофе",
+        "Работа с клиентами",
+        "Поддержание чистоты"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Coffee Culture",
+      "jobTitle": "Бариста-тренер",
+      "start": "2021-03-15",
+      "finish": null,
+      "salary": 71000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Обучение новых бариста",
+        "Контроль качества",
+        "Проведение мастер-классов"
+      ]
+    }
+  ],
+  "referralIds": [
+    15
+  ]
+}

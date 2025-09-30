@@ -1,0 +1,72 @@
+{
+  "id": 6,
+  "name": "Орлова Екатерина Викторовна",
+  "dob": "1993-08-22",
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "latte",
+    "cappuccino",
+    "flat white",
+    "macchiato",
+    "cold brew",
+    "pour over"
+  ],
+  "coffeeWithShugar": false,
+  "lastCofee": "2025-09-30T08:10:05Z",
+  "places": {
+    "home": {
+      "address": "Казань, ул. Баумана, д. 23, кв. 15",
+      "coordinates": [
+        55.79494,
+        49.10531
+      ]
+    },
+    "work": {
+      "address": "Казань, ул. Пушкина, д. 44",
+      "coordinates": [
+        55.79123,
+        49.12245
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "Coffee Lab",
+      "jobTitle": "Бариста-исследователь",
+      "start": "2016-04-01",
+      "finish": "2022-12-31",
+      "salary": 75000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Разработка новых рецептов",
+        "Тестирование сортов кофе",
+        "Проведение дегустаций"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Specialty Coffee Association",
+      "jobTitle": "Кофе-тренер",
+      "start": "2023-01-15",
+      "finish": null,
+      "salary": 110000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Обучение бариста",
+        "Проведение мастер-классов",
+        "Судья на чемпионатах"
+      ]
+    }
+  ],
+  "referralIds": [
+    3,
+    10,
+    11,
+    12,
+    13
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": 10,
+  "name": "Попова Ирина Станиславовна",
+  "dob": "1996-09-12",
+  "sertifiedBarista": true,
+  "skills": [
+    "cappuccino",
+    "latte",
+    "flat white"
+  ],
+  "coffeeWithShugar": true,
+  "lastCofee": "2025-09-29T19:25:14Z",
+  "places": {
+    "home": {
+      "address": "Уфа, ул. Ленина, д. 42, кв. 18",
+      "coordinates": [
+        54.73515,
+        55.95873
+      ]
+    },
+    "work": {
+      "address": "Уфа, пр. Октября, д. 77",
+      "coordinates": [
+        54.73342,
+        55.95781
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "Кофейня 'Ирина'",
+      "jobTitle": "Бариста",
+      "start": "2017-05-20",
+      "finish": null,
+      "salary": 52000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Приготовление кофе",
+        "Обслуживание клиентов",
+        "Поддержание чистоты"
+      ]
+    }
+  ],
+  "referralIds": [
+    6
+  ]
+}

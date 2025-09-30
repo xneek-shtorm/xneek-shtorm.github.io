@@ -1,0 +1,29 @@
+{
+  "id": 14,
+  "name": "Федорова Елена Викторовна",
+  "dob": "1988-10-15",
+  "sertifiedBarista": false,
+  "skills": [],
+  "coffeeWithShugar": false,
+  "lastCofee": "2025-09-26T12:20:44Z",
+  "places": {
+    "home": {
+      "address": "Самара, ул. Куйбышева, д. 71, кв. 13",
+      "coordinates": [
+        53.19906,
+        50.14039
+      ]
+    },
+    "work": {
+      "address": "Самара, ул. Гагарина, д. 33",
+      "coordinates": [
+        53.20234,
+        50.14218
+      ]
+    }
+  },
+  "experience": [],
+  "referralIds": [
+    7
+  ]
+}

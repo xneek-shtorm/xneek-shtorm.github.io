@@ -1,0 +1,24 @@
+{
+  "id": 11,
+  "name": "Соколов Михаил Андреевич",
+  "dob": "1985-12-05",
+  "sertifiedBarista": false,
+  "skills": [
+    "americano"
+  ],
+  "coffeeWithShugar": true,
+  "lastCofee": "2025-09-27T08:50:33Z",
+  "places": {
+    "home": {
+      "address": "Пермь, ул. Сибирская, д. 29, кв. 11",
+      "coordinates": [
+        58.01046,
+        56.22944
+      ]
+    }
+  },
+  "experience": [],
+  "referralIds": [
+    6
+  ]
+}

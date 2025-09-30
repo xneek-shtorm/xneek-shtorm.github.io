@@ -1,0 +1,74 @@
+{
+  "id": 19,
+  "name": "Медведев Сергей Николаевич",
+  "dob": "1991-08-07",
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "americano",
+    "cappuccino",
+    "latte",
+    "flat white",
+    "cold brew"
+  ],
+  "coffeeWithShugar": true,
+  "lastCofee": "2025-09-29T13:55:41Z",
+  "places": {
+    "home": {
+      "address": "Иркутск, ул. Литвинова, д. 17, кв. 5",
+      "coordinates": [
+        52.28639,
+        104.28066
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "Байкальский кофе",
+      "jobTitle": "Бариста",
+      "start": "2013-04-20",
+      "finish": "2017-09-30",
+      "salary": 44000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Приготовление кофе",
+        "Обслуживание клиентов"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Coffee Expert",
+      "jobTitle": "Старший бариста",
+      "start": "2017-10-15",
+      "finish": "2022-05-20",
+      "salary": 60000,
+      "subordinates": 4,
+      "isBoss": true,
+      "responsibilities": [
+        "Управление сменой",
+        "Обучение персонала",
+        "Контроль качества"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Профи Кофе",
+      "jobTitle": "Управляющий",
+      "start": "2022-06-01",
+      "finish": null,
+      "salary": 88000,
+      "subordinates": 10,
+      "isBoss": true,
+      "responsibilities": [
+        "Управление сетью кофеен",
+        "Найм персонала",
+        "Финансовое планирование"
+      ]
+    }
+  ],
+  "referralIds": [
+    15
+  ]
+}

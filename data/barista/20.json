@@ -1,0 +1,47 @@
+{
+  "id": 20,
+  "name": "Павлова Анна Алексеевна",
+  "dob": "1997-12-30",
+  "sertifiedBarista": false,
+  "skills": [
+    "latte"
+  ],
+  "coffeeWithShugar": false,
+  "lastCofee": "2025-09-27T10:10:25Z",
+  "places": {
+    "home": {
+      "address": "Томск, пр. Кирова, д. 63, кв. 19",
+      "coordinates": [
+        56.48463,
+        84.94716
+      ]
+    },
+    "work": {
+      "address": "Томск, ул. Герцена, д. 12",
+      "coordinates": [
+        56.48725,
+        84.94903
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "Студенческая кофейня",
+      "jobTitle": "Помощник бариста",
+      "start": "2018-09-01",
+      "finish": "2021-06-30",
+      "salary": 32000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Подготовка рабочего места",
+        "Мытье посуды",
+        "Поддержание чистоты"
+      ]
+    }
+  ],
+  "referralIds": [
+    15
+  ]
+}

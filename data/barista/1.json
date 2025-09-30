@@ -1,0 +1,64 @@
+{
+  "id": 1,
+  "name": "Иванов Иван Иванович",
+  "dob": "1990-05-21",
+  "sertifiedBarista": true,
+  "skills": [
+    "americano",
+    "espresso",
+    "latte"
+  ],
+  "coffeeWithShugar": true,
+  "lastCofee": "2025-09-29T18:00:32Z",
+  "places": {
+    "home": {
+      "address": "Пенза, ул. Московская, д. 69, кв. 43",
+      "coordinates": [
+        53.12001,
+        45.00002
+      ]
+    },
+    "work": {
+      "address": "Пенза, ул. Кирова, д. 28",
+      "coordinates": [
+        53.12321,
+        45.001235
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "ООО Ололо",
+      "jobTitle": "Джун бариста",
+      "start": "2010-01-01",
+      "finish": "2012-08-31",
+      "salary": 49999.99,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Следил за временем",
+        "Звал всех на кофебрейки",
+        "Принимал участие в приготовлении эспрессо"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "ООО Трололо",
+      "jobTitle": "Мидл бариста",
+      "start": "2012-09-01",
+      "finish": null,
+      "salary": 100000,
+      "subordinates": 3,
+      "isBoss": true,
+      "responsibilities": [
+        "Варил кофе",
+        "Вспенивал молоко"
+      ]
+    }
+  ],
+  "referralIds": [
+    2,
+    3
+  ]
+}

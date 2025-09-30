@@ -1,0 +1,64 @@
+{
+  "id": 15,
+  "name": "Григорьев Андрей Павлович",
+  "dob": "1995-02-27",
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "americano",
+    "cappuccino",
+    "latte",
+    "mocha",
+    "affogato",
+    "pour over"
+  ],
+  "coffeeWithShugar": false,
+  "lastCofee": "2025-09-30T07:15:38Z",
+  "places": {
+    "home": {
+      "address": "Омск, ул. Лермонтова, д. 44, кв. 29",
+      "coordinates": [
+        54.98485,
+        73.36746
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "Coffee Planet",
+      "jobTitle": "Бариста",
+      "start": "2016-03-15",
+      "finish": "2020-07-20",
+      "salary": 45000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Приготовление кофе",
+        "Работа с клиентами"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Specialty Coffee Omsk",
+      "jobTitle": "Шеф-бариста",
+      "start": "2020-08-01",
+      "finish": null,
+      "salary": 82000,
+      "subordinates": 5,
+      "isBoss": true,
+      "responsibilities": [
+        "Управление кофейней",
+        "Обучение персонала",
+        "Контроль качества",
+        "Разработка меню"
+      ]
+    }
+  ],
+  "referralIds": [
+    9,
+    18,
+    19,
+    20
+  ]
+}

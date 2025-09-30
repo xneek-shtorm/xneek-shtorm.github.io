@@ -1,0 +1,78 @@
+{
+  "id": 9,
+  "name": "Кузнецов Артем Владимирович",
+  "dob": "1994-01-25",
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "americano",
+    "cappuccino",
+    "latte",
+    "flat white",
+    "mocha"
+  ],
+  "coffeeWithShugar": false,
+  "lastCofee": "2025-09-30T06:45:19Z",
+  "places": {
+    "home": {
+      "address": "Краснодар, ул. Красная, д. 88, кв. 32",
+      "coordinates": [
+        45.04016,
+        38.97596
+      ]
+    }
+  },
+  "experience": [
+    {
+      "id": 1,
+      "name": "Coffee House",
+      "jobTitle": "Бариста",
+      "start": "2015-08-10",
+      "finish": "2019-11-30",
+      "salary": 48000,
+      "subordinates": 0,
+      "isBoss": false,
+      "responsibilities": [
+        "Приготовление кофе",
+        "Работа с кассой",
+        "Обслуживание клиентов"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Urban Coffee",
+      "jobTitle": "Старший бариста",
+      "start": "2019-12-15",
+      "finish": "2022-06-20",
+      "salary": 65000,
+      "subordinates": 4,
+      "isBoss": true,
+      "responsibilities": [
+        "Управление сменой",
+        "Контроль качества",
+        "Обучение персонала"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Art Coffee Roasters",
+      "jobTitle": "Шеф-бариста",
+      "start": "2022-07-01",
+      "finish": null,
+      "salary": 95000,
+      "subordinates": 8,
+      "isBoss": true,
+      "responsibilities": [
+        "Разработка меню",
+        "Обжарка кофе",
+        "Обучение персонала",
+        "Контроль качества"
+      ]
+    }
+  ],
+  "referralIds": [
+    4,
+    15,
+    16
+  ]
+}
