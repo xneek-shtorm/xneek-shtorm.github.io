@@ -1,0 +1,373 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Иванов Иван Иванович",
+      "active": true,
+      "age": 34,
+      "rating": 4.7,
+      "birthDate": "1990-05-21",
+      "lastLogin": "2025-09-29T18:00:32Z",
+      "tags": ["admin", "premium", "verified"],
+      "contacts": {
+        "email": "ivanov@mail.ru",
+        "phone": "+79123456789"
+      },
+      "preferences": {
+        "theme": "dark",
+        "notifications": true,
+        "language": "ru"
+      },
+      "orders": [
+        {
+          "id": 101,
+          "date": "2025-09-29T10:30:00Z",
+          "amount": 1250.50,
+          "status": "completed",
+          "items": ["кофе", "печенье", "вода"]
+        },
+        {
+          "id": 102,
+          "date": "2025-09-30T08:15:00Z",
+          "amount": 780.00,
+          "status": "processing",
+          "items": ["чай", "булочка"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-30T07:30:00Z",
+        "2025-09-29T19:45:00Z",
+        "2025-09-29T08:15:00Z"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Петрова Анна Сергеевна",
+      "active": false,
+      "age": 28,
+      "rating": 4.2,
+      "birthDate": "1996-12-15",
+      "lastLogin": "2025-09-25T14:20:18Z",
+      "tags": ["user", "new"],
+      "contacts": {
+        "email": "petrova@gmail.com",
+        "phone": null
+      },
+      "preferences": {
+        "theme": "light",
+        "notifications": false,
+        "language": "en"
+      },
+      "orders": [
+        {
+          "id": 203,
+          "date": "2025-09-20T12:00:00Z",
+          "amount": 560.75,
+          "status": "completed",
+          "items": ["капучино"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-25T14:20:00Z",
+        "2025-09-20T09:10:00Z"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Сидоров Алексей",
+      "active": true,
+      "age": 45,
+      "rating": 3.8,
+      "birthDate": "1980-03-10",
+      "lastLogin": "2025-09-30T09:45:33Z",
+      "tags": ["vip", "moderator"],
+      "contacts": {
+        "email": "sidorov@yandex.ru",
+        "phone": "+79219876543"
+      },
+      "preferences": {
+        "theme": "auto",
+        "notifications": true,
+        "language": "ru"
+      },
+      "orders": [],
+      "loginHistory": [
+        "2025-09-30T09:45:00Z",
+        "2025-09-29T18:30:00Z",
+        "2025-09-28T11:20:00Z",
+        "2025-09-27T15:40:00Z"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Козлова Мария",
+      "active": true,
+      "age": 31,
+      "rating": 5.0,
+      "birthDate": "1994-07-22",
+      "lastLogin": "2025-09-30T10:15:27Z",
+      "tags": ["admin", "premium", "vip", "verified"],
+      "contacts": {
+        "email": "maria.k@company.com",
+        "phone": "+79031112233"
+      },
+      "preferences": {
+        "theme": "dark",
+        "notifications": true,
+        "language": "en"
+      },
+      "orders": [
+        {
+          "id": 304,
+          "date": "2025-09-30T09:00:00Z",
+          "amount": 2340.25,
+          "status": "completed",
+          "items": ["эспрессо", "латте", "сэндвич", "торт"]
+        },
+        {
+          "id": 305,
+          "date": "2025-09-29T16:45:00Z",
+          "amount": 890.00,
+          "status": "shipped",
+          "items": ["чай", "пирожное"]
+        },
+        {
+          "id": 306,
+          "date": "2025-09-28T14:20:00Z",
+          "amount": 1567.80,
+          "status": "delivered",
+          "items": ["капучино", "американо", "круассан"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-30T10:15:00Z",
+        "2025-09-30T07:45:00Z",
+        "2025-09-29T19:20:00Z"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Николаев Денис",
+      "active": true,
+      "age": 22,
+      "rating": 4.0,
+      "birthDate": "2003-01-08",
+      "lastLogin": "2025-09-29T22:30:15Z",
+      "tags": ["student"],
+      "contacts": {
+        "email": "den@university.edu",
+        "phone": "+79507778899"
+      },
+      "preferences": {
+        "theme": "light",
+        "notifications": true,
+        "language": "ru"
+      },
+      "orders": [
+        {
+          "id": 407,
+          "date": "2025-09-29T20:15:00Z",
+          "amount": 450.00,
+          "status": "pending",
+          "items": ["американо"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-29T22:30:00Z",
+        "2025-09-28T21:45:00Z"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Орлова Екатерина",
+      "active": false,
+      "age": 29,
+      "rating": null,
+      "birthDate": "1996-11-30",
+      "lastLogin": "2025-08-15T11:10:05Z",
+      "tags": [],
+      "contacts": {
+        "email": "orlova@mail.ru",
+        "phone": null
+      },
+      "preferences": {
+        "theme": "light",
+        "notifications": false,
+        "language": "ru"
+      },
+      "orders": [],
+      "loginHistory": [
+        "2025-08-15T11:10:00Z",
+        "2025-07-20T14:30:00Z"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Волков Павел",
+      "active": true,
+      "age": 38,
+      "rating": 4.9,
+      "birthDate": "1987-04-17",
+      "lastLogin": "2025-09-30T08:05:44Z",
+      "tags": ["premium", "verified"],
+      "contacts": {
+        "email": "volkov.p@business.com",
+        "phone": "+79163334455"
+      },
+      "preferences": {
+        "theme": "dark",
+        "notifications": true,
+        "language": "en"
+      },
+      "orders": [
+        {
+          "id": 508,
+          "date": "2025-09-30T07:30:00Z",
+          "amount": 1780.50,
+          "status": "completed",
+          "items": ["двойной эспрессо", "капучино", "маффин"]
+        },
+        {
+          "id": 509,
+          "date": "2025-09-29T08:00:00Z",
+          "amount": 920.25,
+          "status": "completed",
+          "items": ["латте", "печенье"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-30T08:05:00Z",
+        "2025-09-29T19:15:00Z",
+        "2025-09-29T07:50:00Z",
+        "2025-09-28T20:30:00Z",
+        "2025-09-28T08:10:00Z"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Смирнова Ольга",
+      "active": true,
+      "age": 26,
+      "rating": 4.5,
+      "birthDate": "1999-09-03",
+      "lastLogin": "2025-09-29T23:45:19Z",
+      "tags": ["user", "new"],
+      "contacts": {
+        "email": "olga.smirnova@yahoo.com",
+        "phone": "+79648889900"
+      },
+      "preferences": {
+        "theme": "auto",
+        "notifications": true,
+        "language": "ru"
+      },
+      "orders": [
+        {
+          "id": 610,
+          "date": "2025-09-29T21:20:00Z",
+          "amount": 1345.75,
+          "status": "processing",
+          "items": ["чай", "пирог", "сок"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-29T23:45:00Z",
+        "2025-09-28T22:10:00Z",
+        "2025-09-27T20:35:00Z"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Кузнецов Артем",
+      "active": false,
+      "age": 41,
+      "rating": 4.1,
+      "birthDate": "1984-02-28",
+      "lastLogin": "2025-09-20T16:40:52Z",
+      "tags": ["vip"],
+      "contacts": {
+        "email": "kuznetsov@inbox.ru",
+        "phone": "+79025556677"
+      },
+      "preferences": {
+        "theme": "light",
+        "notifications": false,
+        "language": "ru"
+      },
+      "orders": [
+        {
+          "id": 711,
+          "date": "2025-09-19T12:30:00Z",
+          "amount": 2100.00,
+          "status": "delivered",
+          "items": ["эспрессо", "капучино", "сэндвич"]
+        },
+        {
+          "id": 712,
+          "date": "2025-09-18T15:45:00Z",
+          "amount": 675.50,
+          "status": "completed",
+          "items": ["американо", "круассан"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-20T16:40:00Z",
+        "2025-09-18T10:15:00Z"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Попова Ирина",
+      "active": true,
+      "age": 33,
+      "rating": 4.8,
+      "birthDate": "1992-06-14",
+      "lastLogin": "2025-09-30T11:25:08Z",
+      "tags": ["premium", "verified", "moderator"],
+      "contacts": {
+        "email": "popova.irina@gmail.com",
+        "phone": "+79174445566"
+      },
+      "preferences": {
+        "theme": "dark",
+        "notifications": true,
+        "language": "en"
+      },
+      "orders": [
+        {
+          "id": 813,
+          "date": "2025-09-30T10:45:00Z",
+          "amount": 1890.25,
+          "status": "completed",
+          "items": ["латте", "флет уайт", "пирожное"]
+        },
+        {
+          "id": 814,
+          "date": "2025-09-29T14:20:00Z",
+          "amount": 1120.75,
+          "status": "completed",
+          "items": ["чай", "торт"]
+        },
+        {
+          "id": 815,
+          "date": "2025-09-28T09:15:00Z",
+          "amount": 780.00,
+          "status": "completed",
+          "items": ["эспрессо", "булочка"]
+        }
+      ],
+      "loginHistory": [
+        "2025-09-30T11:25:00Z",
+        "2025-09-29T19:40:00Z",
+        "2025-09-29T08:55:00Z",
+        "2025-09-28T20:10:00Z",
+        "2025-09-28T09:05:00Z"
+      ]
+    }
+  ],
+  "metadata": {
+    "totalCount": 10,
+    "generated": "2025-09-30T12:00:00Z",
+    "version": "1.0"
+  }
+}
