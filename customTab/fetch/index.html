@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch API Config</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: top;
+        }
+        label {
+            display: block;
+            margin-top: 8px;
+            max-width: 120px;
+            width: 120px;
+            margin-right: 0;
+            flex-grow: 0;
+            flex-shrink: 0;
+            text-align: right;
+            padding-right: 8px;
+            font-size: 12px;
+            color: #767676;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+
+        #header-wrapper {
+          flex-grow: 1;
+          width: 80%;
+        }
+        .header-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .header-row input {
+            flex: 1;
+            flex-grow: 1;
+            min-width: 43%;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        h1 {
+          margin-left: 128px;
+          small a {
+            font-size: 18px;
+            text-decoration: none;
+          }
+        }
+    </style>
+</head>
+<body>
+    <h1>
+      
+      <small style="float: right;">
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">📖</a>
+    </small>
+      Fetch API Configuration
+
+
+
+    </h1>
+    
+    
+    <form id="fetchForm">
+        <!-- Basic Request -->
+        <div class="form-group">
+            <label for="url">URL</label>
+            <input type="url" id="url" required placeholder="https://api.example.com/data">
+        </div>
+        
+        <div class="form-group">
+            <label for="method">Method</label>
+            <select id="method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
+                <option value="HEAD">HEAD</option>
+                <option value="OPTIONS">OPTIONS</option>
+            </select>
+        </div>
+        
+        <!-- Headers -->
+        <div class="form-group">
+            <label for="addHeaderEl">Headers</label>
+            <div id="header-wrapper">
+              <div id="headersContainer">
+                
+            </div>
+
+            <button type="button" id="addHeaderEl" onclick="addHeader()">Add Header</button>
+            </div>
+            
+            
+        </div>
+        
+        <!-- Body -->
+        <div class="form-group">
+            <label for="body">Body</label>
+            <textarea id="body" placeholder='{"key": "value"}' rows="4"></textarea>
+        </div>
+        
+        <!-- Fetch Options -->
+        <div class="form-group">
+            <label for="cache">Cache</label>
+            <select id="cache">
+                <option value="default">default</option>
+                <option value="no-store">no-store</option>
+                <option value="reload">reload</option>
+                <option value="no-cache">no-cache</option>
+                <option value="force-cache">force-cache</option>
+                <option value="only-if-cached">only-if-cached</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="credentials">Credentials</label>
+            <select id="credentials">
+                <option value="same-origin">same-origin</option>
+                <option value="include">include</option>
+                <option value="omit">omit</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="mode">Mode</label>
+            <select id="mode">
+                <option value="cors">cors</option>
+                <option value="no-cors">no-cors</option>
+                <option value="same-origin">same-origin</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="redirect">Redirect</label>
+            <select id="redirect">
+                <option value="follow">follow</option>
+                <option value="error">error</option>
+                <option value="manual">manual</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="referrerPolicy">Referrer Policy</label>
+            <select id="referrerPolicy">
+                <option value="">(not set)</option>
+                <option value="no-referrer">no-referrer</option>
+                <option value="no-referrer-when-downgrade">no-referrer-when-downgrade</option>
+                <option value="same-origin">same-origin</option>
+                <option value="origin">origin</option>
+                <option value="strict-origin">strict-origin</option>
+                <option value="origin-when-cross-origin">origin-when-cross-origin</option>
+                <option value="strict-origin-when-cross-origin">strict-origin-when-cross-origin</option>
+                <option value="unsafe-url">unsafe-url</option>
+            </select>
+        </div>
+        
+        <!-- Advanced Options -->
+        <div class="form-group">
+            <label for="integrity">Integrity (hash)</label>
+            <input type="text" id="integrity" placeholder="sha256-...">
+        </div>
+        
+        <div class="form-group">
+            <label for="keepalive">Keepalive</label>
+            <select id="keepalive">
+                <option value="false">false</option>
+                <option value="true">true</option>
+            </select>
+        </div>
+
+            <div class="form-group">
+            <label for="send"></label>
+            <button id=""send type="submit">Send Request</button>
+        </div>
+        
+    </form>
+    
+    <div class="response" id="response" style="display: none;">
+        <h3>Response</h3>
+        <div id="responseStatus"></div>
+        <pre id="responseBody"></pre>
+    </div>
+
+    <script>
+        function addHeader() {
+            const container = document.getElementById('headersContainer');
+            const div = document.createElement('div');
+            div.className = 'header-row';
+            div.innerHTML = `
+                <input type="text" class="header-name" placeholder="Header name">
+                <input type="text" class="header-value" placeholder="Header value">
+                <button type="button" onclick="this.parentElement.remove()">🗑️</button>
+            `;
+            container.appendChild(div);
+        }
+
+        addHeader()
+
+        document.getElementById('fetchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const url = document.getElementById('url').value;
+            const method = document.getElementById('method').value;
+            
+            // Build headers object
+            const headers = {};
+            document.querySelectorAll('.header-row').forEach(row => {
+                const name = row.querySelector('.header-name').value;
+                const value = row.querySelector('.header-value').value;
+                if (name && value) headers[name] = value;
+            });
+            
+            // Build fetch options
+            const options = {
+                method: method,
+                headers: headers,
+                cache: document.getElementById('cache').value,
+                credentials: document.getElementById('credentials').value,
+                mode: document.getElementById('mode').value,
+                redirect: document.getElementById('redirect').value,
+                referrerPolicy: document.getElementById('referrerPolicy').value || undefined,
+                integrity: document.getElementById('integrity').value || undefined,
+                keepalive: document.getElementById('keepalive').value === 'true'
+            };
+            
+            // Add body for methods that support it
+            if (method !== 'GET' && method !== 'HEAD') {
+                const body = document.getElementById('body').value;
+                if (body) {
+                    options.body = body;
+                    if (!headers['Content-Type']) {
+                        options.headers['Content-Type'] = 'application/json';
+                    }
+                }
+            }
+            
+            
+            // Send request
+            try {
+                const response = await fetch(url, options);
+                
+                // Display response
+                document.getElementById('response').style.display = 'block';
+                document.getElementById('responseStatus').textContent = 
+                    `Status: ${response.status} ${response.statusText}`;
+                
+                const text = await response.text();
+                document.getElementById('responseBody').textContent = text;
+            } catch (error) {
+                document.getElementById('response').style.display = 'block';
+                document.getElementById('responseStatus').textContent = `Error: ${error.name}`;
+                document.getElementById('responseBody').textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html>
+
