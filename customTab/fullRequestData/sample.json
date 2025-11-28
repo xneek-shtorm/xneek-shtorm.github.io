@@ -1,0 +1,504 @@
+{
+  "requestData": {
+    "id": 2267509,
+    "externalId": "16917",
+    "timeCreated": "2025-09-22T09:21:23Z",
+    "timeRegistered": "2025-09-22T09:21:24.659035Z",
+    "timeClosed": null,
+    "title": "Тест скрипта диалогов",
+    "channelType": "Telegram",
+    "plainText": null,
+    "source": "Dev_bot",
+    "originator": "67438024",
+    "originatorId": "4534f02b-f6ad-415a-bf56-34a22eca93e9",
+    "originAddressId": "4534f02b-f6ad-415a-bf56-34a22eca93e9",
+    "parentId": null,
+    "customAttributes": [
+      {
+        "type": "Binary",
+        "code": "LastContactInfoJson",
+        "value": "eyJBZGRyZXNzIjoiNjc0MzgwMjQiLCJDaGFubmVsSWQiOjkxLCJTb3VyY2UiOiJEZXZfYm90In0="
+      },
+      {
+        "type": "Bool",
+        "code": "IsCustomerAlreadyNotified",
+        "value": "True"
+      },
+      {
+        "type": "DateTime",
+        "code": "TimeDecisionEscalation",
+        "value": "22.09.2025 09:23:23"
+      },
+      {
+        "type": "DateTime",
+        "code": "TargetDecisionTime",
+        "value": "22.09.2025 09:23:23"
+      },
+      {
+        "type": "DateTime",
+        "code": "TargetResponseTime",
+        "value": "22.09.2025 09:22:23"
+      },
+      {
+        "type": "Long",
+        "code": "RequestType",
+        "value": "0"
+      },
+      {
+        "type": "Long",
+        "code": "PVOO",
+        "value": "1"
+      },
+      {
+        "type": "String",
+        "code": "SenderName",
+        "value": "Super Nickname"
+      }
+    ]
+  },
+  "contactPersonsData": [
+    {
+      "id": "4534f02b-f6ad-415a-bf56-34a22eca93e9",
+      "externalId": null,
+      "firstName": "Иванович",
+      "lastName": "Иван",
+      "middleName": "Иванов",
+      "isDeleted": false,
+      "contactAddresses": [
+        {
+          "id": "67a0f0d6-9119-42a7-ab10-4b3e2d240a46",
+          "addressString": "111222333",
+          "channelId": 91,
+          "addressType": "Telegram",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "af367f7d-09f0-4821-8162-cf637467170c",
+          "addressString": "chat-id",
+          "channelId": 21,
+          "addressType": "Chat",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "b5af2946-c661-40f0-9ecf-fc13f762e534",
+          "addressString": "bad-boy-1999@gmail.com",
+          "channelId": 1,
+          "addressType": "Exchange",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "583170ae-1838-4208-a798-b34f21ea98d5",
+          "addressString": "79371234567",
+          "channelId": 61,
+          "addressType": "Voice",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "109b69c3-0724-49f8-8ede-9fb283d35aa2",
+          "addressString": "79998887766",
+          "channelId": 71,
+          "addressType": "Viber",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "cbec5b99-c2c1-4911-b7ab-4724b343b173",
+          "addressString": "457953",
+          "channelId": 151,
+          "addressType": "BackCall",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "72f2f9d9-861d-4717-af58-67d3392fa00a",
+          "addressString": "789465132",
+          "channelId": 81,
+          "addressType": "Vk",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "1512f01b-c8f5-417d-bedf-e9583f72c465",
+          "addressString": "-123456789",
+          "channelId": 121,
+          "addressType": "VkPublic",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "e569038f-6b3b-47ed-8dab-7d6e0f1ae1e8",
+          "addressString": "123456",
+          "channelId": 91,
+          "addressType": "Telegram",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "aa185c37-c5e0-49a2-9c9c-f62aae3f2956",
+          "addressString": "8497412",
+          "channelId": 31,
+          "addressType": "Facebook",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "a9ec597f-4ebd-4eec-a642-72f1b15556fb",
+          "addressString": "videochat-id",
+          "channelId": 131,
+          "addressType": "VideoChat",
+          "isDeleted": false,
+          "isVerified": false
+        },
+        {
+          "id": "9930a750-87e9-4f24-b233-8e4a3ac5dda5",
+          "addressString": "79279272727",
+          "channelId": 141,
+          "addressType": "MfWhatsApp",
+          "isDeleted": false,
+          "isVerified": false
+        }
+      ],
+      "customAttributes": []
+    }
+  ],
+  "requestSubjectsLinks": [
+    {
+      "requestId": 2267509,
+      "subjectId": 46,
+      "subjectName": "Тест скрипта диалогов"
+    }
+  ],
+  "operatorData": {
+    "title": "Николай Иммануилович Лалилалаев",
+    "firstName": "Николай",
+    "middleName": "Иммануилович",
+    "lastName": "Лалилалаев",
+    "nickname": "",
+    "userName": "nikolay.lalilalay",
+    "activeDirectoryId": "7738f40f-fc7f-4110-a11c-71dfd0d38d7f",
+    "operatorGroupsIds": null,
+    "customAttributes": [
+      {
+        "operatorId": "27262478-ba5e-4969-8c50-3b2891b822c3",
+        "code": "EmailAddress",
+        "stringValue": null,
+        "guidValue": null,
+        "longValue": null,
+        "decimalValue": null,
+        "boolValue": null,
+        "dateTimeValue": null,
+        "binaryValue": null
+      },
+      {
+        "operatorId": "27262478-ba5e-4969-8c50-3b2891b822c3",
+        "code": "LastWorkTime",
+        "stringValue": null,
+        "guidValue": null,
+        "longValue": null,
+        "decimalValue": null,
+        "boolValue": null,
+        "dateTimeValue": null,
+        "binaryValue": null
+      }
+    ],
+    "id": "27262478-ba5e-4969-8c50-3b2891b822c3",
+    "additionalPhoneNumber": null
+  },
+  "serviceSessionData": {
+    "serviceObject": {
+      "integrationObjectId": "019ac03d-00fd-77cb-bf91-4e11d3726a09",
+      "externalId": "-Oc54E_2RG_w9mF_Vv2A",
+      "metadata": {
+        "code": "fednik-contact-persons-ContactPerson-So-1",
+        "name": "Клиент как объект особый",
+        "description": "ContactPerson demo API",
+        "order": 2,
+        "metadata": "{\n  \"type\": \"object\"\n}",
+        "tag": "ServiceObject"
+      },
+      "fields": [
+        {
+          "fieldName": "ИД",
+          "fieldType": "String",
+          "description": "гуид клиента",
+          "value": {
+            "kind": "plain",
+            "value": "-Oc54E_2RG_w9mF_Vv2A",
+            "fieldMetadata": {
+              "fieldName": "ИД",
+              "fieldType": "String",
+              "fieldPath": "id",
+              "dictionaryFieldTypeCode": null,
+              "description": "гуид клиента",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "id"
+        },
+        {
+          "fieldName": "Контакты",
+          "fieldType": "Object",
+          "description": "Контактные данные",
+          "value": {
+            "kind": "listOfDictionary",
+            "items": [
+              {
+                "id": {
+                  "kind": "plain",
+                  "value": "123",
+                  "fieldMetadata": {
+                    "fieldName": "ID",
+                    "fieldType": "Number",
+                    "fieldPath": "id",
+                    "dictionaryFieldTypeCode": null,
+                    "description": "",
+                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+                  }
+                },
+                "isPreferred": {
+                  "kind": "plain",
+                  "value": "True",
+                  "fieldMetadata": {
+                    "fieldName": "Основной",
+                    "fieldType": "Boolean",
+                    "fieldPath": "isPreferred",
+                    "dictionaryFieldTypeCode": null,
+                    "description": "Предпочтительный",
+                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+                  }
+                },
+                "typeId": {
+                  "kind": "plain",
+                  "value": "Телефон",
+                  "fieldMetadata": {
+                    "fieldName": "Тип",
+                    "fieldType": "Dictionary",
+                    "fieldPath": "typeId",
+                    "dictionaryFieldTypeCode": "fednik-contact-persons-dict-address-type",
+                    "description": "PHONE",
+                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+                  }
+                },
+                "value": {
+                  "kind": "plain",
+                  "value": "8800955535",
+                  "fieldMetadata": {
+                    "fieldName": "Адрес",
+                    "fieldType": "String",
+                    "fieldPath": "value",
+                    "dictionaryFieldTypeCode": null,
+                    "description": "или телефон",
+                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+                  }
+                },
+                "valueType": {
+                  "kind": "plain",
+                  "value": "Домашний",
+                  "fieldMetadata": {
+                    "fieldName": "Вид",
+                    "fieldType": "Dictionary",
+                    "fieldPath": "valueType",
+                    "dictionaryFieldTypeCode": "fednik-contact-persons-dict-address-valueType",
+                    "description": "HOME",
+                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+                  }
+                }
+              }
+            ],
+            "fieldMetadata": {
+              "fieldName": "Контакты",
+              "fieldType": "Object",
+              "fieldPath": "addresses[]",
+              "dictionaryFieldTypeCode": null,
+              "description": "Контактные данные",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": true,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "addresses[]"
+        },
+        {
+          "fieldName": "Скидка",
+          "fieldType": "Number",
+          "description": "Размер скидки",
+          "value": {
+            "kind": "plain",
+            "value": "0.75",
+            "fieldMetadata": {
+              "fieldName": "Скидка",
+              "fieldType": "Number",
+              "fieldPath": "discount",
+              "dictionaryFieldTypeCode": null,
+              "description": "Размер скидки",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "discount"
+        },
+        {
+          "fieldName": "ДР",
+          "fieldType": "Date",
+          "description": "Дата рождения",
+          "value": {
+            "kind": "plain",
+            "value": "1990-10-11",
+            "fieldMetadata": {
+              "fieldName": "ДР",
+              "fieldType": "Date",
+              "fieldPath": "dob",
+              "dictionaryFieldTypeCode": null,
+              "description": "Дата рождения",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "dob"
+        },
+        {
+          "fieldName": "Любимый офис",
+          "fieldType": "String",
+          "description": "Любимый офис",
+          "value": {
+            "kind": "plain",
+            "value": "string",
+            "fieldMetadata": {
+              "fieldName": "Любимый офис",
+              "fieldType": "String",
+              "fieldPath": "favoriteOffice",
+              "dictionaryFieldTypeCode": null,
+              "description": "Любимый офис",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "favoriteOffice"
+        },
+        {
+          "fieldName": "Имя",
+          "fieldType": "String",
+          "description": "Имя клиента",
+          "value": {
+            "kind": "plain",
+            "value": "Иван",
+            "fieldMetadata": {
+              "fieldName": "Имя",
+              "fieldType": "String",
+              "fieldPath": "firstName",
+              "dictionaryFieldTypeCode": null,
+              "description": "Имя клиента",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": true,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"firstName\"\n}"
+            }
+          },
+          "fieldPath": "firstName"
+        },
+        {
+          "fieldName": "VIP",
+          "fieldType": "Boolean",
+          "description": "Верри Импортант Персона",
+          "value": {
+            "kind": "plain",
+            "value": "True",
+            "fieldMetadata": {
+              "fieldName": "VIP",
+              "fieldType": "Boolean",
+              "fieldPath": "isVip",
+              "dictionaryFieldTypeCode": null,
+              "description": "Верри Импортант Персона",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "isVip"
+        },
+        {
+          "fieldName": "Фамилия",
+          "fieldType": "String",
+          "description": "Фамилия клиента",
+          "value": {
+            "kind": "plain",
+            "value": "Иванов",
+            "fieldMetadata": {
+              "fieldName": "Фамилия",
+              "fieldType": "String",
+              "fieldPath": "lastName",
+              "dictionaryFieldTypeCode": null,
+              "description": "Фамилия клиента",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": true,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"lastName\"\n}"
+            }
+          },
+          "fieldPath": "lastName"
+        },
+        {
+          "fieldName": "Отчество",
+          "fieldType": "String",
+          "description": "Имя бати клиента",
+          "value": {
+            "kind": "plain",
+            "value": "Иванович",
+            "fieldMetadata": {
+              "fieldName": "Отчество",
+              "fieldType": "String",
+              "fieldPath": "middleName",
+              "dictionaryFieldTypeCode": null,
+              "description": "Имя бати клиента",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"middleName\"\n}"
+            }
+          },
+          "fieldPath": "middleName"
+        },
+        {
+          "fieldName": "Предпочтения",
+          "fieldType": "String",
+          "description": "Предпочтения клиента",
+          "value": {
+            "kind": "list",
+            "items": [
+              "Виски косые",
+              "Сверху подлиннее",
+              "C боков покороче"
+            ],
+            "fieldMetadata": {
+              "fieldName": "Предпочтения",
+              "fieldType": "String",
+              "fieldPath": "preferences[]",
+              "dictionaryFieldTypeCode": null,
+              "description": "Предпочтения клиента",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "preferences[]"
+        },
+        {
+          "fieldName": "ИД источника",
+          "fieldType": "String",
+          "description": "Из клиента  во внешней системе (если клиент оттуда)",
+          "value": {
+            "kind": "plain",
+            "value": "null",
+            "fieldMetadata": {
+              "fieldName": "ИД источника",
+              "fieldType": "String",
+              "fieldPath": "source",
+              "dictionaryFieldTypeCode": null,
+              "description": "Из клиента  во внешней системе (если клиент оттуда)",
+              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            }
+          },
+          "fieldPath": "source"
+        }
+      ]
+    },
+    "serviceSession": {
+      "id": "a3ee160c-d075-4d1f-98e9-24433c34133c",
+      "startTime": "2025-11-28T08:12:49.9483175Z",
+      "closeTime": null,
+      "comment": null,
+      "startedBy": "nikolay.lalilalay",
+      "closedBy": null,
+      "integrationObjectId": "019ac03d-00fd-77cb-bf91-4e11d3726a09",
+      "serviceObjectId": "-Oc54E_2RG_w9mF_Vv2A",
+      "requestId": 2267509,
+      "contactPersonId": "4534f02b-f6ad-415a-bf56-34a22eca93e9"
+    }
+  }
+}

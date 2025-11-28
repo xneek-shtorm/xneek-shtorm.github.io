@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FullRequestData SAMPLE</title>
+  <style>
+    html, body, section {
+      height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 0;
+      margin: 0;
+      color: #444
+    }
+
+    section > div {
+
+      overflow-y: auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      padding: 8px 1em;
+    }
+    code:hover {
+      color: red;
+      cursor: pointer;
+
+    }
+
+    pre {
+      padding: 1em;
+      overflow: auto;
+    }
+    
+  </style>
+</head>
+<body>
+  <section style="display: flex">
+    <div style="width: 50%; border-right: 1px dashed indigo">
+      <header><h3>FullRequestData sample</h3></header>
+      <div id="res"></div>
+    </div>
+    <div style="width: 50%;max-width: 50%;">
+      <header>
+              <h3>FullRequestData query syntax sandbox</h3>
+      <form id="form" style="display: flex;">
+        <input id="inp" name="q" style="flex-grow: 1;" value="*" pattern="^((\w)[\w\~\*=]*((\[\])|\w)?)|\*$">
+        <input type="submit" value="Запросить" list="list" >
+        <datalist id="list">
+          <option value="contactPersonsData~0~contactAddresses~*addressType=VideoChat~0~addressString"></option>
+        </datalist>
+      </form>
+      </header>
+   
+      <pre id="out"></pre>
+    </div>
+  </section>
+  <script src="script.js"></script>
+</body>
+</html>
