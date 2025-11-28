@@ -47,9 +47,10 @@
       <header>
               <h3>FullRequestData query syntax sandbox</h3>
       <form id="form" style="display: flex;">
-        <input id="inp" name="q" style="flex-grow: 1;" value="*" pattern="^((\w)[\w\~\*=]*((\[\])|\w)?)|\*$">
-        <input type="submit" value="Запросить" list="list" >
-        <datalist id="list">
+        <input id="inp" name="FullRequestData" style="flex-grow: 1;" value="*" pattern="^((\w)[\w\~\*=]*((\[\])|\w)?)|\*$" list="samples">
+        <input type="submit" value="Запросить" >
+        <datalist id="samples">
+          <option value="requestData~id"></option>
           <option value="contactPersonsData~0~contactAddresses~*addressType=VideoChat~0~addressString"></option>
         </datalist>
       </form>
