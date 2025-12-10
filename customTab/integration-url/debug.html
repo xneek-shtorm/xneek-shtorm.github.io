@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    html, body {
+      font-family: monospace;
+    }
+    #output {
+      white-space: pre-wrap;
+      display: block;
+      padding: 16px;
+    }
+
+    input {
+      padding: 8px 12px;
+    }
+
+    #url {
+      flex-grow: 1;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    #form {
+      display: flex;
+      gap: 6px;
+      padding: 6px 0;
+    }
+
+    .success {
+      background-color: #f8fff8;
+    }
+
+    .error {
+      background-color: tomato;
+    }
+
+  </style>
+</head>
+<body>
+ <main>
+  <h1> integration: </h1>
+   <form id="form">
+    <input type="url" id="url" required placeholder="type integration: url here">
+    <input type="submit" name="go">
+  </form>
+
+  <output id="output"></output>
+
+ </main>
+  <script>
+    const getAccessByDigitString = (s) => {
+  if (s === '1') return 'full';
+  if (s === '2') return 'readonly';
+  if (s === '3') return 'hidden';
+  return 'default';
+};
+
+const defaultIntegrationObjectAutomation = {
+  integrationObjectType: 'UNKNOWN',
+  integrationSystemSelectedCode: null,
+  integrationObjectSelectedCode: null,
+
+  searchForm: null,
+  additionalForms: [],
+
+  availability: {
+    integrationSystem: 'default',
+    integrationObject: 'default',
+    searchForm: 'default',
+    counter: 'default',
+  },
+
+  targetTabId: null,
+};
+
+const urlToForm = (url) => {
+  const path = url.pathname.replace(/^\//, '').replace(/\/$/, '');
+
+  if (!path.length || path === '*') return null;
+
+  const forms = path.split('/');
+  let selectedCode = null;
+
+  selectedCode = forms[0] ?? null;
+  const indicatorCount = forms?.[1] ? +forms[1] : undefined;
+  // process params
+  const formData = {};
+  for (const [key, value] of url.searchParams.entries()) {
+    formData[key] = value;
+  }
+
+  return {
+    selectedCode,
+    indicatorCount,
+    data: formData,
+    autoSend: !!url.hash.length,
+  };
+};
+
+const getIntegrationObjectAutomationFromURL = (urlString) => {
+  const url = new URL(urlString);
+
+  if (url.protocol !== 'integration:') throw new Error(`it is not integration: schema url`);
+
+  // Process hostname
+  const hostnameParts = url.hostname.split('.');
+
+  let integrationObjectType = null;
+  let integrationSystemSelectedCode = null;
+  let integrationObjectSelectedCode = null;
+
+  integrationObjectType = hostnameParts.at(-1) ?? 'UNKNOWN';
+  integrationSystemSelectedCode = hostnameParts.at(-2) ?? null;
+  integrationObjectSelectedCode = hostnameParts.at(-3) ?? null;
+
+  const additionalForms = url.hash
+    .split('#/')
+    .filter((x) => x.length > 3)
+    .map((x) => {
+      return urlToForm(new URL(x, `${url.protocol}//${url.hostname}`));
+    })
+    .filter(Boolean);
+
+  const port = url.port || '';
+  const availability = {
+    card: port && port[0] ? getAccessByDigitString(port[0]) : 'default',
+    integrationSystem: port && port[1] ? getAccessByDigitString(port[1]) : 'default',
+    integrationObject: port && port[2] ? getAccessByDigitString(port[2]) : 'default',
+    searchForm: port && port[3] ? getAccessByDigitString(port[3]) : 'default',
+    counter: port && port[4] ? getAccessByDigitString(port[4]) : 'default',
+  };
+
+  return {
+    integrationObjectType,
+    integrationSystemSelectedCode,
+    integrationObjectSelectedCode,
+    searchForm: urlToForm(url),
+    additionalForms,
+    targetTabId: url.username.length ? url.username : null,
+    availability,
+  };
+};
+document.querySelector('#form').addEventListener('submit',(e) =>{
+    e.preventDefault();
+    try {
+      const res = getIntegrationObjectAutomationFromURL(url.value);
+      output.value  = JSON.stringify(res, null, 2);
+      output.classList.add('success')
+      output.classList.remove('error')
+    } catch(e) {
+      output.value  = e.message;
+            output.classList.add('error')
+      output.classList.remove('success')
+    }
+  } )
+
+
+  </script>
+  
+</body>
+</html>
