@@ -1,0 +1,72 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": false,
+      "dob": "1990-07-19",
+      "experience": [
+        {
+          "awards": [],
+          "finish": "2017-05-15",
+          "id": 1,
+          "isBoss": false,
+          "jobTitle": "Бариста",
+          "name": "Volga Coffee",
+          "responsibilities": [
+            "Приготовление кофе",
+            "Работа с клиентами"
+          ],
+          "salary": 42000,
+          "start": "2013-02-10",
+          "subordinates": 0
+        },
+        {
+          "awards": [],
+          "finish": null,
+          "id": 2,
+          "isBoss": false,
+          "jobTitle": "Бариста-художник",
+          "name": "Coffee Art Studio",
+          "responsibilities": [
+            "Создание латте-арта",
+            "Проведение мастер-классов",
+            "Разработка дизайнов"
+          ],
+          "salary": 68000,
+          "start": "2017-06-01",
+          "subordinates": 0
+        }
+      ],
+      "id": 12,
+      "lastCofee": "2025-09-30T10:05:27Z",
+      "name": "Новикова Татьяна Борисовна",
+      "places": {
+        "home": {
+          "address": "Волгоград, пр. Ленина, д. 53, кв. 24",
+          "coordinates": [
+            48.71939,
+            44.50183
+          ]
+        },
+        "work": {
+          "address": "Волгоград, ул. Рабоче-Крестьянская, д. 18",
+          "coordinates": [
+            48.71675,
+            44.50392
+          ]
+        }
+      },
+      "referralIds": [
+        6,
+        17
+      ],
+      "sertifiedBarista": true,
+      "skills": [
+        "espresso",
+        "latte",
+        "cappuccino",
+        "macchiato",
+        "cold brew"
+      ]
+    }
+  ]
+}

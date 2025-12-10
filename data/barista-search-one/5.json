@@ -1,0 +1,50 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": true,
+      "dob": "1987-03-14",
+      "experience": [
+        {
+          "awards": [],
+          "finish": "2020-05-20",
+          "id": 1,
+          "isBoss": false,
+          "jobTitle": "Помощник бариста",
+          "name": "ООО 'Вкусный кофе'",
+          "responsibilities": [
+            "Подготовка ингредиентов",
+            "Мытье посуды",
+            "Поддержание чистоты"
+          ],
+          "salary": 35000,
+          "start": "2019-01-15",
+          "subordinates": 0
+        }
+      ],
+      "id": 5,
+      "lastCofee": "2025-09-27T16:45:33Z",
+      "name": "Николаев Денис Олегович",
+      "places": {
+        "home": {
+          "address": "Новосибирск, ул. Кирова, д. 56, кв. 34",
+          "coordinates": [
+            55.0302,
+            82.92043
+          ]
+        },
+        "work": {
+          "address": "Новосибирск, Красный пр., д. 77",
+          "coordinates": [
+            55.02847,
+            82.92249
+          ]
+        }
+      },
+      "referralIds": [],
+      "sertifiedBarista": false,
+      "skills": [
+        "americano"
+      ]
+    }
+  ]
+}

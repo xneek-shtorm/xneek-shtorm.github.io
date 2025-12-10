@@ -1,0 +1,80 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": true,
+      "dob": "1995-07-03",
+      "experience": [
+        {
+          "awards": [],
+          "finish": "2021-02-28",
+          "id": 1,
+          "isBoss": false,
+          "jobTitle": "Бариста",
+          "name": "Starbucks",
+          "responsibilities": [
+            "Приготовление кофе",
+            "Обслуживание клиентов",
+            "Уборка рабочего места"
+          ],
+          "salary": 55000,
+          "start": "2018-06-15",
+          "subordinates": 0
+        },
+        {
+          "awards": [],
+          "finish": null,
+          "id": 2,
+          "isBoss": true,
+          "jobTitle": "Старший бариста",
+          "name": "Coffeeman",
+          "responsibilities": [
+            "Управление сменой",
+            "Контроль качества",
+            "Обучение персонала",
+            "Заказ расходных материалов"
+          ],
+          "salary": 85000,
+          "start": "2021-03-01",
+          "subordinates": 5
+        }
+      ],
+      "id": 3,
+      "lastCofee": "2025-09-30T07:30:45Z",
+      "name": "Сидоров Алексей Петрович",
+      "places": {
+        "home": {
+          "address": "Санкт-Петербург, Невский пр., д. 45, кв. 78",
+          "coordinates": [
+            59.93583,
+            30.32587
+          ]
+        },
+        "secondWork": {
+          "address": "Санкт-Петербург, Лиговский пр., д. 89",
+          "coordinates": [
+            59.92876,
+            30.35892
+          ]
+        },
+        "work": {
+          "address": "Санкт-Петербург, ул. Садовая, д. 12",
+          "coordinates": [
+            59.93111,
+            30.32098
+          ]
+        }
+      },
+      "referralIds": [
+        1,
+        6
+      ],
+      "sertifiedBarista": true,
+      "skills": [
+        "espresso",
+        "macchiato",
+        "ristretto",
+        "cold brew"
+      ]
+    }
+  ]
+}

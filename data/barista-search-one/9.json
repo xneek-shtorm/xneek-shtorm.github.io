@@ -1,0 +1,85 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": false,
+      "dob": "1994-01-25",
+      "experience": [
+        {
+          "awards": [],
+          "finish": "2019-11-30",
+          "id": 1,
+          "isBoss": false,
+          "jobTitle": "Бариста",
+          "name": "Coffee House",
+          "responsibilities": [
+            "Приготовление кофе",
+            "Работа с кассой",
+            "Обслуживание клиентов"
+          ],
+          "salary": 48000,
+          "start": "2015-08-10",
+          "subordinates": 0
+        },
+        {
+          "awards": [],
+          "finish": "2022-06-20",
+          "id": 2,
+          "isBoss": true,
+          "jobTitle": "Старший бариста",
+          "name": "Urban Coffee",
+          "responsibilities": [
+            "Управление сменой",
+            "Контроль качества",
+            "Обучение персонала"
+          ],
+          "salary": 65000,
+          "start": "2019-12-15",
+          "subordinates": 4
+        },
+        {
+          "awards": [],
+          "finish": null,
+          "id": 3,
+          "isBoss": true,
+          "jobTitle": "Шеф-бариста",
+          "name": "Art Coffee Roasters",
+          "responsibilities": [
+            "Разработка меню",
+            "Обжарка кофе",
+            "Обучение персонала",
+            "Контроль качества"
+          ],
+          "salary": 95000,
+          "start": "2022-07-01",
+          "subordinates": 8
+        }
+      ],
+      "id": 9,
+      "lastCofee": "2025-09-30T06:45:19Z",
+      "name": "Кузнецов Артем Владимирович",
+      "places": {
+        "home": {
+          "address": "Краснодар, ул. Красная, д. 88, кв. 32",
+          "coordinates": [
+            45.04016,
+            38.97596
+          ]
+        }
+      },
+      "referralIds": [
+        4,
+        15,
+        16
+      ],
+      "sertifiedBarista": true,
+      "skills": [
+        "espresso",
+        "americano",
+        "cappuccino",
+        "latte",
+        "flat white",
+        "mocha"
+      ]
+    }
+  ]
+}

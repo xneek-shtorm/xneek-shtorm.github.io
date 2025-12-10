@@ -1,0 +1,78 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": true,
+      "dob": "1991-06-30",
+      "experience": [
+        {
+          "awards": [],
+          "finish": "2018-03-15",
+          "id": 1,
+          "isBoss": false,
+          "jobTitle": "Бариста",
+          "name": "Кофейня 'У Павла'",
+          "responsibilities": [
+            "Приготовление кофе",
+            "Обслуживание клиентов"
+          ],
+          "salary": 45000,
+          "start": "2014-07-01",
+          "subordinates": 0
+        },
+        {
+          "awards": [],
+          "finish": "2021-08-10",
+          "id": 2,
+          "isBoss": true,
+          "jobTitle": "Сменный руководитель",
+          "name": "Coffee Time",
+          "responsibilities": [
+            "Управление сменой",
+            "Обучение новых сотрудников"
+          ],
+          "salary": 60000,
+          "start": "2018-03-20",
+          "subordinates": 3
+        },
+        {
+          "awards": [],
+          "finish": null,
+          "id": 3,
+          "isBoss": true,
+          "jobTitle": "Управляющий",
+          "name": "Bean There",
+          "responsibilities": [
+            "Управление кофейней",
+            "Найм персонала",
+            "Финансовый учет"
+          ],
+          "salary": 90000,
+          "start": "2021-08-15",
+          "subordinates": 12
+        }
+      ],
+      "id": 7,
+      "lastCofee": "2025-09-29T22:15:47Z",
+      "name": "Волков Павел Игоревич",
+      "places": {
+        "home": {
+          "address": "Ростов-на-Дону, ул. Большая Садовая, д. 67, кв. 9",
+          "coordinates": [
+            47.22265,
+            39.71868
+          ]
+        }
+      },
+      "referralIds": [
+        4,
+        14
+      ],
+      "sertifiedBarista": true,
+      "skills": [
+        "espresso",
+        "americano",
+        "cappuccino"
+      ]
+    }
+  ]
+}

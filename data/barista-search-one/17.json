@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": true,
+      "dob": "1987-06-21",
+      "experience": [],
+      "id": 17,
+      "lastCofee": "2025-09-28T17:45:29Z",
+      "name": "Ковалев Алексей Дмитриевич",
+      "places": {
+        "home": {
+          "address": "Рязань, ул. Почтовая, д. 26, кв. 8",
+          "coordinates": [
+            54.62983,
+            39.74197
+          ]
+        }
+      },
+      "referralIds": [
+        12
+      ],
+      "sertifiedBarista": false,
+      "skills": [
+        "americano"
+      ]
+    }
+  ]
+}

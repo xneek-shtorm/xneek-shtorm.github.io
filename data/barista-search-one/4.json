@@ -1,0 +1,52 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": false,
+      "dob": "1992-11-28",
+      "experience": [
+        {
+          "awards": [],
+          "finish": null,
+          "id": 1,
+          "isBoss": true,
+          "jobTitle": "Владелец-бариста",
+          "name": "Кофейня 'Мария'",
+          "responsibilities": [
+            "Управление кофейней",
+            "Разработка меню",
+            "Обучение персонала",
+            "Закупка оборудования"
+          ],
+          "salary": 120000,
+          "start": "2017-09-10",
+          "subordinates": 8
+        }
+      ],
+      "id": 4,
+      "lastCofee": "2025-09-29T14:20:18Z",
+      "name": "Козлова Мария Дмитриевна",
+      "places": {
+        "home": {
+          "address": "Екатеринбург, ул. Ленина, д. 33, кв. 21",
+          "coordinates": [
+            56.83801,
+            60.59747
+          ]
+        }
+      },
+      "referralIds": [
+        2,
+        7,
+        8,
+        9
+      ],
+      "sertifiedBarista": true,
+      "skills": [
+        "latte",
+        "cappuccino",
+        "mocha",
+        "affogato"
+      ]
+    }
+  ]
+}

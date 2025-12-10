@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": false,
+      "dob": "1988-12-15",
+      "experience": [
+        {
+          "awards": [
+            {
+              "bonus": 0,
+              "charter": false,
+              "date": "2023-01-27",
+              "name": "Похлопывание по плечу"
+            }
+          ],
+          "finish": "2020-11-30",
+          "id": 1,
+          "isBoss": true,
+          "jobTitle": "Бариста",
+          "name": "Кофейня 'У Анны'",
+          "responsibilities": [
+            "Обучение новых сотрудников",
+            "Контроль качества",
+            "Разработка новых рецептов"
+          ],
+          "salary": 65000,
+          "start": "2015-03-01",
+          "subordinates": 2
+        }
+      ],
+      "id": 2,
+      "lastCofee": "2025-09-28T09:15:22Z",
+      "name": "Петрова Анна Сергеевна",
+      "places": {
+        "home": {
+          "address": "Москва, ул. Тверская, д. 15, кв. 12",
+          "coordinates": [
+            55.76001,
+            37.61759
+          ]
+        }
+      },
+      "referralIds": [
+        1,
+        4,
+        5
+      ],
+      "sertifiedBarista": false,
+      "skills": [
+        "cappuccino",
+        "flat white"
+      ]
+    }
+  ]
+}

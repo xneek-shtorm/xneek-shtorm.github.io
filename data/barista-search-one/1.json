@@ -1,0 +1,89 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": true,
+      "dob": "1990-05-21",
+      "experience": [
+        {
+          "awards": [],
+          "finish": "2012-08-31",
+          "id": 1,
+          "isBoss": false,
+          "jobTitle": "Джун бариста",
+          "name": "ООО Ололо",
+          "responsibilities": [
+            "Следил за временем",
+            "Звал всех на кофебрейки",
+            "Принимал участие в приготовлении эспрессо"
+          ],
+          "salary": 49999.99,
+          "start": "2010-01-01",
+          "subordinates": 0
+        },
+        {
+          "awards": [
+            {
+              "bonus": 15990,
+              "charter": true,
+              "date": "2020-12-27",
+              "name": "Лучший вспениватель молока на новогоднем корпоративе"
+            },
+            {
+              "bonus": 5000,
+              "charter": false,
+              "date": "2021-05-27",
+              "name": "Лучший мидл среди джунов"
+            },
+            {
+              "bonus": 50000,
+              "charter": true,
+              "date": "2022-05-27",
+              "name": "Бариста года"
+            }
+          ],
+          "finish": null,
+          "id": 2,
+          "isBoss": true,
+          "jobTitle": "Мидл бариста",
+          "name": "ООО Трололо",
+          "responsibilities": [
+            "Варил кофе",
+            "Вспенивал молоко"
+          ],
+          "salary": 100000,
+          "start": "2012-09-01",
+          "subordinates": 3
+        }
+      ],
+      "id": 1,
+      "lastCofee": "2025-09-29T18:00:32Z",
+      "name": "Иванов Иван Иванович",
+      "places": {
+        "home": {
+          "address": "Пенза, ул. Московская, д. 69, кв. 43",
+          "coordinates": [
+            53.12001,
+            45.00002
+          ]
+        },
+        "work": {
+          "address": "Пенза, ул. Кирова, д. 28",
+          "coordinates": [
+            53.12321,
+            45.001235
+          ]
+        }
+      },
+      "referralIds": [
+        2,
+        3
+      ],
+      "sertifiedBarista": true,
+      "skills": [
+        "americano",
+        "espresso",
+        "latte"
+      ]
+    }
+  ]
+}

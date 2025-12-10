@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": true,
+      "dob": "1993-03-08",
+      "experience": [
+        {
+          "awards": [],
+          "finish": "2019-12-31",
+          "id": 1,
+          "isBoss": false,
+          "jobTitle": "Бариста",
+          "name": "Сибирский кофе",
+          "responsibilities": [
+            "Приготовление кофе",
+            "Обслуживание клиентов"
+          ],
+          "salary": 47000,
+          "start": "2014-09-01",
+          "subordinates": 0
+        },
+        {
+          "awards": [],
+          "finish": null,
+          "id": 2,
+          "isBoss": true,
+          "jobTitle": "Управляющий бариста",
+          "name": "Coffee Masters",
+          "responsibilities": [
+            "Управление персоналом",
+            "Контроль качества",
+            "Обучение новых сотрудников"
+          ],
+          "salary": 78000,
+          "start": "2020-01-15",
+          "subordinates": 6
+        }
+      ],
+      "id": 13,
+      "lastCofee": "2025-09-29T15:40:11Z",
+      "name": "Морозов Дмитрий Сергеевич",
+      "places": {
+        "home": {
+          "address": "Красноярск, ул. Карла Маркса, д. 95, кв. 7",
+          "coordinates": [
+            56.01056,
+            92.85257
+          ]
+        }
+      },
+      "referralIds": [
+        6
+      ],
+      "sertifiedBarista": true,
+      "skills": [
+        "espresso",
+        "americano",
+        "cappuccino",
+        "latte",
+        "flat white"
+      ]
+    }
+  ]
+}

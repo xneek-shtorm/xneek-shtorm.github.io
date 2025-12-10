@@ -1,0 +1,35 @@
+{
+  "results": [
+    {
+      "coffeeWithShugar": true,
+      "dob": "1989-04-18",
+      "experience": [],
+      "id": 8,
+      "lastCofee": "2025-09-28T11:30:22Z",
+      "name": "Смирнова Ольга Александровна",
+      "places": {
+        "home": {
+          "address": "Воронеж, пр. Революции, д. 39, кв. 6",
+          "coordinates": [
+            51.6607,
+            39.20029
+          ]
+        },
+        "work": {
+          "address": "Воронеж, ул. Плехановская, д. 25",
+          "coordinates": [
+            51.66198,
+            39.20345
+          ]
+        }
+      },
+      "referralIds": [
+        4
+      ],
+      "sertifiedBarista": false,
+      "skills": [
+        "latte"
+      ]
+    }
+  ]
+}
