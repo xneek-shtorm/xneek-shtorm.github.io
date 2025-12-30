@@ -83,7 +83,29 @@
             "americano",
             "espresso",
             "latte"
-        ]
+        ],
+         "extraContacts": {
+            "phone": [
+            {
+                "id": 1,
+                "address": "79374441111"
+            },
+                    {
+                "id": 2,
+                "address": "79374442222"
+            }
+            ],
+            "max": [
+            {
+                "id": 6,
+                "address": "1243"
+            },
+                    {
+                "id": 5,
+                "address": "4320"
+            }
+            ]
+        }
     },
     {
         "coffeeWithShugar": false,
