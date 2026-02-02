@@ -83,6 +83,46 @@
         "americano",
         "espresso",
         "latte"
+      ],
+      "extraContacts": {
+        "phone": [
+          {
+            "id": 1,
+            "address": "79374441111"
+          },
+          {
+            "id": 2,
+            "address": "79374442222"
+          }
+        ],
+        "max": [
+          {
+            "id": 6,
+            "address": "1243"
+          },
+          {
+            "id": 5,
+            "address": "4320"
+          }
+        ]
+      },
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-1@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "71111111111"
+        },
+        {
+          "channel": "tg",
+          "address": "111111"
+        },
+        {
+          "channel": "chat",
+          "address": "be290187-e184-47e9-a51d-e4663517fc72"
+        }
       ]
     }
   ]

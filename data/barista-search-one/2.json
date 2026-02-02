@@ -49,6 +49,16 @@
       "skills": [
         "cappuccino",
         "flat white"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-2@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "72222222222"
+        }
       ]
     }
   ]

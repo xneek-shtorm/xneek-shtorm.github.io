@@ -22,6 +22,16 @@
       "sertifiedBarista": false,
       "skills": [
         "americano"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-11@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "71111111111"
+        }
       ]
     }
   ]

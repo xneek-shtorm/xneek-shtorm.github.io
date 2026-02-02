@@ -1,7 +1,58 @@
 {
-  "id": 15,
-  "name": "Григорьев Андрей Павлович",
+  "coffeeWithShugar": false,
   "dob": "1995-02-27",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2020-07-20",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Coffee Planet",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Работа с клиентами"
+      ],
+      "salary": 45000,
+      "start": "2016-03-15",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 2,
+      "isBoss": true,
+      "jobTitle": "Шеф-бариста",
+      "name": "Specialty Coffee Omsk",
+      "responsibilities": [
+        "Управление кофейней",
+        "Обучение персонала",
+        "Контроль качества",
+        "Разработка меню"
+      ],
+      "salary": 82000,
+      "start": "2020-08-01",
+      "subordinates": 5
+    }
+  ],
+  "id": 15,
+  "lastCofee": "2025-09-30T07:15:38Z",
+  "name": "Григорьев Андрей Павлович",
+  "places": {
+    "home": {
+      "address": "Омск, ул. Лермонтова, д. 44, кв. 29",
+      "coordinates": [
+        54.98485,
+        73.36746
+      ]
+    }
+  },
+  "referralIds": [
+    9,
+    18,
+    19,
+    20
+  ],
   "sertifiedBarista": true,
   "skills": [
     "espresso",
@@ -12,55 +63,10 @@
     "affogato",
     "pour over"
   ],
-  "coffeeWithShugar": false,
-  "lastCofee": "2025-09-30T07:15:38Z",
-  "places": {
-    "home": {
-      "address": "Омск, ул. Лермонтова, д. 44, кв. 29",
-      "coordinates": [
-        54.98485,
-        73.36746
-      ]
-    }
-  },
-  "experience": [
+  "addresses": [
     {
-      "id": 1,
-      "name": "Coffee Planet",
-      "jobTitle": "Бариста",
-      "start": "2016-03-15",
-      "finish": "2020-07-20",
-      "salary": 45000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Работа с клиентами"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Specialty Coffee Omsk",
-      "jobTitle": "Шеф-бариста",
-      "start": "2020-08-01",
-      "finish": null,
-      "salary": 82000,
-      "subordinates": 5,
-      "isBoss": true,
-      "awards": [],
-      "responsibilities": [
-        "Управление кофейней",
-        "Обучение персонала",
-        "Контроль качества",
-        "Разработка меню"
-      ]
+      "channel": "email",
+      "address": "barista-15@barista.ru"
     }
-  ],
-  "referralIds": [
-    9,
-    18,
-    19,
-    20
   ]
 }

@@ -27,7 +27,25 @@
         7
       ],
       "sertifiedBarista": false,
-      "skills": []
+      "skills": [],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-14@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "71414141414"
+        },
+        {
+          "channel": "tg",
+          "address": "141414"
+        },
+        {
+          "channel": "chat",
+          "address": "84c7d1f4-0848-49f6-bdab-e0b6b9c60b1c"
+        }
+      ]
     }
   ]
 }

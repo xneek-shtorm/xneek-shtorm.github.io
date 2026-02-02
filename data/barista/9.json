@@ -1,18 +1,60 @@
 {
-  "id": 9,
-  "name": "Кузнецов Артем Владимирович",
-  "dob": "1994-01-25",
-  "sertifiedBarista": true,
-  "skills": [
-    "espresso",
-    "americano",
-    "cappuccino",
-    "latte",
-    "flat white",
-    "mocha"
-  ],
   "coffeeWithShugar": false,
+  "dob": "1994-01-25",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2019-11-30",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Coffee House",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Работа с кассой",
+        "Обслуживание клиентов"
+      ],
+      "salary": 48000,
+      "start": "2015-08-10",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": "2022-06-20",
+      "id": 2,
+      "isBoss": true,
+      "jobTitle": "Старший бариста",
+      "name": "Urban Coffee",
+      "responsibilities": [
+        "Управление сменой",
+        "Контроль качества",
+        "Обучение персонала"
+      ],
+      "salary": 65000,
+      "start": "2019-12-15",
+      "subordinates": 4
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 3,
+      "isBoss": true,
+      "jobTitle": "Шеф-бариста",
+      "name": "Art Coffee Roasters",
+      "responsibilities": [
+        "Разработка меню",
+        "Обжарка кофе",
+        "Обучение персонала",
+        "Контроль качества"
+      ],
+      "salary": 95000,
+      "start": "2022-07-01",
+      "subordinates": 8
+    }
+  ],
+  "id": 9,
   "lastCofee": "2025-09-30T06:45:19Z",
+  "name": "Кузнецов Артем Владимирович",
   "places": {
     "home": {
       "address": "Краснодар, ул. Красная, д. 88, кв. 32",
@@ -22,60 +64,36 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Coffee House",
-      "jobTitle": "Бариста",
-      "start": "2015-08-10",
-      "finish": "2019-11-30",
-      "salary": 48000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Работа с кассой",
-        "Обслуживание клиентов"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Urban Coffee",
-      "jobTitle": "Старший бариста",
-      "start": "2019-12-15",
-      "finish": "2022-06-20",
-      "salary": 65000,
-      "subordinates": 4,
-      "isBoss": true,
-      "awards": [],
-      "responsibilities": [
-        "Управление сменой",
-        "Контроль качества",
-        "Обучение персонала"
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Art Coffee Roasters",
-      "jobTitle": "Шеф-бариста",
-      "start": "2022-07-01",
-      "finish": null,
-      "salary": 95000,
-      "subordinates": 8,
-      "isBoss": true,
-      "awards": [],
-      "responsibilities": [
-        "Разработка меню",
-        "Обжарка кофе",
-        "Обучение персонала",
-        "Контроль качества"
-      ]
-    }
-  ],
   "referralIds": [
     4,
     15,
     16
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "americano",
+    "cappuccino",
+    "latte",
+    "flat white",
+    "mocha"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-9@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "79999999999"
+    },
+    {
+      "channel": "tg",
+      "address": "999999"
+    },
+    {
+      "channel": "chat",
+      "address": "c19f1b27-9e2e-47e2-a4c0-12d006ca1883"
+    }
   ]
 }

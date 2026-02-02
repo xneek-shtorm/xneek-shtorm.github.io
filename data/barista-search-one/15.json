@@ -64,6 +64,12 @@
         "mocha",
         "affogato",
         "pour over"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-15@barista.ru"
+        }
       ]
     }
   ]

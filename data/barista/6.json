@@ -1,19 +1,43 @@
 {
-  "id": 6,
-  "name": "Орлова Екатерина Викторовна",
-  "dob": "1993-08-22",
-  "sertifiedBarista": true,
-  "skills": [
-    "espresso",
-    "latte",
-    "cappuccino",
-    "flat white",
-    "macchiato",
-    "cold brew",
-    "pour over"
-  ],
   "coffeeWithShugar": false,
+  "dob": "1993-08-22",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2022-12-31",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста-исследователь",
+      "name": "Coffee Lab",
+      "responsibilities": [
+        "Разработка новых рецептов",
+        "Тестирование сортов кофе",
+        "Проведение дегустаций"
+      ],
+      "salary": 75000,
+      "start": "2016-04-01",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 2,
+      "isBoss": false,
+      "jobTitle": "Кофе-тренер",
+      "name": "Specialty Coffee Association",
+      "responsibilities": [
+        "Обучение бариста",
+        "Проведение мастер-классов",
+        "Судья на чемпионатах"
+      ],
+      "salary": 110000,
+      "start": "2023-01-15",
+      "subordinates": 0
+    }
+  ],
+  "id": 6,
   "lastCofee": "2025-09-30T08:10:05Z",
+  "name": "Орлова Екатерина Викторовна",
   "places": {
     "home": {
       "address": "Казань, ул. Баумана, д. 23, кв. 15",
@@ -30,45 +54,39 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Coffee Lab",
-      "jobTitle": "Бариста-исследователь",
-      "start": "2016-04-01",
-      "finish": "2022-12-31",
-      "salary": 75000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Разработка новых рецептов",
-        "Тестирование сортов кофе",
-        "Проведение дегустаций"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Specialty Coffee Association",
-      "jobTitle": "Кофе-тренер",
-      "start": "2023-01-15",
-      "finish": null,
-      "salary": 110000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Обучение бариста",
-        "Проведение мастер-классов",
-        "Судья на чемпионатах"
-      ]
-    }
-  ],
   "referralIds": [
     3,
     10,
     11,
     12,
     13
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "latte",
+    "cappuccino",
+    "flat white",
+    "macchiato",
+    "cold brew",
+    "pour over"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-6@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "76666666666"
+    },
+    {
+      "channel": "tg",
+      "address": "666666"
+    },
+    {
+      "channel": "chat",
+      "address": "c8810d11-e083-4dd1-b850-3666c9fa5bce"
+    }
   ]
 }

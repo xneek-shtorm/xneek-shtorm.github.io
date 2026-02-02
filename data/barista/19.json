@@ -1,18 +1,58 @@
 {
-  "id": 19,
-  "name": "Медведев Сергей Николаевич",
-  "dob": "1991-08-07",
-  "sertifiedBarista": true,
-  "skills": [
-    "espresso",
-    "americano",
-    "cappuccino",
-    "latte",
-    "flat white",
-    "cold brew"
-  ],
   "coffeeWithShugar": true,
+  "dob": "1991-08-07",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2017-09-30",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Байкальский кофе",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Обслуживание клиентов"
+      ],
+      "salary": 44000,
+      "start": "2013-04-20",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": "2022-05-20",
+      "id": 2,
+      "isBoss": true,
+      "jobTitle": "Старший бариста",
+      "name": "Coffee Expert",
+      "responsibilities": [
+        "Управление сменой",
+        "Обучение персонала",
+        "Контроль качества"
+      ],
+      "salary": 60000,
+      "start": "2017-10-15",
+      "subordinates": 4
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 3,
+      "isBoss": true,
+      "jobTitle": "Управляющий",
+      "name": "Профи Кофе",
+      "responsibilities": [
+        "Управление сетью кофеен",
+        "Найм персонала",
+        "Финансовое планирование"
+      ],
+      "salary": 88000,
+      "start": "2022-06-01",
+      "subordinates": 10
+    }
+  ],
+  "id": 19,
   "lastCofee": "2025-09-29T13:55:41Z",
+  "name": "Медведев Сергей Николаевич",
   "places": {
     "home": {
       "address": "Иркутск, ул. Литвинова, д. 17, кв. 5",
@@ -22,56 +62,22 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Байкальский кофе",
-      "jobTitle": "Бариста",
-      "start": "2013-04-20",
-      "finish": "2017-09-30",
-      "salary": 44000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Обслуживание клиентов"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Coffee Expert",
-      "jobTitle": "Старший бариста",
-      "start": "2017-10-15",
-      "finish": "2022-05-20",
-      "salary": 60000,
-      "subordinates": 4,
-      "isBoss": true,
-      "awards": [],
-      "responsibilities": [
-        "Управление сменой",
-        "Обучение персонала",
-        "Контроль качества"
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Профи Кофе",
-      "jobTitle": "Управляющий",
-      "start": "2022-06-01",
-      "finish": null,
-      "salary": 88000,
-      "subordinates": 10,
-      "isBoss": true,
-      "awards": [],
-      "responsibilities": [
-        "Управление сетью кофеен",
-        "Найм персонала",
-        "Финансовое планирование"
-      ]
-    }
-  ],
   "referralIds": [
     15
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "americano",
+    "cappuccino",
+    "latte",
+    "flat white",
+    "cold brew"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-19@barista.ru"
+    }
   ]
 }

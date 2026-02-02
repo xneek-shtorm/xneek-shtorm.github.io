@@ -1,17 +1,42 @@
 {
-  "id": 12,
-  "name": "Новикова Татьяна Борисовна",
-  "dob": "1990-07-19",
-  "sertifiedBarista": true,
-  "skills": [
-    "espresso",
-    "latte",
-    "cappuccino",
-    "macchiato",
-    "cold brew"
-  ],
   "coffeeWithShugar": false,
+  "dob": "1990-07-19",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2017-05-15",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Volga Coffee",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Работа с клиентами"
+      ],
+      "salary": 42000,
+      "start": "2013-02-10",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 2,
+      "isBoss": false,
+      "jobTitle": "Бариста-художник",
+      "name": "Coffee Art Studio",
+      "responsibilities": [
+        "Создание латте-арта",
+        "Проведение мастер-классов",
+        "Разработка дизайнов"
+      ],
+      "salary": 68000,
+      "start": "2017-06-01",
+      "subordinates": 0
+    }
+  ],
+  "id": 12,
   "lastCofee": "2025-09-30T10:05:27Z",
+  "name": "Новикова Татьяна Борисовна",
   "places": {
     "home": {
       "address": "Волгоград, пр. Ленина, д. 53, кв. 24",
@@ -28,41 +53,30 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Volga Coffee",
-      "jobTitle": "Бариста",
-      "start": "2013-02-10",
-      "finish": "2017-05-15",
-      "salary": 42000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Работа с клиентами"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Coffee Art Studio",
-      "jobTitle": "Бариста-художник",
-      "start": "2017-06-01",
-      "finish": null,
-      "salary": 68000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Создание латте-арта",
-        "Проведение мастер-классов",
-        "Разработка дизайнов"
-      ]
-    }
-  ],
   "referralIds": [
     6,
     17
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "latte",
+    "cappuccino",
+    "macchiato",
+    "cold brew"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-12@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "71212121212"
+    },
+    {
+      "channel": "tg",
+      "address": "121212"
+    }
   ]
 }

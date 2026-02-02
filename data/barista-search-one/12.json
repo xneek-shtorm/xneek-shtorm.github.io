@@ -66,6 +66,20 @@
         "cappuccino",
         "macchiato",
         "cold brew"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-12@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "71212121212"
+        },
+        {
+          "channel": "tg",
+          "address": "121212"
+        }
       ]
     }
   ]

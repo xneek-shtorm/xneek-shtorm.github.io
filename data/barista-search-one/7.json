@@ -72,6 +72,12 @@
         "espresso",
         "americano",
         "cappuccino"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-7@barista.ru"
+        }
       ]
     }
   ]

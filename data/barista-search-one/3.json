@@ -74,6 +74,12 @@
         "macchiato",
         "ristretto",
         "cold brew"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-3@barista.ru"
+        }
       ]
     }
   ]

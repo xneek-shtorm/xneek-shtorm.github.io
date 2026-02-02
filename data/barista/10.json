@@ -1,15 +1,27 @@
 {
-  "id": 10,
-  "name": "Попова Ирина Станиславовна",
-  "dob": "1996-09-12",
-  "sertifiedBarista": true,
-  "skills": [
-    "cappuccino",
-    "latte",
-    "flat white"
-  ],
   "coffeeWithShugar": true,
+  "dob": "1996-09-12",
+  "experience": [
+    {
+      "awards": [],
+      "finish": null,
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Кофейня 'Ирина'",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Обслуживание клиентов",
+        "Поддержание чистоты"
+      ],
+      "salary": 52000,
+      "start": "2017-05-20",
+      "subordinates": 0
+    }
+  ],
+  "id": 10,
   "lastCofee": "2025-09-29T19:25:14Z",
+  "name": "Попова Ирина Станиславовна",
   "places": {
     "home": {
       "address": "Уфа, ул. Ленина, д. 42, кв. 18",
@@ -26,25 +38,31 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Кофейня 'Ирина'",
-      "jobTitle": "Бариста",
-      "start": "2017-05-20",
-      "finish": null,
-      "salary": 52000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Обслуживание клиентов",
-        "Поддержание чистоты"
-      ]
-    }
-  ],
   "referralIds": [
     6
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "cappuccino",
+    "latte",
+    "flat white"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-10@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "71010101010"
+    },
+    {
+      "channel": "tg",
+      "address": "101010"
+    },
+    {
+      "channel": "chat",
+      "address": "ffb95dd4-fa3c-426c-97f5-53d44611b9b4"
+    }
   ]
 }

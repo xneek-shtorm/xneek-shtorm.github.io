@@ -1,16 +1,43 @@
 {
-  "id": 18,
-  "name": "Зайцева Ольга Владимировна",
-  "dob": "1994-04-14",
-  "sertifiedBarista": true,
-  "skills": [
-    "espresso",
-    "cappuccino",
-    "latte",
-    "macchiato"
-  ],
   "coffeeWithShugar": false,
+  "dob": "1994-04-14",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2021-02-28",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Сибирские традиции",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Работа с клиентами",
+        "Поддержание чистоты"
+      ],
+      "salary": 49000,
+      "start": "2015-11-01",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 2,
+      "isBoss": false,
+      "jobTitle": "Бариста-тренер",
+      "name": "Coffee Culture",
+      "responsibilities": [
+        "Обучение новых бариста",
+        "Контроль качества",
+        "Проведение мастер-классов"
+      ],
+      "salary": 71000,
+      "start": "2021-03-15",
+      "subordinates": 0
+    }
+  ],
+  "id": 18,
   "lastCofee": "2025-09-30T09:20:16Z",
+  "name": "Зайцева Ольга Владимировна",
   "places": {
     "home": {
       "address": "Тюмень, ул. Республики, д. 58, кв. 22",
@@ -27,41 +54,24 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Сибирские традиции",
-      "jobTitle": "Бариста",
-      "start": "2015-11-01",
-      "finish": "2021-02-28",
-      "salary": 49000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Работа с клиентами",
-        "Поддержание чистоты"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Coffee Culture",
-      "jobTitle": "Бариста-тренер",
-      "start": "2021-03-15",
-      "finish": null,
-      "salary": 71000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Обучение новых бариста",
-        "Контроль качества",
-        "Проведение мастер-классов"
-      ]
-    }
-  ],
   "referralIds": [
     15
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "cappuccino",
+    "latte",
+    "macchiato"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-18@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "71818181818"
+    }
   ]
 }

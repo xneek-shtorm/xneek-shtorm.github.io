@@ -79,6 +79,24 @@
         "latte",
         "flat white",
         "mocha"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-9@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "79999999999"
+        },
+        {
+          "channel": "tg",
+          "address": "999999"
+        },
+        {
+          "channel": "chat",
+          "address": "c19f1b27-9e2e-47e2-a4c0-12d006ca1883"
+        }
       ]
     }
   ]

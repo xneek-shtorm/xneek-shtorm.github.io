@@ -1,15 +1,61 @@
 {
-  "id": 1,
-  "name": "Иванов Иван Иванович",
-  "dob": "1990-05-21",
-  "sertifiedBarista": true,
-  "skills": [
-    "americano",
-    "espresso",
-    "latte"
-  ],
   "coffeeWithShugar": true,
+  "dob": "1990-05-21",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2012-08-31",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Джун бариста",
+      "name": "ООО Ололо",
+      "responsibilities": [
+        "Следил за временем",
+        "Звал всех на кофебрейки",
+        "Принимал участие в приготовлении эспрессо"
+      ],
+      "salary": 49999.99,
+      "start": "2010-01-01",
+      "subordinates": 0
+    },
+    {
+      "awards": [
+        {
+          "bonus": 15990,
+          "charter": true,
+          "date": "2020-12-27",
+          "name": "Лучший вспениватель молока на новогоднем корпоративе"
+        },
+        {
+          "bonus": 5000,
+          "charter": false,
+          "date": "2021-05-27",
+          "name": "Лучший мидл среди джунов"
+        },
+        {
+          "bonus": 50000,
+          "charter": true,
+          "date": "2022-05-27",
+          "name": "Бариста года"
+        }
+      ],
+      "finish": null,
+      "id": 2,
+      "isBoss": true,
+      "jobTitle": "Мидл бариста",
+      "name": "ООО Трололо",
+      "responsibilities": [
+        "Варил кофе",
+        "Вспенивал молоко"
+      ],
+      "salary": 100000,
+      "start": "2012-09-01",
+      "subordinates": 3
+    }
+  ],
+  "id": 1,
   "lastCofee": "2025-09-29T18:00:32Z",
+  "name": "Иванов Иван Иванович",
   "places": {
     "home": {
       "address": "Пенза, ул. Московская, д. 69, кв. 43",
@@ -26,61 +72,15 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "ООО Ололо",
-      "jobTitle": "Джун бариста",
-      "start": "2010-01-01",
-      "finish": "2012-08-31",
-      "salary": 49999.99,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Следил за временем",
-        "Звал всех на кофебрейки",
-        "Принимал участие в приготовлении эспрессо"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "ООО Трололо",
-      "jobTitle": "Мидл бариста",
-      "start": "2012-09-01",
-      "finish": null,
-      "salary": 100000,
-      "subordinates": 3,
-      "isBoss": true,
-      "awards": [
-        {
-          "name": "Лучший вспениватель молока на новогоднем корпоративе",
-          "date": "2020-12-27",
-          "bonus": 15990,
-          "charter": true
-        },
-        {
-          "name": "Лучший мидл среди джунов",
-          "date": "2021-05-27",
-          "bonus": 5000,
-          "charter": false
-        },
-        {
-          "name": "Бариста года",
-          "date": "2022-05-27",
-          "bonus": 50000,
-          "charter": true
-        }
-      ],
-      "responsibilities": [
-        "Варил кофе",
-        "Вспенивал молоко"
-      ]
-    }
-  ],
   "referralIds": [
     2,
     3
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "americano",
+    "espresso",
+    "latte"
   ],
   "extraContacts": {
     "phone": [
@@ -88,7 +88,7 @@
         "id": 1,
         "address": "79374441111"
       },
-            {
+      {
         "id": 2,
         "address": "79374442222"
       }
@@ -98,10 +98,28 @@
         "id": 6,
         "address": "1243"
       },
-            {
+      {
         "id": 5,
         "address": "4320"
       }
     ]
-  }
+  },
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-1@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "71111111111"
+    },
+    {
+      "channel": "tg",
+      "address": "111111"
+    },
+    {
+      "channel": "chat",
+      "address": "be290187-e184-47e9-a51d-e4663517fc72"
+    }
+  ]
 }

@@ -65,6 +65,16 @@
         "cappuccino",
         "latte",
         "macchiato"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-18@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "71818181818"
+        }
       ]
     }
   ]

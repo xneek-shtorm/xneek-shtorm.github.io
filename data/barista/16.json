@@ -1,15 +1,42 @@
 {
-  "id": 16,
-  "name": "Лебедева Наталья Игоревна",
-  "dob": "1992-11-03",
-  "sertifiedBarista": true,
-  "skills": [
-    "latte",
-    "cappuccino",
-    "flat white"
-  ],
   "coffeeWithShugar": true,
+  "dob": "1992-11-03",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2018-04-15",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Уральская кофейня",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Обслуживание клиентов"
+      ],
+      "salary": 43000,
+      "start": "2014-07-10",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 2,
+      "isBoss": true,
+      "jobTitle": "Старший бариста",
+      "name": "Coffee Style",
+      "responsibilities": [
+        "Управление сменой",
+        "Обучение персонала",
+        "Контроль качества"
+      ],
+      "salary": 62000,
+      "start": "2018-05-01",
+      "subordinates": 3
+    }
+  ],
+  "id": 16,
   "lastCofee": "2025-09-29T21:30:52Z",
+  "name": "Лебедева Наталья Игоревна",
   "places": {
     "home": {
       "address": "Челябинск, пр. Ленина, д. 39, кв. 16",
@@ -26,40 +53,31 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Уральская кофейня",
-      "jobTitle": "Бариста",
-      "start": "2014-07-10",
-      "finish": "2018-04-15",
-      "salary": 43000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Обслуживание клиентов"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Coffee Style",
-      "jobTitle": "Старший бариста",
-      "start": "2018-05-01",
-      "finish": null,
-      "salary": 62000,
-      "subordinates": 3,
-      "isBoss": true,
-      "awards": [],
-      "responsibilities": [
-        "Управление сменой",
-        "Обучение персонала",
-        "Контроль качества"
-      ]
-    }
-  ],
   "referralIds": [
     9
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "latte",
+    "cappuccino",
+    "flat white"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-16@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "71616161616"
+    },
+    {
+      "channel": "tg",
+      "address": "161616"
+    },
+    {
+      "channel": "chat",
+      "address": "7e6a2fbf-dae4-4152-a0d0-5194428c18aa"
+    }
   ]
 }

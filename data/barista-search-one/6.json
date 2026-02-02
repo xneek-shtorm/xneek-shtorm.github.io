@@ -72,6 +72,24 @@
         "macchiato",
         "cold brew",
         "pour over"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-6@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "76666666666"
+        },
+        {
+          "channel": "tg",
+          "address": "666666"
+        },
+        {
+          "channel": "chat",
+          "address": "c8810d11-e083-4dd1-b850-3666c9fa5bce"
+        }
       ]
     }
   ]

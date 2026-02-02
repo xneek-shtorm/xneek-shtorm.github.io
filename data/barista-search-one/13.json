@@ -58,6 +58,24 @@
         "cappuccino",
         "latte",
         "flat white"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-13@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "71313131313"
+        },
+        {
+          "channel": "tg",
+          "address": "131313"
+        },
+        {
+          "channel": "chat",
+          "address": "92760217-2510-48c3-a5bf-438fa9711960"
+        }
       ]
     }
   ]

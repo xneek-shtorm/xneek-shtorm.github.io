@@ -1,17 +1,42 @@
 {
-  "id": 13,
-  "name": "Морозов Дмитрий Сергеевич",
-  "dob": "1993-03-08",
-  "sertifiedBarista": true,
-  "skills": [
-    "espresso",
-    "americano",
-    "cappuccino",
-    "latte",
-    "flat white"
-  ],
   "coffeeWithShugar": true,
+  "dob": "1993-03-08",
+  "experience": [
+    {
+      "awards": [],
+      "finish": "2019-12-31",
+      "id": 1,
+      "isBoss": false,
+      "jobTitle": "Бариста",
+      "name": "Сибирский кофе",
+      "responsibilities": [
+        "Приготовление кофе",
+        "Обслуживание клиентов"
+      ],
+      "salary": 47000,
+      "start": "2014-09-01",
+      "subordinates": 0
+    },
+    {
+      "awards": [],
+      "finish": null,
+      "id": 2,
+      "isBoss": true,
+      "jobTitle": "Управляющий бариста",
+      "name": "Coffee Masters",
+      "responsibilities": [
+        "Управление персоналом",
+        "Контроль качества",
+        "Обучение новых сотрудников"
+      ],
+      "salary": 78000,
+      "start": "2020-01-15",
+      "subordinates": 6
+    }
+  ],
+  "id": 13,
   "lastCofee": "2025-09-29T15:40:11Z",
+  "name": "Морозов Дмитрий Сергеевич",
   "places": {
     "home": {
       "address": "Красноярск, ул. Карла Маркса, д. 95, кв. 7",
@@ -21,40 +46,33 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Сибирский кофе",
-      "jobTitle": "Бариста",
-      "start": "2014-09-01",
-      "finish": "2019-12-31",
-      "salary": 47000,
-      "subordinates": 0,
-      "isBoss": false,
-      "awards": [],
-      "responsibilities": [
-        "Приготовление кофе",
-        "Обслуживание клиентов"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Coffee Masters",
-      "jobTitle": "Управляющий бариста",
-      "start": "2020-01-15",
-      "finish": null,
-      "salary": 78000,
-      "subordinates": 6,
-      "isBoss": true,
-      "awards": [],
-      "responsibilities": [
-        "Управление персоналом",
-        "Контроль качества",
-        "Обучение новых сотрудников"
-      ]
-    }
-  ],
   "referralIds": [
     6
+  ],
+  "sertifiedBarista": true,
+  "skills": [
+    "espresso",
+    "americano",
+    "cappuccino",
+    "latte",
+    "flat white"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-13@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "71313131313"
+    },
+    {
+      "channel": "tg",
+      "address": "131313"
+    },
+    {
+      "channel": "chat",
+      "address": "92760217-2510-48c3-a5bf-438fa9711960"
+    }
   ]
 }

@@ -1,14 +1,34 @@
 {
-  "id": 2,
-  "name": "Петрова Анна Сергеевна",
-  "dob": "1988-12-15",
-  "sertifiedBarista": false,
-  "skills": [
-    "cappuccino",
-    "flat white"
-  ],
   "coffeeWithShugar": false,
+  "dob": "1988-12-15",
+  "experience": [
+    {
+      "awards": [
+        {
+          "bonus": 0,
+          "charter": false,
+          "date": "2023-01-27",
+          "name": "Похлопывание по плечу"
+        }
+      ],
+      "finish": "2020-11-30",
+      "id": 1,
+      "isBoss": true,
+      "jobTitle": "Бариста",
+      "name": "Кофейня 'У Анны'",
+      "responsibilities": [
+        "Обучение новых сотрудников",
+        "Контроль качества",
+        "Разработка новых рецептов"
+      ],
+      "salary": 65000,
+      "start": "2015-03-01",
+      "subordinates": 2
+    }
+  ],
+  "id": 2,
   "lastCofee": "2025-09-28T09:15:22Z",
+  "name": "Петрова Анна Сергеевна",
   "places": {
     "home": {
       "address": "Москва, ул. Тверская, д. 15, кв. 12",
@@ -18,34 +38,24 @@
       ]
     }
   },
-  "experience": [
-    {
-      "id": 1,
-      "name": "Кофейня 'У Анны'",
-      "jobTitle": "Бариста",
-      "start": "2015-03-01",
-      "finish": "2020-11-30",
-      "salary": 65000,
-      "subordinates": 2,
-      "isBoss": true,
-      "awards": [
-        {
-          "name": "Похлопывание по плечу",
-          "date": "2023-01-27",
-          "bonus": 0,
-          "charter": false
-        }
-      ],
-      "responsibilities": [
-        "Обучение новых сотрудников",
-        "Контроль качества",
-        "Разработка новых рецептов"
-      ]
-    }
-  ],
   "referralIds": [
     1,
     4,
     5
+  ],
+  "sertifiedBarista": false,
+  "skills": [
+    "cappuccino",
+    "flat white"
+  ],
+  "addresses": [
+    {
+      "channel": "email",
+      "address": "barista-2@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "72222222222"
+    }
   ]
 }

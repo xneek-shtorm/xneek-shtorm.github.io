@@ -46,6 +46,24 @@
       "sertifiedBarista": false,
       "skills": [
         "latte"
+      ],
+      "addresses": [
+        {
+          "channel": "email",
+          "address": "barista-20@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "72020202020"
+        },
+        {
+          "channel": "tg",
+          "address": "202020"
+        },
+        {
+          "channel": "chat",
+          "address": "f8a8237a-cfa7-4914-8f71-dcea9d4793b1"
+        }
       ]
     }
   ]
