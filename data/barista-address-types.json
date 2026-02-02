@@ -1,0 +1,18 @@
+[
+  {
+    "channel": "email",
+    "name": "Электропочта"
+  },
+  {
+    "channel": "phone",
+    "name": "Телефон"
+  },
+  {
+    "channel": "tg",
+    "name": "Телега"
+  },
+  {
+    "channel": "chat",
+    "name": "Чат на сайте"
+  }
+]
