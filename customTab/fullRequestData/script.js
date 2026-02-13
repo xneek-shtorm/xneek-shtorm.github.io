@@ -26,6 +26,8 @@ const getValueFromChain = (rawChain, obj) => {
     }
     catch (e) {
         console.warn('Failed to get value from path', rawChain, e);
+        err.value = e.message
+        err.style.color = 'red'
         return '';
     }
 };
@@ -118,6 +120,10 @@ const run = (q) => {
 
 form.onsubmit =  e => {
   e.preventDefault();
+
+        err.value = ''
+        err.style.color = ''
+
 const req = inp.value;
 run(req)
   const url = new URL(window.location.href);

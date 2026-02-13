@@ -52,7 +52,7 @@
           name="FullRequestData"
           style="flex-grow: 1;"
           value="*"
-          pattern="^([А-яA-z0-9\:]+|\*)[([А-яA-z0-9\:]+)\~\*=]*((\[\])|[А-яA-z0-9\:]+|\*)?$"
+          pattern="^(([A-Za-zА-Яа-яёЁ0-9_: -])[A-Za-zА-Яа-яёЁ0-9_: ~\*=*-]*((\[\])|[A-Za-zА-Яа-яёЁ0-9_: -])?)|*$"
           list="samples"
         >
         <input type="submit" value="Запросить" >
@@ -60,7 +60,11 @@
           <option value="requestData~id"></option>
           <option value="contactPersonsData~0~contactAddresses~*addressType=VideoChat~0~addressString"></option>
         </datalist>
+
       </form>
+              <div>
+          <output id="err"></output>
+        </div>
       </header>
    
       <pre id="out"></pre>
