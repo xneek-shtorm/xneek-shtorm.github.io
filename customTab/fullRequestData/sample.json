@@ -210,283 +210,54 @@
   },
   "serviceSessionData": {
     "serviceObject": {
-      "integrationObjectId": "019ac03d-00fd-77cb-bf91-4e11d3726a09",
-      "externalId": "-Oc54E_2RG_w9mF_Vv2A",
-      "metadata": {
-        "code": "fednik-contact-persons-ContactPerson-So-1",
-        "name": "Клиент как объект особый",
-        "description": "ContactPerson demo API",
-        "order": 2,
-        "metadata": "{\n  \"type\": \"object\"\n}",
-        "tag": "ServiceObject"
-      },
-      "fields": [
-        {
-          "fieldName": "ИД",
-          "fieldType": "String",
-          "description": "гуид клиента",
-          "value": {
-            "kind": "plain",
-            "value": "-Oc54E_2RG_w9mF_Vv2A",
-            "fieldMetadata": {
-              "fieldName": "ИД",
-              "fieldType": "String",
-              "fieldPath": "id",
-              "dictionaryFieldTypeCode": null,
-              "description": "гуид клиента",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-            }
-          },
-          "fieldPath": "id"
-        },
-        {
-          "fieldName": "Контакты",
-          "fieldType": "Object",
-          "description": "Контактные данные",
-          "value": {
-            "kind": "listOfDictionary",
-            "items": [
-              {
-                "id": {
-                  "kind": "plain",
-                  "value": "123",
-                  "fieldMetadata": {
-                    "fieldName": "ID",
-                    "fieldType": "Number",
-                    "fieldPath": "id",
-                    "dictionaryFieldTypeCode": null,
-                    "description": "",
-                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-                  }
-                },
-                "isPreferred": {
-                  "kind": "plain",
-                  "value": "True",
-                  "fieldMetadata": {
-                    "fieldName": "Основной",
-                    "fieldType": "Boolean",
-                    "fieldPath": "isPreferred",
-                    "dictionaryFieldTypeCode": null,
-                    "description": "Предпочтительный",
-                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-                  }
-                },
-                "typeId": {
-                  "kind": "plain",
-                  "value": "Телефон",
-                  "fieldMetadata": {
-                    "fieldName": "Тип",
-                    "fieldType": "Dictionary",
-                    "fieldPath": "typeId",
-                    "dictionaryFieldTypeCode": "fednik-contact-persons-dict-address-type",
-                    "description": "PHONE",
-                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-                  }
-                },
+        "externalId": "НД=74050750001234",
+        "fields": [
+            {
+                "description": "Заголовок",
+                "fieldName": "Заголовок",
+                "fieldPath": "serviceObjects:0:elsOrContractNumber",
+                "fieldType": "String",
                 "value": {
-                  "kind": "plain",
-                  "value": "8800955535",
-                  "fieldMetadata": {
-                    "fieldName": "Адрес",
-                    "fieldType": "String",
-                    "fieldPath": "value",
-                    "dictionaryFieldTypeCode": null,
-                    "description": "или телефон",
-                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-                  }
-                },
-                "valueType": {
-                  "kind": "plain",
-                  "value": "Домашний",
-                  "fieldMetadata": {
-                    "fieldName": "Вид",
-                    "fieldType": "Dictionary",
-                    "fieldPath": "valueType",
-                    "dictionaryFieldTypeCode": "fednik-contact-persons-dict-address-valueType",
-                    "description": "HOME",
-                    "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-                  }
+                    "fieldMetadata": {
+                        "description": "Заголовок",
+                        "dictionaryFieldTypeCode": null,
+                        "fieldName": "Заголовок",
+                        "fieldPath": "serviceObjects:0:elsOrContractNumber",
+                        "fieldType": "String",
+                        "metadata": "{\n      \"type\": \"responseField\",\n      \"showIfEmpty\": false,\n      \"isGroupTitle\": true,\n      \"isCollapsed\": false,\n      \"hidden\": true,\n      \"valueSource\": \"\",\n      \"jsValuePostProcessor\": \"\"\n    }"
+                    },
+                    "kind": "plain",
+                    "value": "74050750001234"
                 }
-              }
-            ],
-            "fieldMetadata": {
-              "fieldName": "Контакты",
-              "fieldType": "Object",
-              "fieldPath": "addresses[]",
-              "dictionaryFieldTypeCode": null,
-              "description": "Контактные данные",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": true,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
+            },
+            {
+                "description": "ЕЛС",
+                "fieldName": "ЕЛС",
+                "fieldPath": "serviceObjects:0:els",
+                "fieldType": "String",
+                "value": {
+                    "fieldMetadata": {
+                        "description": "ЕЛС",
+                        "dictionaryFieldTypeCode": null,
+                        "fieldName": "ЕЛС",
+                        "fieldPath": "serviceObjects:0:els",
+                        "fieldType": "String",
+                        "metadata": "{\n      \"type\": \"responseField\",\n      \"showIfEmpty\": false,\n      \"isGroupTitle\": false,\n      \"isCollapsed\": false,\n      \"hidden\": false,\n      \"valueSource\": \"\"\n    }"
+                    },
+                    "kind": "plain",
+                    "value": "7400061234"
+                }
             }
-          },
-          "fieldPath": "addresses[]"
-        },
-        {
-          "fieldName": "Скидка",
-          "fieldType": "Number",
-          "description": "Размер скидки",
-          "value": {
-            "kind": "plain",
-            "value": "0.75",
-            "fieldMetadata": {
-              "fieldName": "Скидка",
-              "fieldType": "Number",
-              "fieldPath": "discount",
-              "dictionaryFieldTypeCode": null,
-              "description": "Размер скидки",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-            }
-          },
-          "fieldPath": "discount"
-        },
-        {
-          "fieldName": "ДР",
-          "fieldType": "Date",
-          "description": "Дата рождения",
-          "value": {
-            "kind": "plain",
-            "value": "1990-10-11",
-            "fieldMetadata": {
-              "fieldName": "ДР",
-              "fieldType": "Date",
-              "fieldPath": "dob",
-              "dictionaryFieldTypeCode": null,
-              "description": "Дата рождения",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-            }
-          },
-          "fieldPath": "dob"
-        },
-        {
-          "fieldName": "Любимый офис",
-          "fieldType": "String",
-          "description": "Любимый офис",
-          "value": {
-            "kind": "plain",
-            "value": "string",
-            "fieldMetadata": {
-              "fieldName": "Любимый офис",
-              "fieldType": "String",
-              "fieldPath": "favoriteOffice",
-              "dictionaryFieldTypeCode": null,
-              "description": "Любимый офис",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-            }
-          },
-          "fieldPath": "favoriteOffice"
-        },
-        {
-          "fieldName": "Имя",
-          "fieldType": "String",
-          "description": "Имя клиента",
-          "value": {
-            "kind": "plain",
-            "value": "Иван",
-            "fieldMetadata": {
-              "fieldName": "Имя",
-              "fieldType": "String",
-              "fieldPath": "firstName",
-              "dictionaryFieldTypeCode": null,
-              "description": "Имя клиента",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": true,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"firstName\"\n}"
-            }
-          },
-          "fieldPath": "firstName"
-        },
-        {
-          "fieldName": "VIP",
-          "fieldType": "Boolean",
-          "description": "Верри Импортант Персона",
-          "value": {
-            "kind": "plain",
-            "value": "True",
-            "fieldMetadata": {
-              "fieldName": "VIP",
-              "fieldType": "Boolean",
-              "fieldPath": "isVip",
-              "dictionaryFieldTypeCode": null,
-              "description": "Верри Импортант Персона",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-            }
-          },
-          "fieldPath": "isVip"
-        },
-        {
-          "fieldName": "Фамилия",
-          "fieldType": "String",
-          "description": "Фамилия клиента",
-          "value": {
-            "kind": "plain",
-            "value": "Иванов",
-            "fieldMetadata": {
-              "fieldName": "Фамилия",
-              "fieldType": "String",
-              "fieldPath": "lastName",
-              "dictionaryFieldTypeCode": null,
-              "description": "Фамилия клиента",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": true,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"lastName\"\n}"
-            }
-          },
-          "fieldPath": "lastName"
-        },
-        {
-          "fieldName": "Отчество",
-          "fieldType": "String",
-          "description": "Имя бати клиента",
-          "value": {
-            "kind": "plain",
-            "value": "Иванович",
-            "fieldMetadata": {
-              "fieldName": "Отчество",
-              "fieldType": "String",
-              "fieldPath": "middleName",
-              "dictionaryFieldTypeCode": null,
-              "description": "Имя бати клиента",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"middleName\"\n}"
-            }
-          },
-          "fieldPath": "middleName"
-        },
-        {
-          "fieldName": "Предпочтения",
-          "fieldType": "String",
-          "description": "Предпочтения клиента",
-          "value": {
-            "kind": "list",
-            "items": [
-              "Виски косые",
-              "Сверху подлиннее",
-              "C боков покороче"
-            ],
-            "fieldMetadata": {
-              "fieldName": "Предпочтения",
-              "fieldType": "String",
-              "fieldPath": "preferences[]",
-              "dictionaryFieldTypeCode": null,
-              "description": "Предпочтения клиента",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-            }
-          },
-          "fieldPath": "preferences[]"
-        },
-        {
-          "fieldName": "ИД источника",
-          "fieldType": "String",
-          "description": "Из клиента  во внешней системе (если клиент оттуда)",
-          "value": {
-            "kind": "plain",
-            "value": "null",
-            "fieldMetadata": {
-              "fieldName": "ИД источника",
-              "fieldType": "String",
-              "fieldPath": "source",
-              "dictionaryFieldTypeCode": null,
-              "description": "Из клиента  во внешней системе (если клиент оттуда)",
-              "metadata": "{\n  \"type\": \"responseField\",\n  \"showIfEmpty\": false,\n  \"isGroupTitle\": false,\n  \"isCollapsed\": false,\n  \"hidden\": false,\n  \"valueSource\": \"\"\n}"
-            }
-          },
-          "fieldPath": "source"
+        ],
+        "integrationObjectId": "019c4190-d350-7916-b3e7-9552a268a88a",
+        "metadata": {
+            "code": "BTRX_ID_SEARCH",
+            "description": "",
+            "metadata": "{\n      \"type\": \"object\"\n    }",
+            "name": "Поиск ОО по ID КЛ Bitrix",
+            "order": 5,
+            "tag": "ServiceObject"
         }
-      ]
     },
     "serviceSession": {
       "id": "a3ee160c-d075-4d1f-98e9-24433c34133c",

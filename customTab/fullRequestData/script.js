@@ -2,8 +2,10 @@ const getValueFromChain = (rawChain, obj) => {
     try {
         const parts = rawChain.split('~');
         let currentObjLevel = obj;
+
         parts.forEach((x) => {
             if (rawChain.length === 1 && x === '*') {
+              
                 return currentObjLevel;
             }
             else if (/\d+/.test(x)) {
@@ -13,7 +15,7 @@ const getValueFromChain = (rawChain, obj) => {
             else if (/\*.+/.test(x)) {
                 // Если есть звездочка, запускам поиск индекса. Пример: requestData~customAttributes~*code=CustomerType~value
                 const [k, v] = x.substring(1).split('=');
-                currentObjLevel = currentObjLevel.filter((a) => a[k] == v);
+                currentObjLevel = currentObjLevel.find((a) => a[k] == v);
             }
             else {
                 // В любом другом случае, просто пытаемся достать из объекта по ключу. requestData~id

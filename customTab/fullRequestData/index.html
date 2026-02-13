@@ -47,7 +47,14 @@
       <header>
               <h3>FullRequestData query syntax sandbox</h3>
       <form id="form" style="display: flex;">
-        <input id="inp" name="FullRequestData" style="flex-grow: 1;" value="*" pattern="^((\w)[\w\~\*=]*((\[\])|\w)?)|\*$" list="samples">
+        <input
+          id="inp"
+          name="FullRequestData"
+          style="flex-grow: 1;"
+          value="*"
+          pattern="^([А-яA-z0-9\:]+|\*)[([А-яA-z0-9\:]+)\~\*=]*((\[\])|[А-яA-z0-9\:]+|\*)?$"
+          list="samples"
+        >
         <input type="submit" value="Запросить" >
         <datalist id="samples">
           <option value="requestData~id"></option>
