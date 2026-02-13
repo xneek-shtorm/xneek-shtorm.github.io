@@ -4,23 +4,30 @@ const getValueFromChain = (rawChain, obj) => {
         let currentObjLevel = obj;
 
         parts.forEach((x) => {
+          console.log('xneek', 'process part', x)
             if (rawChain.length === 1 && x === '*') {
-              
+              console.log('xneek', 'result for', x, currentObjLevel)
                 return currentObjLevel;
             }
-            else if (/\d+/.test(x)) {
+            else if (/^\d+$/.test(x)) {
+              console.log('xneek', 'NUMBER', x)
                 // Если передано число, вытаскиваем по индексу. Пример: contactPersonsData~0~firstName
                 currentObjLevel = currentObjLevel[x];
             }
-            else if (/\*.+/.test(x)) {
+            else if (/^\*.+/.test(x)) {
+              console.log('xneek', 'ARRAY')
                 // Если есть звездочка, запускам поиск индекса. Пример: requestData~customAttributes~*code=CustomerType~value
                 const [k, v] = x.substring(1).split('=');
+                console.log('xneek', 'find where ', k,  '=', v, currentObjLevel )
                 currentObjLevel = currentObjLevel.find((a) => a[k] == v);
             }
             else {
+              console.log('xneek', 'OTHER', x)
                 // В любом другом случае, просто пытаемся достать из объекта по ключу. requestData~id
                 currentObjLevel = currentObjLevel[x];
             }
+
+            console.log('xneek', 'level for', x, currentObjLevel)
         });
         return currentObjLevel;
     }
