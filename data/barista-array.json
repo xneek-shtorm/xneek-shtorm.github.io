@@ -163,6 +163,7 @@
     {
         "coffeeWithShugar": true,
         "dob": "1995-07-03",
+        "atataApproved": null,
         "experience": [
             {
                 "awards": [
