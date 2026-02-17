@@ -51,14 +51,6 @@
         {
           "channel": "email",
           "address": "barista-4@barista.ru"
-        },
-        {
-          "channel": "phone",
-          "address": "74444444444"
-        },
-        {
-          "channel": "tg",
-          "address": "444444"
         }
       ]
     }

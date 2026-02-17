@@ -109,10 +109,6 @@
     {
       "channel": "email",
       "address": "barista-1@barista.ru"
-    },
-    {
-      "channel": "phone",
-      "address": "71111111111"
     }
   ]
 }

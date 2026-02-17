@@ -77,6 +77,18 @@
         {
           "channel": "email",
           "address": "barista-7@barista.ru"
+        },
+        {
+          "channel": "phone",
+          "address": "77777777777"
+        },
+        {
+          "channel": "tg",
+          "address": "777777"
+        },
+        {
+          "channel": "chat",
+          "address": "777777-777777-777777"
         }
       ]
     }

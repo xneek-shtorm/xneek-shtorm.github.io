@@ -53,14 +53,6 @@
     {
       "channel": "phone",
       "address": "72020202020"
-    },
-    {
-      "channel": "tg",
-      "address": "202020"
-    },
-    {
-      "channel": "chat",
-      "address": "4d577058-f85b-4519-87fc-da1613b82ad1"
     }
   ]
 }

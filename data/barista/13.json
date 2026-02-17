@@ -65,14 +65,6 @@
     {
       "channel": "phone",
       "address": "71313131313"
-    },
-    {
-      "channel": "tg",
-      "address": "131313"
-    },
-    {
-      "channel": "chat",
-      "address": "e51da00d-f72a-4655-a984-d32379773401"
     }
   ]
 }

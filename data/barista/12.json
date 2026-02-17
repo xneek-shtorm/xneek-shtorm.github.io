@@ -73,14 +73,6 @@
     {
       "channel": "phone",
       "address": "71212121212"
-    },
-    {
-      "channel": "tg",
-      "address": "121212"
-    },
-    {
-      "channel": "chat",
-      "address": "9ebc521a-4944-491b-a9e1-93097637d7d0"
     }
   ]
 }

@@ -72,10 +72,6 @@
         {
           "channel": "phone",
           "address": "71616161616"
-        },
-        {
-          "channel": "tg",
-          "address": "161616"
         }
       ]
     }

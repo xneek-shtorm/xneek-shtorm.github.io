@@ -36,6 +36,14 @@
         {
           "channel": "phone",
           "address": "71414141414"
+        },
+        {
+          "channel": "tg",
+          "address": "141414"
+        },
+        {
+          "channel": "chat",
+          "address": "141414-141414-141414"
         }
       ]
     }

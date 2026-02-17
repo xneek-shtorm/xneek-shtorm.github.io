@@ -53,10 +53,6 @@
         {
           "channel": "email",
           "address": "barista-10@barista.ru"
-        },
-        {
-          "channel": "phone",
-          "address": "71010101010"
         }
       ]
     }

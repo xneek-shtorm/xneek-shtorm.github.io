@@ -6,6 +6,7 @@ fs.readFile('./barista-array.json', 'utf8', (err, data) => {
     console.error('Error reading file:', err);
     return;
   }
+  const results = [];
   try {
     const jsonData = JSON.parse(data);
     jsonData.forEach((b) => {
@@ -26,7 +27,7 @@ fs.readFile('./barista-array.json', 'utf8', (err, data) => {
           },
           {
             channel: 'chat',
-            address: crypto.randomUUID()
+            address: `${`${b.id}`.padEnd(6,b.id.toString())}-${`${b.id}`.padEnd(6,b.id.toString())}-${`${b.id}`.padEnd(6,b.id.toString())}`
           }
         ].slice(0,Math.ceil(Math.random()*5));
 
@@ -38,10 +39,18 @@ fs.readFile('./barista-array.json', 'utf8', (err, data) => {
         fs.writeFileSync(filePath1, JSON.stringify({results: [b]}, null, 2), 'utf8');
         console.log(`JSON file "${filePath1}" created successfully.`);
 
+        results.push(b);
+
+
       } catch (err) {
         console.error('Error writing JSON file:', err);
       }
     })
+
+    const filePath1 = path.resolve(`./barista-results.json`);
+    fs.writeFileSync(filePath1, JSON.stringify({count: results.length, results}, null, 2), 'utf8');
+    console.log(`JSON file "${filePath1}" created successfully.`);
+
   } catch (parseErr) {
     console.error('Error parsing JSON:', parseErr);
   }
