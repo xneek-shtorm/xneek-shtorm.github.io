@@ -74,10 +74,6 @@
     {
       "channel": "tg",
       "address": "161616"
-    },
-    {
-      "channel": "chat",
-      "address": "584e4701-90a0-4472-ac1c-4cb3f3ca2698"
     }
   ]
 }

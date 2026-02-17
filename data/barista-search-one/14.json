@@ -36,14 +36,6 @@
         {
           "channel": "phone",
           "address": "71414141414"
-        },
-        {
-          "channel": "tg",
-          "address": "141414"
-        },
-        {
-          "channel": "chat",
-          "address": "430b2974-24d4-4998-a3c1-356b7e812783"
         }
       ]
     }

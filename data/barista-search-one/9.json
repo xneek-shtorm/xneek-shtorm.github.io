@@ -88,14 +88,6 @@
         {
           "channel": "phone",
           "address": "79999999999"
-        },
-        {
-          "channel": "tg",
-          "address": "999999"
-        },
-        {
-          "channel": "chat",
-          "address": "e328580c-417d-42f7-abbc-dd2d745bd2ce"
         }
       ]
     }

@@ -70,14 +70,6 @@
         {
           "channel": "email",
           "address": "barista-18@barista.ru"
-        },
-        {
-          "channel": "phone",
-          "address": "71818181818"
-        },
-        {
-          "channel": "tg",
-          "address": "181818"
         }
       ]
     }

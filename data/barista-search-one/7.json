@@ -77,10 +77,6 @@
         {
           "channel": "email",
           "address": "barista-7@barista.ru"
-        },
-        {
-          "channel": "phone",
-          "address": "77777777777"
         }
       ]
     }
