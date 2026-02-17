@@ -67,6 +67,18 @@
     {
       "channel": "email",
       "address": "barista-15@barista.ru"
+    },
+    {
+      "channel": "phone",
+      "address": "71515151515"
+    },
+    {
+      "channel": "tg",
+      "address": "151515"
+    },
+    {
+      "channel": "chat",
+      "address": "662f76f1-9b7d-4323-a027-fb2f035ae896"
     }
   ]
 }

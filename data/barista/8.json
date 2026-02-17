@@ -40,10 +40,6 @@
     {
       "channel": "tg",
       "address": "888888"
-    },
-    {
-      "channel": "chat",
-      "address": "59eab697-6a4e-469a-ac57-0ece528e2d0e"
     }
   ]
 }

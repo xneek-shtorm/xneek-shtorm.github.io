@@ -2,6 +2,7 @@
   "results": [
     {
       "coffeeWithShugar": true,
+      "atataApproved": false,
       "dob": "1990-05-21",
       "experience": [
         {
@@ -110,18 +111,6 @@
         {
           "channel": "email",
           "address": "barista-1@barista.ru"
-        },
-        {
-          "channel": "phone",
-          "address": "71111111111"
-        },
-        {
-          "channel": "tg",
-          "address": "111111"
-        },
-        {
-          "channel": "chat",
-          "address": "be290187-e184-47e9-a51d-e4663517fc72"
         }
       ]
     }

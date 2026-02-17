@@ -1,6 +1,7 @@
 {
   "coffeeWithShugar": false,
   "dob": "1988-12-15",
+  "atataApproved": true,
   "experience": [
     {
       "awards": [
@@ -56,6 +57,14 @@
     {
       "channel": "phone",
       "address": "72222222222"
+    },
+    {
+      "channel": "tg",
+      "address": "222222"
+    },
+    {
+      "channel": "chat",
+      "address": "3b8ea07c-5ead-461a-88e4-35014cda6d2b"
     }
   ]
 }

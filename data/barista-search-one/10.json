@@ -57,14 +57,6 @@
         {
           "channel": "phone",
           "address": "71010101010"
-        },
-        {
-          "channel": "tg",
-          "address": "101010"
-        },
-        {
-          "channel": "chat",
-          "address": "ffb95dd4-fa3c-426c-97f5-53d44611b9b4"
         }
       ]
     }

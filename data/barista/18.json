@@ -72,6 +72,10 @@
     {
       "channel": "phone",
       "address": "71818181818"
+    },
+    {
+      "channel": "tg",
+      "address": "181818"
     }
   ]
 }

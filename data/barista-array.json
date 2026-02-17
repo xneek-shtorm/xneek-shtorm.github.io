@@ -1,6 +1,7 @@
 [
     {
         "coffeeWithShugar": true,
+        "atataApproved": false,
         "dob": "1990-05-21",
         "experience": [
             {
@@ -110,6 +111,7 @@
     {
         "coffeeWithShugar": false,
         "dob": "1988-12-15",
+        "atataApproved": true,
         "experience": [
             {
                 "awards": [
