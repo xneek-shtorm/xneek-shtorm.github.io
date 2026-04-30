@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Замена фона веб-камеры — MediaPipe Selfie Segmentation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0a0a1a;
+      font-family: system-ui, 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .camera-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0a0a1a;
+    }
+    #inputVideo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+
+      z-index: 0;
+    }
+    #outputCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      z-index: 1;
+    }
+    .controls {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(20, 20, 35, 0.85);
+      backdrop-filter: blur(16px);
+      border-radius: 60px;
+      z-index: 10;
+      flex-wrap: wrap;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    button, select {
+      background: #2c2c3e;
+      border: none;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    button:hover {
+      background: #3d3d5a;
+      transform: scale(1.02);
+    }
+    select {
+      background: #1e1e2c;
+      cursor: pointer;
+    }
+    select:hover {
+      background: #2a2a3c;
+    }
+    .status {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(12px);
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #e0e0e0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      z-index: 10;
+      pointer-events: none;
+      border-left: 3px solid #2ecc71;
+      letter-spacing: 0.3px;
+    }
+    @media (max-width: 640px) {
+      .controls { gap: 8px; padding: 10px 16px; bottom: 16px; }
+      button, select { padding: 6px 14px; font-size: 0.75rem; }
+      .status { font-size: 0.65rem; top: 12px; left: 12px; }
+    }
+  </style>
+  
+  <!-- MediaPipe библиотеки -->
+  <script src="cdn/camera_utils.js"></script>
+  <script src="cdn/selfie_segmentation.js"></script>
+</head>
+<body>
+
+<div class="camera-container">
+  <video id="inputVideo" autoplay playsinline muted></video>
+  <canvas id="outputCanvas"></canvas>
+</div>
+
+<div class="controls">
+  <button id="startCameraBtn">🎥 Запустить камеру</button>
+  <select id="bgTypeSelect">
+    <option value="image">🌄 Фото (пляж / пользовательский)</option>
+    <option value="blur">🌀 Размытие фона</option>
+    <option value="color">🎨 Цветовая заливка</option>
+  </select>
+  <button id="uploadBgBtn">🖼 Загрузить фон</button>
+  <input type="file" id="bgUploadInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+</div>
+<div class="status" id="statusMessage">
+  ✨ Готово. Нажмите «Запустить камеру»
+</div>
+
+<script>
+  (function(){
+    // --- DOM элементы ---
+    const video = document.getElementById('inputVideo');
+    const canvas = document.getElementById('outputCanvas');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startCameraBtn');
+    const bgTypeSelect = document.getElementById('bgTypeSelect');
+    const uploadBtn = document.getElementById('uploadBgBtn');
+    const fileInput = document.getElementById('bgUploadInput');
+    const statusDiv = document.getElementById('statusMessage');
+
+    // --- Состояние ---
+    let camera = null;
+    let selfieSegmentation = null;
+    let isActive = false;
+    let animationFrameId = null;
+    let backgroundImage = null;           // пользовательское фоновое изображение
+    let defaultBgImage = null;            // встроенный фон Nature
+    
+    // --- Настройки модели (landscape — лучшая для веб-камер) ---
+    const MODEL_SELECTION = 1;  // 1 = landscape (лучше для общих сцен)
+    const SELFIE_MODE = false;   // зеркальный режим
+
+    // --- Функция статуса (без спама) ---
+    function setStatus(msg, isError = false) {
+      statusDiv.innerHTML = msg;
+      if (isError) console.error(msg);
+      else console.log(msg);
+      // автоматически сбросить стили ошибки через 4 секунды если не критично
+      if (!isError) {
+        setTimeout(() => {
+          if (statusDiv.innerHTML === msg) 
+            statusDiv.style.borderLeftColor = '#2ecc71';
+        }, 3000);
+      } else {
+        statusDiv.style.borderLeftColor = '#e74c3c';
+      }
+    }
+
+    // --- Загрузка пользовательского фона ---
+    function loadUserBackground(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          backgroundImage = img;
+          setStatus(`✅ Фон загружен: ${file.name}`);
+          // если активен режим "image" — сразу обновляем рендер
+        };
+        img.onerror = () => setStatus('❌ Ошибка при декодировании изображения', true);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => setStatus('❌ Не удалось прочитать файл', true);
+      reader.readAsDataURL(file);
+    }
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        loadUserBackground(e.target.files[0]);
+      }
+      fileInput.value = '';
+    });
+
+    // --- Создание стандартного красивого фона (природа/пляж) ---
+    function initDefaultBackground() {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = 'img2.jpg';
+        img.onload = () => {
+          defaultBgImage = img;
+          if (!backgroundImage) backgroundImage = img;
+          resolve();
+        };
+        img.onerror = () => {
+          console.warn("Запасной фон (пляж) не загрузился, используем градиент");
+          const fallbackCanvas = document.createElement('canvas');
+          fallbackCanvas.width = 800;
+          fallbackCanvas.height = 600;
+          const fbCtx = fallbackCanvas.getContext('2d');
+          const grd = fbCtx.createLinearGradient(0, 0, 0, fallbackCanvas.height);
+          grd.addColorStop(0, '#1e3c72');
+          grd.addColorStop(1, '#2a5298');
+          fbCtx.fillStyle = grd;
+          fbCtx.fillRect(0, 0, fallbackCanvas.width, fallbackCanvas.height);
+          defaultBgImage = fallbackCanvas;
+          if (!backgroundImage) backgroundImage = defaultBgImage;
+          resolve();
+        };
+      });
+    }
+
+    // --- Отрисовка финального изображения с заменой фона (использует маску) ---
+    function renderWithMask(maskImageData, videoFrameWidth, videoFrameHeight) {
+      if (!isActive) return;
+      
+      // 1. Устанавливаем размеры canvas под видео
+      if (canvas.width !== videoFrameWidth || canvas.height !== videoFrameHeight) {
+        canvas.width = videoFrameWidth;
+        canvas.height = videoFrameHeight;
+      }
+
+      const currentBgMode = bgTypeSelect.value;
+      
+      // --- Шаг A: Рисуем фон (в зависимости от выбранного типа) ---
+      if (currentBgMode === 'color') {
+        // Яркий зелёный фон (chroma-like или любой цвет)
+        ctx.fillStyle = '#2ecc71';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } 
+      else if (currentBgMode === 'blur') {
+        // Размытый фон из текущего видео (эффект портретного режима)
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        tempCtx.filter = 'blur(18px)';
+        tempCtx.drawImage(tempCanvas, 0, 0);
+        tempCtx.filter = 'none';
+        ctx.drawImage(tempCanvas, 0, 0);
+      } 
+      else { // режим "image" — картинка либо пользовательская, либо дефолтная
+        let bgToDraw = backgroundImage || defaultBgImage;
+        if (bgToDraw && bgToDraw.complete !== false) {
+          ctx.drawImage(bgToDraw, 0, 0, canvas.width, canvas.height);
+        } else {
+          // fallback на случай неготового фона
+          ctx.fillStyle = '#2c3e66';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      
+      // --- Шаг B: Применение маски для человека (композитинг человека поверх фона) ---
+      // Используем технику временного canvas с альфа-каналом (destination-in) для создания маски человека
+      const personCanvas = document.createElement('canvas');
+      personCanvas.width = canvas.width;
+      personCanvas.height = canvas.height;
+      const personCtx = personCanvas.getContext('2d');
+      
+      // Рисуем текущий видеокадр (зеркальный эффект при необходимости, MediaPipe отдаёт незеркальную маску)
+      personCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Применяем маску к человеку: маска — это ImageData с интенсивностью (0-255),
+      // где высокие значения обозначают человека.
+      // Используем глобальную композицию 'destination-in' чтобы сохранить только те пиксели,
+      // где маска имеет высокую непрозрачность.
+      // Важно: мы должны использовать саму маску как альфа-канал.
+      // Сначала сохраним контекст и применим маску через putImageData в режиме композита.
+      personCtx.globalCompositeOperation = 'destination-in';
+      // Маска может быть любым ImageData, рисуем её поверх текущего видео-слоя
+      personCtx.drawImage(maskImageData, 0, 0);
+      personCtx.globalCompositeOperation = 'source-over';
+      
+      // personCanvas теперь содержит только человека на прозрачном фоне
+      // Рисуем поверх уже подготовленного фона
+      ctx.drawImage(personCanvas, 0, 0);
+    }
+
+    // --- Инициализация модели сегментации и обработка кадров через onResults ---
+    async function initSegmentationAndStart() {
+      if (selfieSegmentation) {
+        // Если уже была модель, остановим обработку
+        if (isActive) stopEverything();
+      }
+
+      setStatus('🧠 Загрузка модели MediaPipe SelfieSegmentation...');
+      
+      selfieSegmentation = new SelfieSegmentation({
+        locateFile: (file) => `wasm/${file}`
+      });
+      
+      // Настройка модели
+      selfieSegmentation.setOptions({
+        modelSelection: MODEL_SELECTION,
+        selfieMode: SELFIE_MODE,   // важно для зеркального отображения
+      });
+      
+      // Обработчик результатов: вызывается после каждого кадра, переданного через send()
+      selfieSegmentation.onResults((results) => {
+        if (!isActive) return;
+        // results.segmentationMask — это ImageData маски (ширина/высота совпадают с выходным разрешением)
+        if (results && results.segmentationMask) {
+          // Получаем текущие размеры видео (реальные)
+          const vidWidth = video.videoWidth;
+          const vidHeight = video.videoHeight;
+          if (vidWidth > 0 && vidHeight > 0) {
+            renderWithMask(results.segmentationMask, vidWidth, vidHeight);
+          }
+        } else {
+          // Если маски нет, выводим хотя бы фон (на всякий случай)
+          if (video.videoWidth && canvas) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+      });
+      
+      // Ждем инициализации (медиапайп сам подгружает wasm)
+      // Для большей надёжности просто принудительно запускаем камеру после готовности
+      return new Promise((resolve) => {
+        // Достаточно дать время на загрузку ассетов
+        // onResults готов сразу после new
+        setTimeout(() => {
+          setStatus('✅ Модель сегментации готова');
+          resolve();
+        }, 800);
+      });
+    }
+
+    // --- Остановка всего процесса ---
+    function stopEverything() {
+      isActive = false;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      if (camera) {
+        camera.stop();
+        camera = null;
+      }
+      if (video.srcObject) {
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+      }
+    }
+
+    // --- Полный запуск камеры и привязка к MediaPipe ---
+    async function startFullPipeline() {
+      if (isActive) stopEverything();
+      
+      // Предварительная инициализация модели если ещё не создана
+      if (!selfieSegmentation) {
+        await initSegmentationAndStart();
+      }
+      
+      setStatus('🎥 Запрос доступа к камере...');
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }
+        });
+        video.srcObject = stream;
+        await video.play();
+        
+        // Размеры видео станут доступны после метаданных
+        await new Promise(resolve => {
+          if (video.videoWidth > 0) resolve();
+          else video.onloadedmetadata = () => resolve();
+        });
+        
+        setStatus(`📐 Разрешение видео: ${video.videoWidth}x${video.videoHeight}`);
+        
+        // Используем CameraUtils для синхронной подачи кадров в сегментатор
+        camera = new Camera(video, {
+          onFrame: async () => {
+            // Отправляем текущий кадр в сегментатор (вызовет onResults асинхронно)
+            if (selfieSegmentation && isActive) {
+              await selfieSegmentation.send({ image: video });
+            }
+          },
+          width: video.videoWidth,
+          height: video.videoHeight
+        });
+        
+        await camera.start();
+        isActive = true;
+        
+        // Запускаем постоянно обновляемый цикл только для поддержки отрисовки (хотя onResults сам вызывает рендер)
+        // Дополнительный цикл не нужен, т.к onResults вызывает render. Но для гибкости оставим
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        
+        function keepAlive() {
+          if (!isActive) return;
+          // Просто чтобы поддерживать поток отрисовки, если понадобится (например, если маска задерживается)
+          animationFrameId = requestAnimationFrame(keepAlive);
+        }
+        animationFrameId = requestAnimationFrame(keepAlive);
+        
+        setStatus('📷 Камера активна · Замена фона работает');
+      } catch (err) {
+        setStatus(`❌ Ошибка камеры: ${err.message}`, true);
+        isActive = false;
+        console.error(err);
+      }
+    }
+
+    // --- Обработчик кнопки старта (перезапуск) ---
+    startBtn.addEventListener('click', async () => {
+      if (isActive) {
+        stopEverything();
+        setStatus('⏹️ Остановлено. Запускаем заново...');
+        await new Promise(r => setTimeout(r, 300));
+      }
+      await startFullPipeline();
+    });
+    
+    // --- При смене типа фона просто обновляем сообщение ---
+    bgTypeSelect.addEventListener('change', () => {
+      setStatus(`🎨 Режим: ${bgTypeSelect.options[bgTypeSelect.selectedIndex]?.text || bgTypeSelect.value}`);
+      // Дополнительно для режима "image": если пользователь уже загрузил фон, он будет использован автоматически
+    });
+    
+    // --- Подготовка стартового фона по умолчанию ---
+    async function prepareDefaultBackground() {
+      await initDefaultBackground();
+      // маленькая заглушка
+      if (backgroundImage === null) backgroundImage = defaultBgImage;
+    }
+    
+    // --- Загрузка ассетов при старте страницы ---
+    window.addEventListener('load', async () => {
+      await prepareDefaultBackground();
+      setStatus('✨ Нажмите «Запустить камеру»');
+      // Предварительная загрузка модели в фоне (без блокировки UI)
+      setTimeout(() => {
+        if (!selfieSegmentation) {
+          initSegmentationAndStart().catch(e => console.warn("Предзагрузка модели не удалась", e));
+        }
+      }, 500);
+    });
+    
+    // Очистка при выгрузке страницы
+    window.addEventListener('beforeunload', () => {
+      if (camera) camera.stop();
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(t => t.stop());
+      }
+    });
+  })();
+</script>
+</body>
+</html>
