@@ -36,7 +36,7 @@
       const timer = setInterval(() => {
         if (payWindow.closed) {
           clearInterval(timer);
-          res.textContent = 'Pay window was closed. Check payments state and make something...';
+          res.textContent += 'Pay window was closed. Check payments state and make something...';
         }
       }, 500);
 
