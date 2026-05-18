@@ -8,17 +8,37 @@
 <body>
   <h2>Window open</h2>
   <button id="btn1">Open pay window and wait it close</button>
-  <br>
-  <button id="btn2">Open pay window and wait post-message</button>
-
+  <br><br>
+  <button id="btn2">Open pay window as POPUP and wait it close</button>
 
   <div id="res" style="margin: 2rem 0;"></div>
 
+
   <script>
+    const checkInterval = 1000;
+    const waitLimit = 15_000;
+    let restTime = waitLimit;
 
-  const openWindow = (waitForClose = false) => {
+    const openWindow = (features) => {
+      const payWindow = window.open(`https://xneek-job.netlify.app/payments-demo/`, '_blank', features);
+      restTime = waitLimit;
 
-    const payWindow = window.open(`https://xneek-job.netlify.app/payments-demo/${waitForClose?'':'?postmessage=1'}`, '_blank');
+      const timer = setInterval(() => {
+        if (payWindow.closed) {
+          clearInterval(timer);
+          res.textContent = 'Pay window was closed. Check payments state and make something...';
+        }
+
+        if (restTime === 0) {
+          clearInterval(timer);
+          res.textContent = 'Time out...';
+          document.title = '';
+          payWindow.close();
+        } else {
+          restTime -= checkInterval;
+          document.title = `rest time: ${restTime/1000} sec`
+        }
+      }, checkInterval);
 
     const info = document.createElement('span');
     info.textContent = 'Wait for payment...⏳'
@@ -32,23 +52,18 @@
     }
     res.append(cancelBtn);
 
-    payWindow.onmessage = (e) => {
-      res.textContent = e.data
-    }
 
-    if (waitForClose) {
-      const timer = setInterval(() => {
-        if (payWindow.closed) {
-          clearInterval(timer);
-          res.textContent = 'Pay window was closed. Check payments state and make something...';
-        }
-      }, 500);
+    const focusBtn = document.createElement('button');
+    focusBtn.textContent = 'Focus';
+    focusBtn.onclick = () => {
+      payWindow.focus();
     }
+    res.append(focusBtn);
 
   }
 
-  btn1.onclick = () => openWindow(true);
-  btn2.onclick = () => openWindow(false);
+  btn1.onclick = () => openWindow();
+  btn2.onclick = () => openWindow('popup');
 
   </script>
 </body>
