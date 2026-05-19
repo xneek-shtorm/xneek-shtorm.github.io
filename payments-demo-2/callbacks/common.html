@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment result received</title>
+</head>
+<body style="text-align: center;">
+  <br><br><br>
+  <h1>
+    Payment result received!
+  </h1>
+  <h2 id="res" style="color: orange"></h2>
+  <br>
+
+
+  <span style="font-size: 6rem;">💸</span>
+
+
+    <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const result = urlParams.get('result');
+    if (result) {
+      res.textContent = result;
+    }
+  </script>
+  
+</body>
+</html>

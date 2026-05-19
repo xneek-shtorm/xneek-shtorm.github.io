@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Window open</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main>
+    <h2>Window open</h2>
+    <button id="btn1" class="btn bg-sky-500 hover:bg-sky-700">Open pay window and wait it close</button>
+    <br><br>
+    <button id="btn2">Open pay window as POPUP and wait it close</button>
+
+    <div id="res" style="margin: 2rem 0;"></div>
+  </main>
+
+
+  <script>
+    const checkInterval = 1000;
+    const waitLimit = 15_000;
+    let restTime = waitLimit;
+
+    const openWindow = (features) => {
+      const payWindow = window.open(`https://fl.yantarenergosbyt.ru/payment/`, '_blank', features);
+      restTime = waitLimit;
+
+      const timer = setInterval(() => {
+        if (payWindow.closed) {
+          clearInterval(timer);
+          res.textContent = 'Pay window was closed. Check payments state and make something...';
+        }
+
+        if (restTime === 0) {
+          clearInterval(timer);
+          res.textContent = 'Time out...';
+          document.title = '';
+          payWindow.close();
+        } else {
+          restTime -= checkInterval;
+          document.title = `rest time: ${restTime/1000} sec`
+        }
+      }, checkInterval);
+
+    const info = document.createElement('span');
+    info.textContent = 'Wait for payment...⏳'
+    res.append(info);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.onclick = () => {
+      payWindow.close();
+      res.textContent = 'Pay was canceled 😕'
+    }
+    res.append(cancelBtn);
+
+
+    const focusBtn = document.createElement('button');
+    focusBtn.textContent = 'Focus';
+    focusBtn.onclick = () => {
+      payWindow.focus();
+    }
+    res.append(focusBtn);
+
+  }
+
+  btn1.onclick = () => openWindow();
+  btn2.onclick = () => openWindow('popup');
+
+  </script>
+</body>
+</html>
