@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0; background: #222; display: flex; justify-content: center; align-items: center; height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+    }
+
+    footer {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: #adadad;
+      position: fixed;
+      bottom: 0;
+      padding: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+
+    }
+
+    details {position: fixed; top: 20px; left: 20px; color: #adadad;}
+    label {display: flex; gap: 6px; align-items: center;}
+  </style>
+  <script src="cdn/camera_utils.js"></script>
+  <script src="cdn/selfie_segmentation.js"></script>
+</head>
+<body>
+  <div>
+    <video id="input_video" style="display: none;" autoplay playsinline></video>
+    <canvas id="output_canvas" width="640" height="480"></canvas>
+    
+    <footer>
+      <label>
+        Модель:
+        <select id="modelSelectionSelect">
+          <option value="0">тяжелая, но более точная модель (меньше дергается)</option>
+          <option value="1">легкая модель для слабых устройств (может давать рваный край)</option>
+        </select>
+      </label>
+
+            <label>
+        Фон:
+        <input type="file" id="fileInput" accept="image/*">
+      </label>
+
+     
+    </footer>
+     <details>
+        <summary>Оптимизации</summary>
+
+
+      <label>
+        Размытие маски:
+        <input type="number" id="blurInp" maxlength="1" min="0" max="99">
+      </label>
+
+            <label>
+        Межкадровое сглаживание:
+        <input type="checkbox" id="withSmoothing">
+        <input type="number" id="alphaInp" maxlength="1" min="0.1" max="0.8" step="0.1">
+      </label>
+
+      <label>
+        Бинаризация маски (повышение чёткости):
+        <input type="checkbox" id="withBinMask">
+        <input type="number" id="binMaskThresholdInp" maxlength="1" min="0" max="255" step="1">
+      </label>
+      
+      </details>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('input_video');
+const canvasElement = document.getElementById('output_canvas');
+const canvasCtx = canvasElement.getContext('2d');
+let blur = 0;
+ let binMaskThreshold = 128; // порог (0-255), можно регулировать
+
+const backgroundImage = new Image();
+backgroundImage.src = 'ues.webp'
+
+// ---- Переменные для сглаживания маски ----
+let previousMaskData = null;
+let SMOOTHING_ALPHA = 0.3; // 0.1 – сильное сглаживание, 0.5 – слабое
+   let applyBinMask = false;
+    let applyAlphaSmoothing  = false;
+
+function onResults(results) {
+    const w = results.image.width;
+    const h = results.image.height;
+    canvasElement.width = w;
+    canvasElement.height = h;
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, w, h);
+
+    // 1. Получаем маску как ImageData
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(results.segmentationMask, 0, 0, w, h);
+    let currentMaskData = tempCtx.getImageData(0, 0, w, h);
+
+ 
+
+    // 2. Смешиваем с предыдущей маской (если есть)
+    if (previousMaskData && applyAlphaSmoothing) {
+        const data = currentMaskData.data;
+        const prevData = previousMaskData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            // Смешиваем все каналы (R,G,B,A) – альфа-канал определяет прозрачность
+            data[i]     = SMOOTHING_ALPHA * data[i]     + (1 - SMOOTHING_ALPHA) * prevData[i];
+            data[i+1]   = SMOOTHING_ALPHA * data[i+1]   + (1 - SMOOTHING_ALPHA) * prevData[i+1];
+            data[i+2]   = SMOOTHING_ALPHA * data[i+2]   + (1 - SMOOTHING_ALPHA) * prevData[i+2];
+            data[i+3]   = SMOOTHING_ALPHA * data[i+3]   + (1 - SMOOTHING_ALPHA) * prevData[i+3];
+        }
+    }
+
+    if (applyBinMask) {
+      const data = currentMaskData.data;
+         
+      for (let i = 0; i < data.length; i += 4) {
+          // Бинаризуем только альфа-канал (прозрачность)
+          // Если альфа > порога, делаем 255 (полностью непрозрачный), иначе 0 (полностью прозрачный)
+          data[i+3] = data[i+3] > binMaskThreshold ? 255 : 0;
+          // Для большей жёсткости можно также обнулить цветовые каналы (не обязательно)
+          data[i] = data[i+3] ? 255 : 0; // если хотим чёрно-белую маску
+      }
+    }
+
+
+    // Сохраняем текущую (уже смешанную) маску для следующего кадра
+    previousMaskData = currentMaskData;
+
+    // 3. Рисуем маску на основном canvas (с возможным размытием)
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = w;
+    maskCanvas.height = h;
+    const maskCtx = maskCanvas.getContext('2d');
+
+    maskCtx.putImageData(currentMaskData, 0, 0);
+    
+    canvasCtx.filter = `blur(${blur}px)`;
+    canvasCtx.drawImage(maskCanvas, 0, 0, w, h);
+
+    // 4. Накладываем видео (source-in) – обрезаем по маске
+    canvasCtx.globalCompositeOperation = 'source-in';
+    canvasCtx.filter = 'none';
+    canvasCtx.drawImage(results.image, 0, 0, w, h);
+
+    // 5. Рисуем фон (destination-over)
+    canvasCtx.globalCompositeOperation = 'destination-over';
+    if (backgroundImage.complete && backgroundImage.naturalWidth !== 0) {
+        canvasCtx.drawImage(backgroundImage, 0, 0, w, h);
+    } else {
+        // Если фон не загружен – размытый оригинал
+        canvasCtx.filter = 'saturate(10%)';
+        canvasCtx.drawImage(results.image, 0, 0, w, h);
+    }
+    canvasCtx.restore();
+}
+
+// --- Остальной код (инициализация SelfieSegmentation, камера, выбор модели и т.д.) ---
+selfieSegmentation = new SelfieSegmentation({
+    locateFile: (file) => `wasm/${file}`
+});
+selfieSegmentation.setOptions({ modelSelection: 0 });
+selfieSegmentation.onResults(onResults);
+
+// Запуск камеры
+const camera = new Camera(videoElement, {
+    onFrame: async () => {
+        await selfieSegmentation.send({ image: videoElement });
+    },
+});
+camera.start();
+
+// Обработчики UI
+modelSelectionSelect.onchange = () => {
+    selfieSegmentation.setOptions({ modelSelection: +modelSelectionSelect.value });
+};
+blurInp.onchange = () => {
+    blur = +blurInp.value;
+};
+blurInp.value = 0; // по умолчанию без размытия – чёткий край
+alphaInp.onchange = () => {
+    SMOOTHING_ALPHA = +alphaInp.value;
+};
+alphaInp.value = SMOOTHING_ALPHA; // по умолчанию без размытия – чёткий край
+
+binMaskThresholdInp.onchange = () => {
+    binMaskThreshold = +binMaskThresholdInp.value;
+};
+binMaskThresholdInp.value = binMaskThreshold;
+
+
+withSmoothing.onchange = () => {
+    applyAlphaSmoothing = withSmoothing.checked;
+    alphaInp.disabled =  !withSmoothing.checked;
+};
+withSmoothing.checked = applyAlphaSmoothing;
+alphaInp.disabled =  !applyAlphaSmoothing;
+
+
+withBinMask.onchange = () => {
+    applyBinMask = withBinMask.checked;
+    binMaskThresholdInp.disabled = !withBinMask.checked
+};
+withBinMask.checked = applyBinMask;
+binMaskThresholdInp.disabled =!applyBinMask
+
+document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            backgroundImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+    </script>
+</body>
+</html>

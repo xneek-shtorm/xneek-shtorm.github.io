@@ -292,7 +292,8 @@
       personCtx.globalCompositeOperation = 'destination-in';
       // Маска может быть любым ImageData, рисуем её поверх текущего видео-слоя
       personCtx.drawImage(maskImageData, 0, 0);
-      personCtx.globalCompositeOperation = 'source-over';
+      personCtx.globalCompositeOperation = 'source-in';
+      personCtx.filter = 'blur(4px)'
       
       // personCanvas теперь содержит только человека на прозрачном фоне
       // Рисуем поверх уже подготовленного фона
@@ -310,8 +311,8 @@
       
       selfieSegmentation = new SelfieSegmentation({
         locateFile: (file) => `wasm/${file}`
-      });
-      
+      })
+      ;
       // Настройка модели
       selfieSegmentation.setOptions({
         modelSelection: MODEL_SELECTION,
