@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Замена фона (Рабочая версия)</title>
+<style>
+  body { 
+    margin: 0; 
+    background: #000; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+  #output { 
+    max-width: 100%; 
+    max-height: 100vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  #status {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    background: rgba(0,0,0,0.8);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<video id="video" autoplay playsinline muted style="display:none"></video>
+<canvas id="output"></canvas>
+<div id="status">Инициализация...</div>
+
+<script src="tf.min.js"></script>
+<script src="body-pix.min.js"></script>
+
+<script>
+const video = document.getElementById('video');
+const output = document.getElementById('output');
+const ctx = output.getContext('2d', { willReadFrequently: true });
+const status = document.getElementById('status');
+
+let net, bgImage;
+let maskCanvas, maskCtx, tempCanvas, tempCtx, imageData;
+
+let prevMaskData = null;     // Маска предыдущего кадра
+let currentMaskCanvas = null; // Кэш последней маски
+let frameCount = 0;          // Счётчик кадров
+const SMOOTHING_ALPHA = 0.5; // Коэффициент сглаживания (0.5-0.9)
+const SEGMENT_EVERY_N = 3;   // Сегментировать каждый N-й кадр
+
+async function setupCamera() {
+  status.textContent = 'Запуск камеры...';
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { width: 640, height: 480, facingMode: 'user' }
+  });
+  video.srcObject = stream;
+  return new Promise(resolve => {
+    video.onloadedmetadata = () => { video.play(); resolve(); };
+  });
+}
+
+async function loadModel() {
+  status.textContent = 'Загрузка модели...';
+  net = await bodyPix.load({
+    architecture: 'MobileNetV1',
+    outputStride: 16,
+    multiplier: 0.75,
+    quantBytes: 2,
+    modelUrl: './model-stride16.json'
+  });
+}
+
+async function loadBackground() {
+  status.textContent = 'Загрузка фона...';
+  bgImage = new Image();
+  bgImage.src = './bg.png';
+  await new Promise((resolve, reject) => {
+    bgImage.onload = () => { 
+      console.log('✅ Фон загружен:', bgImage.width, 'x', bgImage.height); 
+      resolve(); 
+    };
+    bgImage.onerror = () => reject(new Error('bg.png не найден!'));
+  });
+}
+
+function initCanvases() {
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+  output.width = w;
+  output.height = h;
+  
+  maskCanvas = document.createElement('canvas');
+  maskCanvas.width = w;
+  maskCanvas.height = h;
+  maskCtx = maskCanvas.getContext('2d');
+  
+  tempCanvas = document.createElement('canvas');
+  tempCanvas.width = w;
+  tempCanvas.height = h;
+  tempCtx = tempCanvas.getContext('2d');
+  
+  // Дополнительный canvas для морфологической обработки
+  currentMaskCanvas = document.createElement('canvas');
+  currentMaskCanvas.width = w;
+  currentMaskCanvas.height = h;
+  
+  imageData = tempCtx.createImageData(w, h);
+  
+  // Инициализируем предыдущую маску нулями
+  prevMaskData = new Float32Array(w * h);
+}
+
+async function render() {
+  if (!net || !bgImage || video.readyState < 2) {
+    requestAnimationFrame(render);
+    return;
+  }
+  
+  const w = output.width;
+  const h = output.height;
+  const totalPixels = w * h;
+  
+  frameCount++;
+  
+  // === СЕГМЕНТАЦИЯ (только каждый N-й кадр) ===
+  if (frameCount % SEGMENT_EVERY_N === 1) {
+    
+    const segmentation = await net.segmentPerson(video, {
+      flipHorizontal: true,
+      internalResolution: 'high',
+      segmentationThreshold: 0.65,
+      maxDetections: 1,
+      scoreThreshold: 0.3
+    });
+    
+    const rawMask = segmentation.data;
+    
+    // === 1. ЭКСПОНЕНЦИАЛЬНОЕ СГЛАЖИВАНИЕ ===
+    // Смешиваем текущую маску с предыдущей
+    for (let i = 0; i < totalPixels; i++) {
+      const current = rawMask[i]; // 0 или 1
+      const previous = prevMaskData[i]; // 0.0 - 1.0
+      // Плавный переход вместо резкого 0/1
+      prevMaskData[i] = SMOOTHING_ALPHA * current + (1 - SMOOTHING_ALPHA) * previous;
+    }
+    
+    // === 2. ФОРМИРОВАНИЕ ИЗОБРАЖЕНИЯ МАСКИ ===
+    for (let i = 0; i < totalPixels; i++) {
+      // Порог после сглаживания: пиксель > 0.3 считаем «человеком»
+      const alpha = prevMaskData[i] > 0.3 ? 255 : 0;
+      imageData.data[i * 4 + 0] = 0;
+      imageData.data[i * 4 + 1] = 0;
+      imageData.data[i * 4 + 2] = 0;
+      imageData.data[i * 4 + 3] = alpha;
+    }
+    
+    tempCtx.putImageData(imageData, 0, 0);
+    
+    // === 3. МОРФОЛОГИЧЕСКАЯ ОБРАБОТКА (close = dilate + erode) ===
+    // Убирает «шум» и мелкие дырки на краях маски
+    const morphCtx = currentMaskCanvas.getContext('2d');
+    
+    // Расширение (dilate): заливаем мелкие дырки
+    morphCtx.clearRect(0, 0, w, h);
+    morphCtx.filter = 'blur(2px)';
+    morphCtx.drawImage(tempCanvas, 0, 0);
+    morphCtx.filter = 'none';
+    
+    // Сужение (erode): убираем лишние пиксели снаружи
+    tempCtx.clearRect(0, 0, w, h);
+    tempCtx.filter = 'blur(2px)';
+    tempCtx.drawImage(currentMaskCanvas, 0, 0);
+    tempCtx.filter = 'none';
+    
+    // Ребинáризация после морфологии
+    const morphedData = tempCtx.getImageData(0, 0, w, h);
+    for (let i = 0; i < totalPixels; i++) {
+      morphedData.data[i * 4 + 3] = morphedData.data[i * 4 + 3] > 80 ? 255 : 0;
+    }
+    tempCtx.putImageData(morphedData, 0, 0);
+    
+    // === 4. ФИНАЛЬНОЕ РАЗМЫТИЕ КРАЁВ ===
+    maskCtx.clearRect(0, 0, w, h);
+    maskCtx.filter = location.hash ? location.hash.substring(1) : 'blur(4px)';
+    maskCtx.drawImage(tempCanvas, 0, 0);
+    maskCtx.filter = 'none';
+  }
+  
+  // === ОТРИСОВКА (каждый кадр, даже без новой сегментации) ===
+  ctx.clearRect(0, 0, w, h);
+  
+  // Маска
+  ctx.drawImage(maskCanvas, 0, 0, w, h);
+  
+  // Видео только внутри маски
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.drawImage(video, 0, 0, w, h);
+  
+  // Фон под видео
+  ctx.globalCompositeOperation = 'destination-over';
+  ctx.drawImage(bgImage, 0, 0, w, h);
+  
+  // Сброс режима
+  ctx.globalCompositeOperation = 'source-over';
+  
+  requestAnimationFrame(render);
+}
+
+async function init() {
+  try {
+    await tf.setBackend('webgl');
+    await tf.ready();
+    await setupCamera();
+    initCanvases();
+    await loadModel();
+    await loadBackground();
+    
+    status.textContent = '✅ Готово!';
+    status.style.background = 'rgba(0, 150, 0, 0.8)';
+    setTimeout(() => { status.style.display = 'none'; }, 2000);
+    
+    render();
+  } catch (error) {
+    status.textContent = '❌ ОШИБКА:\n' + error.message;
+    status.style.background = 'rgba(200, 0, 0, 0.9)';
+    console.error(error);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

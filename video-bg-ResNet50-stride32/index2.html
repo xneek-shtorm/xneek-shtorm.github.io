@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Замена фона (Анти-мерцание)</title>
+<style>
+  body { 
+    margin: 0; 
+    background: #000; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    overflow: hidden;
+  }
+  #output { 
+    max-width: 100%; 
+    max-height: 100vh;
+  }
+  #status {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    background: rgba(0,0,0,0.8);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10;
+    font-family: Arial, sans-serif;
+  }
+  #controls {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    color: #fff;
+    background: rgba(0,0,0,0.8);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    z-index: 10;
+    font-family: Arial, sans-serif;
+  }
+  #controls label { display: block; margin: 4px 0; }
+  #controls input { width: 120px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<video id="video" autoplay playsinline muted style="display:none"></video>
+<canvas id="output"></canvas>
+<div id="status">Инициализация...</div>
+<div id="controls">
+  <label>Сглаживание: <input type="range" id="smoothSlider" min="0" max="95" value="70"> <span id="smoothVal">0.70</span></label>
+  <label>Размытие: <input type="range" id="blurSlider" min="0" max="15" value="6"> <span id="blurVal">6px</span></label>
+  <label>Порог: <input type="range" id="threshSlider" min="30" max="90" value="60"> <span id="threshVal">0.60</span></label>
+</div>
+
+<script src="tf.min.js"></script>
+<script src="body-pix.min.js"></script>
+
+<script>
+const video = document.getElementById('video');
+const output = document.getElementById('output');
+const ctx = output.getContext('2d', { willReadFrequently: true });
+const status = document.getElementById('status');
+
+// Настройки с ползунков
+let smoothFactor = 0.70;  // 0 = нет сглаживания, 0.95 = максимальное
+let blurAmount = 6;
+let segThreshold = 0.60;
+
+document.getElementById('smoothSlider').oninput = function() {
+  smoothFactor = this.value / 100;
+  document.getElementById('smoothVal').textContent = smoothFactor.toFixed(2);
+};
+document.getElementById('blurSlider').oninput = function() {
+  blurAmount = parseInt(this.value);
+  document.getElementById('blurVal').textContent = blurAmount + 'px';
+};
+document.getElementById('threshSlider').oninput = function() {
+  segThreshold = this.value / 100;
+  document.getElementById('threshVal').textContent = segThreshold.toFixed(2);
+};
+
+let net, bgImage;
+let maskCanvas, maskCtx, tempCanvas, tempCtx, imageData;
+
+// === КЛЮЧЕВОЕ: буфер для сглаженной маски ===
+let smoothedMask = null;  // Float32Array, хранит значения 0.0-1.0
+
+async function setupCamera() {
+  status.textContent = 'Камера...';
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { width: 640, height: 480, facingMode: 'user' }
+  });
+  video.srcObject = stream;
+  return new Promise(resolve => {
+    video.onloadedmetadata = () => { video.play(); resolve(); };
+  });
+}
+
+async function loadModel() {
+  status.textContent = 'Загрузка ResNet50 stride 32...';
+  net = await bodyPix.load({
+    architecture: 'ResNet50',
+    outputStride: 32,
+    quantBytes: 2,
+    modelUrl: './model-resnet50-stride32.json'
+  });
+}
+
+async function loadBackground() {
+  status.textContent = 'Фон...';
+  bgImage = new Image();
+  bgImage.src = './ues.png';
+  await new Promise((resolve, reject) => {
+    bgImage.onload = resolve;
+    bgImage.onerror = () => reject(new Error('bg.png не найден!'));
+  });
+}
+
+function initCanvases() {
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+  output.width = w;
+  output.height = h;
+  
+  maskCanvas = document.createElement('canvas');
+  maskCanvas.width = w;
+  maskCanvas.height = h;
+  maskCtx = maskCanvas.getContext('2d');
+  
+  tempCanvas = document.createElement('canvas');
+  tempCanvas.width = w;
+  tempCanvas.height = h;
+  tempCtx = tempCanvas.getContext('2d');
+  
+  imageData = tempCtx.createImageData(w, h);
+  
+  // Инициализируем буфер сглаживания нулями
+  smoothedMask = new Float32Array(w * h);
+}
+
+async function render() {
+  if (!net || !bgImage || video.readyState < 2) {
+    requestAnimationFrame(render);
+    return;
+  }
+  
+  const segmentation = await net.segmentPerson(video, {
+    flipHorizontal: true,
+    internalResolution: 'high',
+    segmentationThreshold: segThreshold,
+    maxDetections: 1,
+    scoreThreshold: 0.3
+  });
+  
+  const maskData = segmentation.data;  // Uint8Array: 0 или 1
+  const len = maskData.length;
+  
+  // === УРОВЕНЬ 1: Экспоненциальное скользящее среднее (EMA) ===
+  // smoothedMask[i] = smoothFactor * smoothedMask[i] + (1 - smoothFactor) * newMask[i]
+  // Это "запоминает" предыдущие кадры и не даёт пикселям прыгать
+  const alpha = 1.0 - smoothFactor;  // доля нового кадра
+  for (let i = 0; i < len; i++) {
+    smoothedMask[i] = smoothFactor * smoothedMask[i] + alpha * maskData[i];
+  }
+  
+  // === УРОВЕНЬ 2: Гистерезис (мёртвая зона) ===
+  // Пиксель считается "человеком" только если сглаженное значение > 0.6
+  // и "фоном" только если < 0.4. Между 0.4 и 0.6 — сохраняем предыдущее состояние.
+  // Это предотвращает мерцание пикселей, которые "балансируют" на границе.
+  const highThresh = 0.6;
+  const lowThresh = 0.4;
+  
+  for (let i = 0; i < len; i++) {
+    let val = smoothedMask[i];
+    if (val > highThresh) {
+      val = 1.0;
+    } else if (val < lowThresh) {
+      val = 0.0;
+    }
+    // Иначе val остаётся как есть (плавный переход)
+    
+    const a = Math.round(val * 255);
+    imageData.data[i * 4 + 0] = 0;
+    imageData.data[i * 4 + 1] = 0;
+    imageData.data[i * 4 + 2] = 0;
+    imageData.data[i * 4 + 3] = a;
+  }
+  
+  tempCtx.putImageData(imageData, 0, 0);
+  
+  // === УРОВЕНЬ 3: Пространственное размытие (blur) ===
+  // Сглаживает "лесенки" и одиночные шумовые пиксели
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  if (blurAmount > 0) {
+    maskCtx.filter = `blur(${blurAmount}px)`;
+  }
+  maskCtx.drawImage(tempCanvas, 0, 0);
+  maskCtx.filter = 'none';
+  
+  // === ОТРИСОВКА ===
+  const w = output.width;
+  const h = output.height;
+  
+  ctx.clearRect(0, 0, w, h);
+  ctx.drawImage(maskCanvas, 0, 0, w, h);
+  
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.drawImage(video, 0, 0, w, h);
+  
+  ctx.globalCompositeOperation = 'destination-over';
+  ctx.drawImage(bgImage, 0, 0, w, h);
+  
+  ctx.globalCompositeOperation = 'source-over';
+  
+  requestAnimationFrame(render);
+}
+
+async function init() {
+  try {
+    await tf.setBackend('webgl');
+    await tf.ready();
+    await setupCamera();
+    initCanvases();
+    await loadModel();
+    await loadBackground();
+    
+    status.textContent = '✅ Готово!';
+    status.style.background = 'rgba(0, 150, 0, 0.8)';
+    setTimeout(() => { status.style.display = 'none'; }, 3000);
+    render();
+  } catch (error) {
+    status.textContent = '❌ ' + error.message;
+    status.style.background = 'rgba(200, 0, 0, 0.9)';
+    console.error(error);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
