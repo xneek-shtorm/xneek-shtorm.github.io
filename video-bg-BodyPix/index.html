@@ -134,7 +134,7 @@ async function render() {
   
   // Размытие для мягких краев головы
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-  maskCtx.filter = 'blur(2px)';
+  maskCtx.filter = location.hash || 'blur(2px)';
   maskCtx.drawImage(tempCanvas, 0, 0);
   maskCtx.filter = 'none';
   
