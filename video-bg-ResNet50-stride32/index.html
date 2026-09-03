@@ -133,7 +133,7 @@ const segmentation = await net.segmentPerson(video, {
   
   // Размытие для мягких краев головы
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-  maskCtx.filter = location.hash || 'blur(4px)';
+  maskCtx.filter = location.hash ? location.hash.substring(1) : 'blur(4px)';
   maskCtx.drawImage(tempCanvas, 0, 0);
   maskCtx.filter = 'none';
   
