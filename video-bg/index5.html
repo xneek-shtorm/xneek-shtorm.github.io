@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Webcam Background Replacement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        video {
+            display: none;
+        }
+
+        canvas {
+            border-radius: 8px;
+            background: #0f3460;
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+
+        .controls {
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .controls label {
+            color: #e0e0e0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #c73652;
+        }
+
+        .btn-secondary {
+            background: #533483;
+        }
+
+        .btn-secondary:hover {
+            background: #6a4c9e;
+        }
+
+        .status {
+            color: #aaa;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            min-height: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <canvas id="outputCanvas" width="640" height="480"></canvas>
+
+        <div class="controls">
+            <label>
+                <span>🎨 Background:</span>
+                <button class="btn btn-secondary" onclick="document.getElementById('bgInput').click()">
+                    Upload Image
+                </button>
+                <input type="file" id="bgInput" accept="image/*" />
+            </label>
+            <button class="btn" id="toggleBtn">▶ Start Camera</button>
+        </div>
+
+        <div class="status" id="status">Ready</div>
+    </div>
+
+    <video id="webcam" width="640" height="480" autoplay playsinline></video>
+
+    <!-- Load TensorFlow.js and MediaPipe Selfie Segmentation -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js">
+    </script>
+
+    <script>
+      // ============================================
+// Configuration
+// ============================================
+const CONFIG = {
+    canvasWidth: 640,
+    canvasHeight: 480,
+    modelSelection: 'general', // 'general' or 'landscape'
+    segmentationThreshold: 0.5,
+};
+
+// ============================================
+// DOM References
+// ============================================
+const canvas = document.getElementById('outputCanvas');
+const ctx = canvas.getContext('2d');
+const video = document.getElementById('webcam');
+const statusDiv = document.getElementById('status');
+const toggleBtn = document.getElementById('toggleBtn');
+const bgInput = document.getElementById('bgInput');
+
+// ============================================
+// State
+// ============================================
+let isRunning = false;
+let backgroundImage = null;
+let segmentation = null;
+let animationId = null;
+
+// ============================================
+// Default Background (gradient)
+// ============================================
+function createDefaultBackground() {
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.width = CONFIG.canvasWidth;
+    bgCanvas.height = CONFIG.canvasHeight;
+    const bgCtx = bgCanvas.getContext('2d');
+
+    const gradient = bgCtx.createLinearGradient(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+    gradient.addColorStop(0, '#0f3460');
+    gradient.addColorStop(0.5, '#16213e');
+    gradient.addColorStop(1, '#1a1a2e');
+    bgCtx.fillStyle = gradient;
+    bgCtx.fillRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+
+    // Add some decorative circles
+    bgCtx.fillStyle = 'rgba(233, 69, 96, 0.15)';
+    bgCtx.beginPath();
+    bgCtx.arc(100, 80, 60, 0, Math.PI * 2);
+    bgCtx.fill();
+    bgCtx.fillStyle = 'rgba(83, 52, 131, 0.15)';
+    bgCtx.beginPath();
+    bgCtx.arc(540, 400, 80, 0, Math.PI * 2);
+    bgCtx.fill();
+
+    return bgCanvas;
+}
+
+// ============================================
+// Load Background Image
+// ============================================
+function loadBackgroundImage(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            // Draw image onto a canvas to ensure proper sizing
+            const bgCanvas = document.createElement('canvas');
+            bgCanvas.width = CONFIG.canvasWidth;
+            bgCanvas.height = CONFIG.canvasHeight;
+            const bgCtx = bgCanvas.getContext('2d');
+
+            // Cover mode: fill the canvas while maintaining aspect ratio
+            const imgAspect = img.width / img.height;
+            const canvasAspect = CONFIG.canvasWidth / CONFIG.canvasHeight;
+            let drawWidth, drawHeight, offsetX, offsetY;
+
+            if (imgAspect > canvasAspect) {
+                drawHeight = CONFIG.canvasHeight;
+                drawWidth = CONFIG.canvasHeight * imgAspect;
+                offsetX = (CONFIG.canvasWidth - drawWidth) / 2;
+                offsetY = 0;
+            } else {
+                drawWidth = CONFIG.canvasWidth;
+                drawHeight = CONFIG.canvasWidth / imgAspect;
+                offsetX = 0;
+                offsetY = (CONFIG.canvasHeight - drawHeight) / 2;
+            }
+
+            bgCtx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+            backgroundImage = bgCanvas;
+
+            setStatus('Background image loaded ✅');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ============================================
+// Initialize MediaPipe Selfie Segmentation
+// ============================================
+async function initSegmentation() {
+    try {
+        const selfieSegmentation = new SelfieSegmentation({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+            }
+        });
+
+        selfieSegmentation.setOptions({
+            modelSelection: CONFIG.modelSelection,
+        });
+
+        selfieSegmentation.onResults((results) => {
+            segmentation = results;
+        });
+
+        // Initialize the model
+        await selfieSegmentation.initialize();
+
+        // Start sending frames
+        const sendFrame = async () => {
+            if (!isRunning) return;
+
+            try {
+                await selfieSegmentation.send({ image: video });
+            } catch (err) {
+                // Silent fail - will retry next frame
+            }
+
+            if (isRunning) {
+                requestAnimationFrame(sendFrame);
+            }
+        };
+
+        // Start the frame loop
+        sendFrame();
+
+        setStatus('Segmentation model ready ✅');
+        return selfieSegmentation;
+    } catch (error) {
+        console.error('Segmentation init error:', error);
+        setStatus('❌ Failed to load segmentation model');
+        throw error;
+    }
+}
+
+// ============================================
+// Render Frame with Background Replacement
+// ============================================
+function renderFrame() {
+    if (!isRunning) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+
+    // If no segmentation data yet, show video directly
+    if (!segmentation || !segmentation.segmentationMask) {
+        if (video.readyState >= 2) {
+            ctx.drawImage(video, 0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+        }
+        animationId = requestAnimationFrame(renderFrame);
+        return;
+    }
+
+    // Get the segmentation mask
+    const mask = segmentation.segmentationMask;
+
+    // Create an image data from the mask
+    const maskData = mask.data;
+
+    // 1. Draw the background
+    if (backgroundImage) {
+        ctx.drawImage(backgroundImage, 0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+    } else {
+        // Fallback: draw default background
+        const defaultBg = createDefaultBackground();
+        ctx.drawImage(defaultBg, 0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+    }
+
+    // 2. Draw the webcam video with the mask as alpha
+    // We need to draw the video with the mask applied
+    // Method: Use getImageData/putImageData for precise blending
+
+    // Get the current canvas data (background)
+    const bgImageData = ctx.getImageData(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+    const bgData = bgImageData.data;
+
+    // Get video frame data
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = CONFIG.canvasWidth;
+    tempCanvas.height = CONFIG.canvasHeight;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(video, 0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+    const videoImageData = tempCtx.getImageData(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
+    const videoData = videoImageData.data;
+
+    // Blend based on mask
+    const threshold = CONFIG.segmentationThreshold;
+    for (let i = 0; i < maskData.length; i++) {
+        const maskValue = maskData[i] / 255;
+        const alpha = maskValue > threshold ? 1 : 0;
+
+        const idx = i * 4;
+        if (alpha > 0.5) {
+            // Person pixel - use video
+            bgData[idx] = videoData[idx];
+            bgData[idx + 1] = videoData[idx + 1];
+            bgData[idx + 2] = videoData[idx + 2];
+            // Keep original alpha
+        }
+        // Else background pixel stays as is
+    }
+
+    // Put the blended data back
+    ctx.putImageData(bgImageData, 0, 0);
+
+    // Continue animation
+    animationId = requestAnimationFrame(renderFrame);
+}
+
+// ============================================
+// Start Webcam
+// ============================================
+async function startWebcam() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: CONFIG.canvasWidth,
+                height: CONFIG.canvasHeight,
+                facingMode: 'user',
+            },
+            audio: false,
+        });
+
+        video.srcObject = stream;
+        await video.play();
+
+        // Initialize segmentation
+        await initSegmentation();
+
+        isRunning = true;
+        toggleBtn.textContent = '⏹ Stop Camera';
+        toggleBtn.classList.remove('btn-secondary');
+        toggleBtn.classList.add('btn');
+
+        // Start render loop
+        renderFrame();
+
+        setStatus('Camera running 🟢');
+    } catch (err) {
+        console.error('Camera error:', err);
+        setStatus('❌ Failed to access camera: ' + err.message);
+    }
+}
+
+// ============================================
+// Stop Webcam
+// ============================================
+function stopWebcam() {
+    isRunning = false;
+
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach((track) => track.stop());
+        video.srcObject = null;
+    }
+
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+
+    segmentation = null;
+    toggleBtn.textContent = '▶ Start Camera';
+    toggleBtn.classList.add('btn-secondary');
+    setStatus('Stopped ⏹');
+}
+
+// ============================================
+// Toggle Camera
+// ============================================
+async function toggleCamera() {
+    if (isRunning) {
+        stopWebcam();
+    } else {
+        await startWebcam();
+    }
+}
+
+// ============================================
+// UI Helpers
+// ============================================
+function setStatus(msg) {
+    statusDiv.textContent = msg;
+}
+
+// ============================================
+// Event Listeners
+// ============================================
+toggleBtn.addEventListener('click', toggleCamera);
+
+bgInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) {
+        loadBackgroundImage(e.target.files[0]);
+    }
+});
+
+// ============================================
+// Initial Setup
+// ============================================
+// Load default background
+backgroundImage = createDefaultBackground();
+setStatus('Ready. Click "Start Camera" to begin.');
+
+// Handle page visibility change to clean up
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && isRunning) {
+        // Stop when tab is hidden to save resources
+        // You can choose to pause instead
+    }
+});
+
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+    if (isRunning) {
+        stopWebcam();
+    }
+});
+
+console.log('🎥 Background Replacement App Loaded');
+    </script>
+</body>
+</html>

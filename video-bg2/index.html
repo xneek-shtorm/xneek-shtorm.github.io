@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Quality Virtual Background (Fixed)</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 20px;
+        }
+        button, label {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+        button { background-color: #4CAF50; }
+        button:hover { background-color: #45a049; }
+        label { background-color: #008CBA; }
+        label:hover { background-color: #007bb5; }
+        input[type="file"] { display: none; }
+        .status { margin-top: 10px; color: #ffcc00; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <h2>Замена фона (Исправленная маска)</h2>
+    <canvas id="outputCanvas" width="640" height="480"></canvas>
+    
+    <div class="controls">
+        <button id="startBtn">Запустить веб-камеру</button>
+        <label for="bgUpload">Выбрать картинку фона</label>
+        <input type="file" id="bgUpload" accept="image/*">
+        <div class="status" id="statusText">Загрузка модели...</div>
+    </div>
+
+    <video id="webcam" style="display:none;" autoplay playsinline></video>
+
+    <script type="module">
+        import { FilesetResolver, ImageSegmenter } from "./vision_bundle.mjs";
+
+        const video = document.getElementById("webcam");
+        const canvas = document.getElementById("outputCanvas");
+        const ctx = canvas.getContext("2d");
+        const startBtn = document.getElementById("startBtn");
+        const bgUpload = document.getElementById("bgUpload");
+        const statusText = document.getElementById("statusText");
+
+        let segmenter = null;
+        let backgroundImg = null;
+        let isRunning = false;
+
+        const maskCanvas = document.createElement("canvas");
+        maskCanvas.width = canvas.width;
+        maskCanvas.height = canvas.height;
+        const maskCtx = maskCanvas.getContext("2d");
+
+        let smallMaskCanvas = null;
+        let smallMaskCtx = null;
+        let maskImageData = null;
+
+        async function loadModel() {
+            try {
+                statusText.innerText = "Загрузка WASM и модели...";
+                const vision = await FilesetResolver.forVisionTasks("./wasm");
+                
+                segmenter = await ImageSegmenter.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "./selfie_segmenter.tflite",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    outputCategoryMask: true,
+                    outputConfidenceMasks: false
+                });
+                
+                statusText.innerText = "Готово! Нажмите 'Запустить веб-камеру'.";
+                statusText.style.color = "#4CAF50";
+            } catch (e) {
+                console.error(e);
+                statusText.innerText = "Ошибка! Убедитесь, что запустили setup.ps1";
+                statusText.style.color = "red";
+            }
+        }
+
+        startBtn.addEventListener("click", async () => {
+            if (isRunning) return;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 640, height: 480 } 
+                });
+                video.srcObject = stream;
+                await video.play();
+                isRunning = true;
+                startBtn.innerText = "Камера работает";
+                startBtn.disabled = true;
+                statusText.innerText = "Идет обработка в реальном времени...";
+                
+                requestAnimationFrame(renderLoop);
+            } catch (e) {
+                alert("Нет доступа к веб-камере.");
+            }
+        });
+
+        bgUpload.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                backgroundImg = new Image();
+                backgroundImg.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function renderLoop() {
+            if (!isRunning || !segmenter) {
+                requestAnimationFrame(renderLoop);
+                return;
+            }
+
+            if (video.readyState >= 2) {
+                const result = segmenter.segmentForVideo(video, performance.now());
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                if (result.categoryMask) {
+                    const mask = result.categoryMask;
+                    
+                    if (!smallMaskCanvas || smallMaskCanvas.width !== mask.width) {
+                        smallMaskCanvas = document.createElement("canvas");
+                        smallMaskCanvas.width = mask.width;
+                        smallMaskCanvas.height = mask.height;
+                        smallMaskCtx = smallMaskCanvas.getContext("2d");
+                        maskImageData = smallMaskCtx.createImageData(mask.width, mask.height);
+                    }
+
+                    const maskData = mask.getAsUint8Array();
+                    const dataArr = maskImageData.data;
+                    const numPixels = mask.width * mask.height;
+                    
+                    // ИСПРАВЛЕНИЕ: Динамически определяем, сколько байт на пиксель (1 или 4)
+                    // Если длина массива равна числу пикселей — 1 байт (Grayscale)
+                    // Если длина в 4 раза больше — 4 байта (RGBA)
+                    const step = maskData.length === numPixels ? 1 : 4;
+                    
+                    for (let i = 0; i < numPixels; i++) {
+                        // Читаем значение (обычно 0 - фон, 1 - человек)
+                        const maskVal = maskData[i * step]; 
+                        const val = maskVal > 0 ? 255 : 0;
+                        
+                        dataArr[i * 4] = val;     // R
+                        dataArr[i * 4 + 1] = val; // G
+                        dataArr[i * 4 + 2] = val; // B
+                        dataArr[i * 4 + 3] = val; // Alpha
+                    }
+                    smallMaskCtx.putImageData(maskImageData, 0, 0);
+
+                    // Размываем маску (убирает дрожание) и повышаем контраст (делает край четким)
+                    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+                    maskCtx.filter = "blur(2px) contrast(3)";
+                    maskCtx.drawImage(smallMaskCanvas, 0, 0, maskCanvas.width, maskCanvas.height);
+                    maskCtx.filter = "none";
+
+                    // Вырезаем человека из видео
+                    ctx.globalCompositeOperation = "destination-in";
+                    ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
+
+                    // Кладем фон позади
+                    ctx.globalCompositeOperation = "destination-over";
+                    
+                    if (backgroundImg) {
+                        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+                    } else {
+                        ctx.fillStyle = "#2c3e50";
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+
+                    ctx.globalCompositeOperation = "source-over";
+                }
+            }
+            
+            requestAnimationFrame(renderLoop);
+        }
+
+        loadModel();
+    </script>
+</body>
+</html>

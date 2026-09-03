@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Локальная замена фона</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        #output-canvas {
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+        #webcam {
+            display: none;
+        }
+        #status {
+            position: absolute;
+            top: 20px;
+            color: #fff;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="status">Инициализация камеры и модели...</div>
+    
+    <video id="webcam" autoplay playsinline></video>
+    <canvas id="output-canvas"></canvas>
+
+    <!-- Локальная библиотека MediaPipe -->
+    <script src="selfie_segmentation.js"></script>
+
+    <script>
+        const videoElement = document.getElementById('webcam');
+        const canvasElement = document.getElementById('output-canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const statusElement = document.getElementById('status');
+
+        // Загрузка фонового изображения
+        const bgImage = new Image();
+        bgImage.src = 'bg.jpg';
+        bgImage.onload = () => {
+            console.log("Фоновое изображение загружено");
+        };
+
+        // Временный canvas для жесткого вырезания маски (для четких краев)
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+
+        let segmenter = null;
+        let isProcessing = false;
+
+        function initSegmenter() {
+            // Указываем загружать файлы из локальной папки
+            segmenter = new SelfieSegmentation({
+                locateFile: (file) => {
+                    return `./${file}`;
+                }
+            });
+
+            // modelSelection: 1 - Landscape модель. 
+            // Она дает более стабильную маску и высокое разрешение (256x256 вместо 144x256)
+            // Это решает проблему мерцания и делает края более четкими.
+            segmenter.setOptions({
+                modelSelection: 1,
+                selfieMode: false
+            });
+
+            segmenter.onResults(onResults);
+        }
+
+        function onResults(results) {
+            if (!bgImage.complete || bgImage.naturalHeight === 0) return;
+
+            const width = results.image.width;
+            const height = results.image.height;
+
+            canvasElement.width = width;
+            canvasElement.height = height;
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+
+            // 1. Рисуем кадр с веб-камеры на временном canvas
+            tempCtx.drawImage(results.image, 0, 0, width, height);
+
+            // 2. Применяем маску сегментации
+            // Используем составной режим 'destination-in', который оставляет 
+            // только те пиксели видео, где маска непрозрачна. 
+            // Это дает четкие края без полупрозрачного ореола.
+            tempCtx.globalCompositeOperation = 'destination-in';
+            
+            // Отключаем сглаживание при масштабировании маски, 
+            // чтобы границы оставались резкими, а не размывались
+            tempCtx.imageSmoothingEnabled = false;
+            tempCtx.drawImage(results.segmentationMask, 0, 0, width, height);
+            
+            // Сбрасываем режим наложения для следующих кадров
+            tempCtx.globalCompositeOperation = 'source-over';
+
+            // 3. Рисуем фон на основном canvas
+            canvasCtx.drawImage(bgImage, 0, 0, width, height);
+
+            // 4. Накладываем вырезанного человека поверх фона
+            canvasCtx.drawImage(tempCanvas, 0, 0);
+
+            isProcessing = false;
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+                videoElement.srcObject = stream;
+                await videoElement.play();
+                
+                statusElement.style.opacity = '0';
+                setTimeout(() => statusElement.remove(), 500);
+                
+                processFrame();
+            } catch (err) {
+                statusElement.innerText = "Ошибка доступа к камере: " + err.message;
+                statusElement.style.background = "rgba(200,0,0,0.8)";
+            }
+        }
+
+        // Цикл обработки requestAnimationFrame
+        function processFrame() {
+            requestAnimationFrame(processFrame);
+            
+            // Предотвращаем переполнение стека, если обработка занимает больше времени, чем 1 кадр
+            if (!isProcessing && videoElement.readyState >= 2) {
+                isProcessing = true;
+                segmenter.send({ image: videoElement });
+            }
+        }
+
+        // Запуск приложения
+        window.onload = () => {
+            initSegmenter();
+            startCamera();
+        };
+    </script>
+</body>
+</html>

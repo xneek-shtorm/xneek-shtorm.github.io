@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time WebCam Background Replacement</title>
+    
+    <!-- Load the modern MediaPipe Tasks Vision Library -->
+    <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #1e1e1e;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .video-container {
+            position: relative;
+            margin: 20px auto;
+            width: 640px;
+            height: 480px;
+        }
+        /* Mirror the outputs for a natural selfie view */
+        video, canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 640px;
+            height: 480px;
+            transform: scaleX(-1);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        video {
+            display: none; /* Hide the raw webcam feed */
+        }
+        #status {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Real-Time Background Replacement</h1>
+    <div id="status">Loading AI Model...</div>
+
+    <div class="video-container">
+        <!-- Input elements -->
+        <video id="webcam" autoplay playsinline></video>
+        <!-- Output canvas -->
+        <canvas id="output_canvas" width="640" height="480"></canvas>
+    </div>
+
+    <script type="module">
+        // Import ImageSegmenter from the CDN bundle
+        const vision = await FilesetResolver.forVisionTasks(
+            "https://jsdelivr.net"
+        );
+        
+        let imageSegmenter;
+        const video = document.getElementById("webcam");
+        const canvas = document.getElementById("output_canvas");
+        const ctx = canvas.getContext("2d");
+        const statusDiv = document.getElementById("status");
+
+        // 1. Pre-load your new replacement background image
+        const backgroundImage = new Image();
+        // You can replace this URL with any image path you want
+        backgroundImage.src = "https://unsplash.com"; 
+
+        // 2. Initialize the AI Selfie Segmenter
+        async function initSegmenter() {
+            imageSegmenter = await ImageSegmenter.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: "https://googleapis.com",
+                    delegate: "GPU" // Forces hardware acceleration
+                },
+                runningMode: "VIDEO",
+                outputCategoryMask: true,
+                outputConfidenceMasks: false
+            });
+            
+            statusDiv.innerText = "Model Ready! Accessing webcam...";
+            startWebcam();
+        }
+
+        // 3. Request and start the user's Webcam
+        function startWebcam() {
+            navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+                .then((stream) => {
+                    video.srcObject = stream;
+                    video.addEventListener("loadeddata", () => {
+                        statusDiv.innerText = "Running Background Replacement";
+                        requestAnimationFrame(renderFrame);
+                    });
+                })
+                .catch((err) => {
+                    statusDiv.innerText = "Webcam access denied or unavailable.";
+                    console.error(err);
+                });
+        }
+
+        // 4. Main looping logic executed frame-by-frame
+        let lastVideoTime = -1;
+        async function renderFrame() {
+            // Only process if a new webcam frame has arrived
+            if (video.currentTime !== lastVideoTime) {
+                lastVideoTime = video.currentTime;
+                let startTimeMs = performance.now();
+
+                // Run AI segmentation on the frame
+                const result = imageSegmenter.segmentForVideo(video, startTimeMs);
+                
+                // Extract the mask (0 = background, 255 = person)
+                const mask = result.categoryMask;
+                const maskData = mask.getAsUint8Array();
+                
+                // Create a temporary offscreen canvas for the mask
+                const maskCanvas = document.createElement('canvas');
+                maskCanvas.width = canvas.width;
+                maskCanvas.height = canvas.height;
+                const maskCtx = maskCanvas.getContext('2d');
+                
+                // Write the raw mask data to pixels
+                const imgData = maskCtx.createImageData(canvas.width, canvas.height);
+                for (let i = 0; i < maskData.length; i++) {
+                    const val = maskData[i]; 
+                    const index = i * 4;
+                    imgData.data[index] = 0;       // R
+                    imgData.data[index+1] = 0;     // G
+                    imgData.data[index+2] = 0;     // B
+                    imgData.data[index+3] = val;   // Alpha channel isolates the person
+                }
+                maskCtx.putImageData(imgData, 0, 0);
+
+                // --- CANVAS COMPOSITING LAYERS ---
+                ctx.save();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Layer A: Draw the raw webcam person using the alpha mask
+                ctx.drawImage(maskCanvas, 0, 0);
+                ctx.globalCompositeOperation = 'source-in'; // Keep webcam pixels ONLY where mask exists
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Layer B: Draw the new background behind the person
+                ctx.globalCompositeOperation = 'destination-over'; // Draw underneath existing layer
+                if (backgroundImage.complete) {
+                    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+                } else {
+                    // Fallback to a solid dark grey color if the image fails to load
+                    ctx.fillStyle = "#333333";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                ctx.restore();
+            }
+
+            // Loop indefinitely
+            requestAnimationFrame(renderFrame);
+        }
+
+        // Trigger program start
+        initSegmenter();
+    </script>
+</body>
+</html>

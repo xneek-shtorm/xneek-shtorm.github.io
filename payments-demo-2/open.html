@@ -12,7 +12,8 @@
     <button id="btn1" class="btn bg-sky-500 hover:bg-sky-700">Open pay window and wait it close</button>
     <br><br>
     <button id="btn2">Open pay window as POPUP and wait it close</button>
-
+    <br><br>
+    <button id="btn3">Open pay window as postwindow and wait it close</button>
     <div id="res" style="margin: 2rem 0;"></div>
   </main>
 
@@ -67,6 +68,7 @@
 
   btn1.onclick = () => openWindow();
   btn2.onclick = () => openWindow('popup');
+  btn3.onclick = () => openWindow('toolbar=no');
 
   </script>
 </body>

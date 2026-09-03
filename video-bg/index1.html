@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      html {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+      }
+
+      footer {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        color: #373737;
+        position: fixed;
+        bottom: 0;
+        padding: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      #output_canvas {
+        resize: both;
+      }
+
+  
+      label {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+    </style>
+    <script src="cdn/camera_utils.js"></script>
+    <script src="cdn/selfie_segmentation.js"></script>
+  </head>
+  <body>
+    <div>
+      <video
+        id="input_video"
+        style="display: none"
+        autoplay
+        playsinline
+      ></video>
+      <canvas id="output_canvas" width="640" height="480"></canvas>
+
+      <footer>
+        <label>
+          Модель:
+          <select id="modelSelectionSelect">
+            <option value="0">
+              тяжелая, но более точная модель (меньше дергается)
+            </option>
+            <option value="1">
+              легкая модель для слабых устройств (может давать рваный край)
+            </option>
+          </select>
+        </label>
+
+        <label>
+          Фон:
+          <input type="file" id="fileInput" accept="image/*" />
+        </label>
+      </footer>
+      
+    </div>
+
+    <script>
+      const videoElement = document.getElementById("input_video");
+      const canvasElement = document.getElementById("output_canvas");
+      const canvasCtx = canvasElement.getContext("2d");
+     
+      const SELFIE_MODE = false;
+
+      const backgroundImage = new Image();
+      //backgroundImage.src = "ues.webp";
+
+      // ---- Переменные для сглаживания маски ----
+ 
+
+      function onResults(results) {
+        const w = results.image.width;
+        const h = results.image.height;
+        canvasElement.width = w;
+        canvasElement.height = h;
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, w, h);
+
+        // 1. Получаем маску как ImageData
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = w;
+        tempCanvas.height = h;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(results.segmentationMask, 0, 0, w, h);
+   
+        let currentMaskData = tempCtx.getImageData(0, 0, w, h);
+
+  
+        const maskCanvas = document.createElement("canvas");
+        maskCanvas.width = w;
+        maskCanvas.height = h;
+        const maskCtx = maskCanvas.getContext("2d");
+
+        maskCtx.putImageData(currentMaskData, 0, 0);
+
+        canvasCtx.filter = `blur(${blur}px)  contrast(1.2)`;
+        canvasCtx.drawImage(maskCanvas, 0, 0, w, h);
+
+        // 4. Накладываем видео (source-in) – обрезаем по маске
+        canvasCtx.globalCompositeOperation = "source-in";
+        canvasCtx.filter = "none";
+        canvasCtx.drawImage(results.image, 0, 0, w, h);
+
+        // 5. Рисуем фон (destination-over)
+        canvasCtx.globalCompositeOperation = "destination-over";
+        if (backgroundImage.complete && backgroundImage.naturalWidth !== 0) {
+          canvasCtx.drawImage(backgroundImage, 0, 0, w, h);
+        } else {
+          // Если фон не загружен – размытый оригинал
+          canvasCtx.filter = "saturate(10%)";
+          canvasCtx.drawImage(results.image, 0, 0, w, h);
+        }
+        canvasCtx.restore();
+      }
+
+      // --- Остальной код (инициализация SelfieSegmentation, камера, выбор модели и т.д.) ---
+      selfieSegmentation = new SelfieSegmentation({
+        locateFile: (file) => `wasm/${file}`,
+      });
+      selfieSegmentation.setOptions({
+        modelSelection: 0,
+        selfieMode: SELFIE_MODE,
+        runningMode: "VIDEO",
+        minHandDetectionConfidence: 0.6, // Specific to hand detection
+        minHandPresenceConfidence: 0.6, // Specific to landmark presence
+        minTrackingConfidence: 0.6,
+      });
+      selfieSegmentation.onResults(onResults);
+
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const widthValue = urlParams.get("width"); // "500"
+
+      // Запуск камеры
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await selfieSegmentation.send({ image: videoElement });
+        },
+        width: widthValue ? +widthValue : 640, // Target stream width
+        height: widthValue ? +widthValue / (4 / 3) : 480, // Target stream height
+      });
+      camera.start();
+
+      // Обработчики UI
+      modelSelectionSelect.onchange = () => {
+        selfieSegmentation.setOptions({
+          modelSelection: +modelSelectionSelect.value,
+        });
+      };
+    
+
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              backgroundImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+    </script>
+  </body>
+</html>

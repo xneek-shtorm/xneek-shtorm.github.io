@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robust Video Matting - Background Replacement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        canvas {
+            background-color: #000;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            max-width: 100%;
+            height: auto;
+        }
+        #status {
+            font-weight: bold;
+            color: #ffaa00;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Замена фона в реальном времени (RVM MobileNetV3)</h1>
+    
+    <div class="controls">
+        <span id="status">Загрузка модели...</span>
+        <button id="startBtn" disabled>Запустить камеру</button>
+        <label for="bgUpload">Загрузить свой фон:</label>
+        <input type="file" id="bgUpload" accept="image/*">
+    </div>
+
+    <canvas id="output" width="512" height="288"></canvas>
+
+    <!-- Скрытые элементы для видео и фона -->
+    <video id="webcam" class="hidden" autoplay playsinline></video>
+    <img id="bgImg" src="bg.png" class="hidden" crossorigin="anonymous">
+
+    <!-- Локальная библиотека ONNX Runtime -->
+    <script src="ort.min.js"></script>
+
+    <script>
+        // Разрешение 512x288 (кратно 32)
+        const MODEL_WIDTH = 512;
+        const MODEL_HEIGHT = 288;
+
+        const video = document.getElementById('webcam');
+        const bgImg = document.getElementById('bgImg');
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const statusEl = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const bgUpload = document.getElementById('bgUpload');
+
+        const bgCanvas = document.createElement('canvas');
+        bgCanvas.width = MODEL_WIDTH;
+        bgCanvas.height = MODEL_HEIGHT;
+        const bgCtx = bgCanvas.getContext('2d', { willReadFrequently: true });
+
+        const srcCanvas = document.createElement('canvas');
+        srcCanvas.width = MODEL_WIDTH;
+        srcCanvas.height = MODEL_HEIGHT;
+        const srcCtx = srcCanvas.getContext('2d', { willReadFrequently: true });
+
+        let session = null;
+        let isRunning = false;
+
+        // ИСПРАВЛЕНИЕ: Инициализация рекуррентных состояний как 1x1x1x1
+        // Кастомные (14.6 МБ) модели обычно ожидают именно такие размеры, 
+        // а затем сами "разворачивают" их внутри узла Expand.
+        let r1i = new ort.Tensor('float32', new Float32Array(1), [1, 1, 1, 1]);
+        let r2i = new ort.Tensor('float32', new Float32Array(1), [1, 1, 1, 1]);
+        let r3i = new ort.Tensor('float32', new Float32Array(1), [1, 1, 1, 1]);
+        let r4i = new ort.Tensor('float32', new Float32Array(1), [1, 1, 1, 1]);
+
+        ort.env.wasm.wasmPaths = './';
+
+        async function loadModel() {
+            try {
+                session = await ort.InferenceSession.create('rvm_mobilenetv3_fp32.onnx', {
+                    executionProviders: ['wasm']
+                });
+                
+                // Выводим в консоль имена и размеры входов, которые ожидает модель
+                console.log("Model inputs:");
+                for (const input of session.inputNames) {
+                    console.log(` - ${input}`);
+                }
+
+                statusEl.innerText = 'Модель загружена!';
+                statusEl.style.color = '#00ff00';
+                startBtn.disabled = false;
+            } catch (e) {
+                statusEl.innerText = 'Ошибка загрузки модели! Проверьте консоль.';
+                statusEl.style.color = 'red';
+                console.error(e);
+            }
+        }
+
+        bgUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                bgImg.src = URL.createObjectURL(file);
+            }
+        });
+
+        bgImg.onload = () => {
+            bgCtx.drawImage(bgImg, 0, 0, MODEL_WIDTH, MODEL_HEIGHT);
+        };
+        
+        if (bgImg.complete) {
+            bgCtx.drawImage(bgImg, 0, 0, MODEL_WIDTH, MODEL_HEIGHT);
+        }
+
+        startBtn.addEventListener('click', async () => {
+            if (isRunning) return;
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: MODEL_WIDTH }, height: { ideal: MODEL_HEIGHT }, facingMode: 'user' }
+                });
+                video.srcObject = stream;
+                await video.play();
+                
+                isRunning = true;
+                startBtn.disabled = true;
+                statusEl.innerText = 'Обработка...';
+                
+                processFrame();
+            } catch (e) {
+                statusEl.innerText = 'Нет доступа к камере!';
+                statusEl.style.color = 'red';
+                console.error(e);
+            }
+        });
+
+        async function processFrame() {
+            if (!isRunning) return;
+
+            srcCtx.drawImage(video, 0, 0, MODEL_WIDTH, MODEL_HEIGHT);
+            const imgData = srcCtx.getImageData(0, 0, MODEL_WIDTH, MODEL_HEIGHT);
+
+            const pixCount = MODEL_WIDTH * MODEL_HEIGHT;
+            const srcData = new Float32Array(3 * pixCount);
+            
+            for (let i = 0; i < pixCount; i++) {
+                srcData[i] = imgData.data[i * 4] / 255; // R
+                srcData[pixCount + i] = imgData.data[i * 4 + 1] / 255; // G
+                srcData[2 * pixCount + i] = imgData.data[i * 4 + 2] / 255; // B
+            }
+            const srcTensor = new ort.Tensor('float32', srcData, [1, 3, MODEL_HEIGHT, MODEL_WIDTH]);
+
+            const dsr = new ort.Tensor('float32', [0.25], [1]);
+
+            const feeds = {
+                src: srcTensor,
+                r1i: r1i,
+                r2i: r2i,
+                r3i: r3i,
+                r4i: r4i,
+                downsample_ratio: dsr
+            };
+
+            try {
+                const results = await session.run(feeds);
+
+                // Обновляем состояния для следующего кадра
+                r1i = results.r1o;
+                r2i = results.r2o;
+                r3i = results.r3o;
+                r4i = results.r4o;
+
+                const fgr = results.fgr.data;
+                const pha = results.pha.data;
+
+                const bgData = bgCtx.getImageData(0, 0, MODEL_WIDTH, MODEL_HEIGHT).data;
+
+                const outData = new Uint8ClampedArray(pixCount * 4);
+                
+                for (let i = 0; i < pixCount; i++) {
+                    const alpha = pha[i];
+
+                    const outR = fgr[i] * 255 * alpha + bgData[i * 4] * (1 - alpha);
+                    const outG = fgr[pixCount + i] * 255 * alpha + bgData[i * 4 + 1] * (1 - alpha);
+                    const outB = fgr[2 * pixCount + i] * 255 * alpha + bgData[i * 4 + 2] * (1 - alpha);
+
+                    outData[i * 4] = outR;
+                    outData[i * 4 + 1] = outG;
+                    outData[i * 4 + 2] = outB;
+                    outData[i * 4 + 3] = 255;
+                }
+
+                const outImgData = new ImageData(outData, MODEL_WIDTH, MODEL_HEIGHT);
+                ctx.putImageData(outImgData, 0, 0);
+
+            } catch (e) {
+                console.error("Ошибка инференса:", e);
+            }
+
+            requestAnimationFrame(processFrame);
+        }
+
+        loadModel();
+    </script>
+</body>
+</html>

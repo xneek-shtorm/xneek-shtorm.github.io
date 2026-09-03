@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ФОНОРЕЗ — замена фона с вебкамеры</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1017; --panel:#141b26; --panel2:#0d1420; --line:#243044;
+  --txt:#e9f0f8; --mut:#8fa0b8; --teal:#3de1c0; --amber:#ffb454; --red:#ff4d5e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font:14px/1.55 "IBM Plex Sans",sans-serif;color:var(--txt);min-height:100vh;
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(61,225,192,.08), transparent 60%),
+    radial-gradient(820px 480px at 108% 16%, rgba(255,150,84,.07), transparent 60%),
+    var(--bg);
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle, rgba(233,240,248,.05) 1px, transparent 1.4px);
+  background-size:26px 26px}
+.wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:22px 22px 30px}
+.mono{font-family:"JetBrains Mono",monospace}
+
+/* ── шапка ── */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:20px;
+  animation:rise .6s cubic-bezier(.2,.7,.3,1) both}
+.brand{display:flex;align-items:center;gap:13px}
+.brand-ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;flex:none;
+  background:linear-gradient(145deg,#17222f,#0d1420);border:1px solid #2c3b52;
+  box-shadow:0 0 22px -6px rgba(61,225,192,.45) inset,0 6px 18px -8px #000}
+.brand-name{font:900 22px "Unbounded";letter-spacing:.5px}
+.brand-name em{color:var(--teal);font-style:normal}
+.brand-tag{font:600 10px "JetBrains Mono";letter-spacing:3px;color:var(--amber);margin-top:2px}
+.pills{display:flex;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);
+  border-radius:9px;background:var(--panel2);font:600 11px "JetBrains Mono";letter-spacing:1px;color:var(--mut)}
+.pill.live{color:var(--red)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1.1s infinite}
+@keyframes blink{50%{opacity:.2}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── сетка ── */
+main{display:grid;grid-template-columns:1fr 322px;gap:18px;align-items:start}
+.stage{animation:rise .6s .06s cubic-bezier(.2,.7,.3,1) both}
+.frame{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  background:#05080d;box-shadow:0 30px 60px -30px #000}
+#output{display:block;width:100%;height:auto;background:#05080d}
+.corner{position:absolute;width:26px;height:26px;border:2px solid rgba(61,225,192,.6);pointer-events:none;z-index:3}
+.tl{top:10px;left:10px;border-right:0;border-bottom:0}
+.tr{top:10px;right:10px;border-left:0;border-bottom:0}
+.bl{bottom:10px;left:10px;border-right:0;border-top:0}
+.br{bottom:10px;right:10px;border-left:0;border-top:0}
+.tc{position:absolute;top:12px;right:16px;z-index:3;font:600 11px "JetBrains Mono";letter-spacing:2px;
+  color:#cfe3ff;background:rgba(5,8,13,.55);padding:3px 9px;border-radius:6px}
+
+/* стартовый оверлей */
+.overlay{position:absolute;inset:0;z-index:5;display:grid;place-items:center;text-align:center;
+  background:radial-gradient(700px 400px at 50% 30%, rgba(20,32,46,.94), rgba(7,11,17,.97));
+  transition:opacity .5s;padding:24px}
+.overlay.gone{opacity:0;pointer-events:none}
+.ov-kicker{font:600 10px "JetBrains Mono";letter-spacing:3.5px;color:var(--teal);margin-bottom:14px}
+.overlay h1{font:700 clamp(24px,3.6vw,42px)/1.16 "Unbounded";margin-bottom:14px}
+.overlay p{color:var(--mut);max-width:52ch;margin:0 auto 26px}
+#startBtn{position:relative;font:700 14px "Unbounded";letter-spacing:.5px;color:#06231d;
+  background:var(--teal);border:0;border-radius:12px;padding:16px 34px;cursor:pointer;
+  box-shadow:0 12px 30px -10px rgba(61,225,192,.55);transition:transform .18s,box-shadow .18s}
+#startBtn:hover{transform:translateY(-2px);box-shadow:0 18px 38px -10px rgba(61,225,192,.7)}
+#startBtn:active{transform:scale(.97)}
+#startBtn::after{content:"";position:absolute;inset:-7px;border-radius:16px;border:2px solid rgba(61,225,192,.4);animation:pulse 2s infinite}
+@keyframes pulse{0%{opacity:.9;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.12)}}
+.ov-err{margin-top:16px;font:600 12px "JetBrains Mono";color:var(--red);min-height:16px}
+
+.stagebar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.status{display:flex;align-items:center;font:500 12.5px "IBM Plex Sans";color:var(--mut)}
+.sdot{width:8px;height:8px;border-radius:50%;background:#5a6b84;margin-right:9px;flex:none}
+.sdot.wait{background:var(--amber);animation:blink .9s infinite}
+.sdot.ok{background:var(--teal);box-shadow:0 0 9px rgba(61,225,192,.9)}
+.sdot.err{background:var(--red)}
+.sb-right{display:flex;align-items:center;gap:8px}
+.chip{font:600 10px "JetBrains Mono";letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);
+  border:1px solid rgba(61,225,192,.35);border-radius:99px;padding:4px 11px}
+.ghostbtn{font:600 11px "JetBrains Mono";color:var(--txt);background:var(--panel2);
+  border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer;transition:.18s}
+.ghostbtn:hover{border-color:var(--teal);transform:translateY(-1px)}
+
+/* ── панель справа ── */
+.rack{display:flex;flex-direction:column;gap:16px}
+.panel{background:linear-gradient(180deg,#151d29,#111823);border:1px solid var(--line);
+  border-radius:14px;padding:16px 16px 18px;animation:rise .6s cubic-bezier(.2,.7,.3,1) both}
+.panel.d1{animation-delay:.12s}.panel.d2{animation-delay:.2s}.panel.d3{animation-delay:.28s}
+.p-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.p-num{font:600 11px "JetBrains Mono";color:var(--amber);letter-spacing:2px}
+.p-head h2{font:700 13px "Unbounded";letter-spacing:2px;text-transform:uppercase}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  background:#0a0f16;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.tile:hover{transform:translateY(-2px);border-color:#3c4d68}
+.tile canvas{display:block;width:100%;aspect-ratio:16/9}
+.tile b{position:absolute;left:6px;bottom:5px;z-index:2;font:600 10.5px "IBM Plex Sans";color:#eef4fb;
+  background:rgba(6,10,16,.62);padding:2px 7px;border-radius:6px}
+.tile.active{border-color:var(--teal);box-shadow:0 0 0 1px rgba(61,225,192,.5),0 8px 20px -10px rgba(61,225,192,.4)}
+.tile.active::before{content:"";position:absolute;top:7px;right:7px;width:8px;height:8px;z-index:2;
+  border-radius:50%;background:var(--teal);box-shadow:0 0 9px var(--teal)}
+.tile .rm{position:absolute;top:5px;right:5px;z-index:3;width:19px;height:19px;border-radius:50%;
+  background:rgba(5,8,13,.8);border:1px solid var(--line);color:#ffb1ba;font-size:11px;cursor:pointer;
+  opacity:0;transition:.15s}
+.tile:hover .rm{opacity:1}
+.uploads{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.upbtn{border:1px dashed #3a4a63;background:transparent;color:var(--mut);border-radius:10px;
+  padding:10px 6px;font:600 12px "IBM Plex Sans";cursor:pointer;transition:.18s}
+.upbtn:hover{border-color:var(--teal);color:var(--teal);background:rgba(61,225,192,.06);transform:translateY(-1px)}
+
+.ctl{display:block;margin-bottom:14px}
+.ctl-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut)}
+.ctl-top b{font:600 11px "JetBrains Mono";color:var(--teal)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;
+  background:#26334a;outline:none;margin:11px 0 2px;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:#eafffa;border:3px solid var(--teal);box-shadow:0 0 10px rgba(61,225,192,.5);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.18)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#eafffa;border:3px solid var(--teal)}
+.switchrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:13px}
+.switch{position:relative;width:38px;height:22px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2}
+.switch i{position:absolute;inset:0;background:#26334a;border:1px solid #33415c;border-radius:99px;transition:.2s}
+.switch i::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+  background:#8fa0b8;transition:.2s}
+.switch input:checked+i{background:rgba(61,225,192,.22);border-color:var(--teal)}
+.switch input:checked+i::after{left:18px;background:var(--teal)}
+
+.fld{display:block;margin-bottom:12px}
+.fld span{display:block;font:600 10px "JetBrains Mono";letter-spacing:2px;color:var(--mut);margin-bottom:6px}
+select{width:100%;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;
+  padding:9px 10px;font:inherit;font-size:13px;outline:none;transition:border-color .2s}
+select:focus{border-color:var(--teal)}
+.hint{font-size:11.5px;color:#68788f;margin-top:4px}
+
+footer{margin-top:24px;font:400 11px "JetBrains Mono";color:#68788f;letter-spacing:.3px;
+  animation:rise .6s .36s cubic-bezier(.2,.7,.3,1) both}
+footer code{color:var(--amber);background:var(--panel2);border:1px solid var(--line);
+  padding:1px 6px;border-radius:5px}
+.cam-hidden{position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+@media(max-width:1020px){
+  main{grid-template-columns:1fr}
+  .rack{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-ic">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3de1c0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10.5 21 7v10l-6-3.5"/>
+          <circle cx="8.5" cy="12" r="2.6" stroke="#ffb454"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">ФОНО<em>РЕЗ</em></div>
+        <div class="brand-tag">ВИРТУАЛЬНЫЙ ФОН · REALTIME</div>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill live"><i class="dot"></i>LIVE</span>
+      <span class="pill" id="resPill">— × —</span>
+      <span class="pill" id="fpsPill">-- FPS</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage">
+      <div class="frame">
+        <canvas id="output" width="640" height="360"></canvas>
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <span class="tc" id="timecode">00:00:00</span>
+
+        <div class="overlay" id="overlay">
+          <div>
+            <div class="ov-kicker">MEDIAPIPE SELFIE SEGMENTER · 100% В БРАУЗЕРЕ</div>
+            <h1>Выходите в эфир<br>с любым фоном</h1>
+            <p>Нейросеть вырезает вас из кадра в реальном времени — без зелёного экрана.
+               Видео не покидает устройство. Фон выбирается на панели справа.</p>
+            <button id="startBtn">▶&nbsp;&nbsp;Включить камеру</button>
+            <div class="ov-err" id="ovErr"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stagebar">
+        <div class="status"><i class="sdot" id="sdot"></i><span id="statusTxt">Готовлюсь…</span></div>
+        <div class="sb-right">
+          <span class="chip" id="modeChip">Оригинал</span>
+          <button class="ghostbtn" id="snapBtn" title="Скачать кадр">📷 Снимок</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="rack">
+      <section class="panel d1">
+        <div class="p-head"><span class="p-num">01</span><h2>Фон</h2></div>
+        <div class="tiles" id="tiles"></div>
+        <div class="uploads">
+          <button class="upbtn" id="upImg">＋ Своё фото</button>
+          <button class="upbtn" id="upVid">＋ Своё видео</button>
+        </div>
+        <input type="file" id="imgInput" accept="image/*" hidden>
+        <input type="file" id="vidInput" accept="video/*" hidden>
+      </section>
+
+      <section class="panel d2">
+        <div class="p-head"><span class="p-num">02</span><h2>Обработка</h2></div>
+        <label class="ctl">
+          <div class="ctl-top"><span>Мягкость контура</span><b id="smoothVal">3px</b></div>
+          <input type="range" id="smooth" min="0" max="12" step="1" value="3">
+        </label>
+        <label class="ctl">
+          <div class="ctl-top"><span>Сдвиг контура</span><b id="expandVal">0</b></div>
+          <input type="range" id="expand" min="-6" max="6" step="1" value="0">
+        </label>
+        <div class="switchrow"><span>Зеркальное отражение</span>
+          <label class="switch"><input type="checkbox" id="mirrorCb" checked><i></i></label></div>
+        <div class="switchrow"><span>Показать исходник</span>
+          <label class="switch"><input type="checkbox" id="rawCb"><i></i></label></div>
+      </section>
+
+      <section class="panel d3">
+        <div class="p-head"><span class="p-num">03</span><h2>Камера</h2></div>
+        <label class="fld"><span>УСТРОЙСТВО</span>
+          <select id="deviceSel"><option>Сначала включите камеру</option></select></label>
+        <label class="fld"><span>РАЗРЕШЕНИЕ</span>
+          <select id="resSel">
+            <option value="640,360">360p</option>
+            <option value="854,480">480p</option>
+            <option value="1280,720" selected>720p</option>
+            <option value="1920,1080">1080p</option>
+          </select></label>
+        <p class="hint">Модель: Selfie Segmenter (MediaPipe). Все вычисления — локально.</p>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    Совет: <code>canvas.captureStream(30)</code> превращает результат в видеопоток для звонков и стримов
+    (отдайте его в WebRTC или расшарьте экран). Лучше всего работает в Chrome / Edge;
+    открывайте страницу по <code>https://</code> или <code>localhost</code>.
+  </footer>
+</div>
+
+<video id="cam" class="cam-hidden" playsinline muted></video>
+
+<script type="module">
+import { FilesetResolver, ImageSegmenter } from
+  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+const MODEL_URL = "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite";
+const WASM_URL  = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+const $ = s => document.querySelector(s);
+
+const outCanvas = $("#output"), outCtx = outCanvas.getContext("2d");
+const personCanvas = document.createElement("canvas"), pCtx = personCanvas.getContext("2d");
+const maskCanvas = document.createElement("canvas"), maskCtx = maskCanvas.getContext("2d");
+const blurScratch = document.createElement("canvas"), bsCtx = blurScratch.getContext("2d");
+const video = $("#cam");
+
+const state = { running:false, mirror:true, raw:false, smooth:3, expand:0,
+                mode:{type:"none"}, vw:0, vh:0 };
+let segmenter=null, segBusy=false, modelReady=false, streamRef=null;
+let maskData=null, maskW=0, maskH=0, personVal=1, calHist=[], lastVT=-1;
+
+// поддержка canvas.filter (нет в старых Safari — тогда контур будет жёстким)
+const filterOK = (()=>{const c=document.createElement("canvas").getContext("2d");
+  c.filter="blur(2px)";return c.filter==="blur(2px)";})();
+
+/* ───────── статус ───────── */
+const sdot=$("#sdot"), statusTxt=$("#statusTxt");
+function setStatus(txt,kind){ statusTxt.textContent=txt; sdot.className="sdot "+(kind||""); }
+
+/* ───────── генеративные фоны (рисуются каждый кадр) ───────── */
+function glow(c,x,y,r,col){const g=c.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,col);g.addColorStop(1,"rgba(0,0,0,0)");c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2);}
+const stars=Array.from({length:150},()=>({x:Math.random(),y:Math.random(),
+  r:Math.random()*1.8+.6,v:Math.random()*.008+.002,tw:Math.random()*2+.5,
+  p:Math.random()*6.28,a:Math.random()*.5+.4}));
+const bubbles=Array.from({length:34},()=>({x:Math.random(),y:Math.random(),
+  r:Math.random()*.035+.008,s:Math.random()*.05+.018,p:Math.random()*6.28}));
+
+const scenes = {
+  space(c,w,h,t){
+    const g=c.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,"#050a1a");g.addColorStop(.6,"#0a1630");g.addColorStop(1,"#101f42");
+    c.fillStyle=g;c.fillRect(0,0,w,h);
+    glow(c,w*(.22+.04*Math.sin(t*.1)),h*.32,w*.42,"rgba(61,225,192,.12)");
+    glow(c,w*(.78+.03*Math.cos(t*.13)),h*.62,w*.4,"rgba(146,111,255,.13)");
+    c.fillStyle="#e6eeff";
+    for(const s of stars){const x=(((s.x-t*s.v)%1)+1)%1*w;
+      c.globalAlpha=s.a*(.4+.6*Math.abs(Math.sin(t*s.tw+s.p)));
+      c.fillRect(x,s.y*h,s.r,s.r);}
+    c.globalAlpha=1;
+  },
+  studio(c,w,h,t){
+    const g=c.createRadialGradient(w*.5,h*.38,w*.08,w*.5,h*.45,w*.85);
+    g.addColorStop(0,"#eef1f4");g.addColorStop(.55,"#b9c2cd");g.addColorStop(1,"#74808e");
+    c.fillStyle=g;c.fillRect(0,0,w,h);
+    c.fillStyle="rgba(40,50,64,.26)";
+    c.beginPath();c.ellipse(w*.5,h*1.07,w*.62,h*.22,0,0,7);c.fill();
+    glow(c,w*(.5+.08*Math.sin(t*.35)),h*.3,w*.32,"rgba(255,255,255,.3)");
+  },
+  sunset(c,w,h,t){
+    const g=c.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,"#241040");g.addColorStop(.42,"#7a2f63");
+    g.addColorStop(.62,"#ff7847");g.addColorStop(.74,"#ffc46b");g.addColorStop(1,"#ffc46b");
+    c.fillStyle=g;c.fillRect(0,0,w,h);
+    const sx=w*.6,sy=h*.66;
+    glow(c,sx,sy,w*.3,"rgba(255,205,120,.55)");
+    c.fillStyle="#ffe3a0";c.beginPath();c.arc(sx,sy,h*.13,0,7);c.fill();
+    const seaY=h*.72,sg=c.createLinearGradient(0,seaY,0,h);
+    sg.addColorStop(0,"#3a1233");sg.addColorStop(1,"#12041f");
+    c.fillStyle=sg;c.fillRect(0,seaY,w,h-seaY);
+    c.fillStyle="#ffb46b";
+    for(let i=0;i<10;i++){const yy=seaY+6+i*(h-seaY)/11;
+      const ww=w*(.16-i*.011)*(.8+.2*Math.sin(t*2.4+i));
+      c.globalAlpha=.5*(1-i/10)*(.6+.4*Math.sin(t*3+i*1.7));
+      c.fillRect(sx-ww/2,yy,ww,2.2);}
+    c.globalAlpha=1;
+    c.fillStyle="rgba(255,190,140,.16)";
+    for(let i=0;i<3;i++){const cx=((t*(.01+i*.006)+i*.37)%1.2-.1)*w;
+      c.beginPath();c.ellipse(cx,h*(.2+.13*i),w*.16,h*.02,0,0,7);c.fill();}
+  },
+  grid(c,w,h,t){
+    const hor=h*.55;
+    let g=c.createLinearGradient(0,0,0,hor);g.addColorStop(0,"#08020f");g.addColorStop(1,"#3b0f52");
+    c.fillStyle=g;c.fillRect(0,0,w,hor);
+    g=c.createLinearGradient(0,hor,0,h);g.addColorStop(0,"#1c0630");g.addColorStop(1,"#08020f");
+    c.fillStyle=g;c.fillRect(0,hor,w,h-hor);
+    const sx=w*.5,r=h*.19;
+    const sg=c.createLinearGradient(0,hor-r,0,hor+r*.2);
+    sg.addColorStop(0,"#ffd166");sg.addColorStop(1,"#ff3f8e");
+    c.save();c.beginPath();c.arc(sx,hor,r,Math.PI,0);c.clip();
+    c.fillStyle=sg;c.fillRect(sx-r,hor-r,r*2,r*2);c.restore();
+    glow(c,sx,hor,r*1.8,"rgba(255,80,150,.25)");
+    c.strokeStyle="rgba(255,70,170,.85)";c.lineWidth=Math.max(1,h*.0018);
+    c.shadowColor="rgba(255,70,170,.8)";c.shadowBlur=6;
+    c.beginPath();
+    for(let i=0;i<14;i++){const p=((i/14)+t*.09)%1,y=hor+(h-hor)*Math.pow(p,2.6);
+      c.moveTo(0,y);c.lineTo(w,y);}
+    for(let j=-9;j<=9;j++){c.moveTo(w/2+j*w*.045,hor);c.lineTo(w/2+j*w*.16,h+40);}
+    c.stroke();c.shadowBlur=0;
+  },
+  bubbles(c,w,h,t){
+    const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,"#06304d");g.addColorStop(1,"#031525");
+    c.fillStyle=g;c.fillRect(0,0,w,h);
+    c.save();c.globalAlpha=.05;c.fillStyle="#bfeaff";
+    for(let i=0;i<3;i++){const x=w*(.2+.3*i)+Math.sin(t*.2+i)*w*.02;
+      c.beginPath();c.moveTo(x,0);c.lineTo(x+w*.05,0);
+      c.lineTo(x+w*.16,h);c.lineTo(x+w*.02,h);c.closePath();c.fill();}
+    c.restore();
+    for(const b of bubbles){
+      const y=(((b.y-t*b.s)%1)+1)%1,yy=y*(h+40)-20;
+      const x=(b.x+Math.sin(t*.9+b.p)*.012)*w,r=b.r*w*.5;
+      c.strokeStyle="rgba(200,235,255,.55)";c.lineWidth=Math.max(1,r*.09);
+      c.beginPath();c.arc(x,yy,r,0,7);c.stroke();
+      c.fillStyle="rgba(255,255,255,.5)";
+      c.beginPath();c.arc(x-r*.35,yy-r*.35,r*.18,0,7);c.fill();}
+  }
+};
+
+/* ───────── плитки фонов ───────── */
+const TW=160,TH=90,tilesWrap=$("#tiles"),bgList=[];let studioTile=null,customTile=null,customUrl=null;
+const defs=[
+  {id:"none",   name:"Оригинал", kind:"none"},
+  {id:"blur",   name:"Размытие", kind:"blur"},
+  {id:"space",  name:"Космос",   kind:"scene"},
+  {id:"studio", name:"Студия",   kind:"scene"},
+  {id:"sunset", name:"Закат",    kind:"scene"},
+  {id:"grid",   name:"Синтвейв", kind:"scene"},
+  {id:"bubbles",name:"Пузыри",   kind:"scene"},
+];
+function makeTile(b){
+  const d=document.createElement("div");d.className="tile";
+  const cv=document.createElement("canvas");cv.width=TW;cv.height=TH;
+  const lab=document.createElement("b");lab.textContent=b.name;
+  d.append(cv,lab);b.dom=d;b.tctx=cv.getContext("2d");
+  d.addEventListener("click",()=>{ if(b.kind==="video"&&b.el)b.el.play().catch(()=>{}); setMode(b); });
+  tilesWrap.append(d);return d;
+}
+function paintStatic(b){
+  const c=b.tctx;
+  if(b.id==="none"){
+    const g=c.createLinearGradient(0,0,TW,TH);g.addColorStop(0,"#232d3d");g.addColorStop(1,"#141b26");
+    c.fillStyle=g;c.fillRect(0,0,TW,TH);
+    c.strokeStyle="#3de1c0";c.lineWidth=3;c.beginPath();c.arc(TW/2,TH/2,16,0,7);c.stroke();
+    c.fillStyle="#3de1c0";c.beginPath();c.arc(TW/2,TH/2,6,0,7);c.fill();
+    c.fillStyle="#ff4d5e";c.fillRect(TW/2+26,TH/2-16,6,6);
+  }else{
+    c.fillStyle="#101623";c.fillRect(0,0,TW,TH);
+    glow(c,TW*.3,TH*.4,42,"rgba(61,225,192,.5)");
+    glow(c,TW*.75,TH*.6,44,"rgba(255,150,84,.45)");
+    c.fillStyle="#05080d";
+    c.beginPath();c.arc(TW/2,TH*.42,10,0,7);c.fill();
+    c.beginPath();c.ellipse(TW/2,TH*.92,22,17,0,Math.PI,0);c.fill();
+  }
+}
+for(const b of defs){ makeTile(b); if(b.kind==="scene"){}else paintStatic(b);
+  bgList.push(b); if(b.id==="studio")studioTile=b; if(b.id==="space")var spaceTile=b; }
+
+function drawCover(c,el,w,h){
+  const sw=el.videoWidth||el.naturalWidth||el.width, sh=el.videoHeight||el.naturalHeight||el.height;
+  if(!sw||!sh)return;
+  const sa=sw/sh,da=w/h;let cw,ch,cx,cy;
+  if(sa>da){ch=sh;cw=sh*da;cx=(sw-cw)/2;cy=0;}else{cw=sw;ch=sw/da;cx=0;cy=(sh-ch)/2;}
+  c.drawImage(el,cx,cy,cw,ch,0,0,w,h);
+}
+function setMode(b){
+  state.mode={type:b.kind, fn:b.kind==="scene"?scenes[b.id]:null, el:b.el||null};
+  document.querySelectorAll(".tile").forEach(x=>x.classList.remove("active"));
+  b.dom.classList.add("active");
+  $("#modeChip").textContent=b.name;
+}
+
+/* загрузка своих фонов */
+$("#upImg").onclick=()=>$("#imgInput").click();
+$("#upVid").onclick=()=>$("#vidInput").click();
+$("#imgInput").onchange=e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  const url=URL.createObjectURL(f),img=new Image();
+  img.onload=()=>setCustom({kind:"image",el:img,name:f.name.slice(0,16)},url);
+  img.src=url;
+};
+$("#vidInput").onchange=e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  const url=URL.createObjectURL(f),v=document.createElement("video");
+  v.src=url;v.loop=true;v.muted=true;v.playsInline=true;
+  v.onloadedmetadata=()=>{v.play().catch(()=>{});setCustom({kind:"video",el:v,name:f.name.slice(0,16)},url);};
+};
+function setCustom(b,url){
+  if(customTile){customTile.dom.remove();if(customUrl)URL.revokeObjectURL(customUrl);}
+  customUrl=url;b.id="custom";
+  makeTile(b);bgList.push(b.filter?b:b); // в bgList для отрисовки миниатюры видео
+  if(!bgList.includes(b))bgList.push(b);
+  if(b.kind==="image")drawCover(b.tctx,b.el,TW,TH);
+  const rm=document.createElement("button");rm.className="rm";rm.textContent="✕";
+  rm.onclick=ev=>{ev.stopPropagation();b.dom.remove();
+    const i=bgList.indexOf(b);if(i>-1)bgList.splice(i,1);
+    if(state.mode.el===b.el)setMode(studioTile);URL.revokeObjectURL(url);customTile=null;};
+  b.dom.append(rm);customTile=b;setMode(b);
+}
+
+/* ───────── камера ───────── */
+const resPill=$("#resPill"),fpsPill=$("#fpsPill"),timecode=$("#timecode");
+function stopStream(){ if(streamRef){streamRef.getTracks().forEach(t=>t.stop());streamRef=null;} }
+async function startCamera(deviceId,[w,h]){
+  stopStream();setStatus("Запрашиваю доступ к камере…","wait");
+  const stream=await navigator.mediaDevices.getUserMedia({audio:false,
+    video:{deviceId:deviceId?{exact:deviceId}:undefined,width:{ideal:w},height:{ideal:h}}});
+  streamRef=stream;video.srcObject=stream;await video.play();
+  state.vw=video.videoWidth;state.vh=video.videoHeight;
+  outCanvas.width=personCanvas.width=state.vw;
+  outCanvas.height=personCanvas.height=state.vh;
+  blurScratch.width=192;blurScratch.height=Math.max(2,Math.round(192*state.vh/state.vw));
+  maskData=null;lastVT=-1;
+  resPill.textContent=state.vw+"×"+state.vh;
+  await listDevices(deviceId);
+}
+async function listDevices(current){
+  try{
+    const cams=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput");
+    $("#deviceSel").innerHTML=cams.map((c,i)=>
+      `<option value="${c.deviceId}">${c.label||"Камера "+(i+1)}</option>`).join("");
+    if(current)$("#deviceSel").value=current;
+  }catch(e){}
+}
+$("#deviceSel").onchange=()=>{if(state.running)restart();};
+$("#resSel").onchange=()=>{if(state.running)restart();};
+async function restart(){
+  try{await startCamera($("#deviceSel").value,$("#resSel").value.split(",").map(Number));
+      setStatus(modelReady?"Сегментация активна":"Жду загрузку модели…",modelReady?"ok":"wait");}
+  catch(e){setStatus("Ошибка камеры: "+e.message,"err");}
+}
+
+/* ───────── модель ───────── */
+async function initModel(){
+  setStatus("Загружаю нейросеть…","wait");
+  const fileset=await FilesetResolver.forVisionTasks(WASM_URL);
+  const opts=d=>({baseOptions:{modelAssetPath:MODEL_URL,delegate:d},
+    runningMode:"VIDEO",outputCategoryMask:true,outputConfidenceMasks:false});
+  try{segmenter=await ImageSegmenter.createFromOptions(fileset,opts("GPU"));}
+  catch(e){segmenter=await ImageSegmenter.createFromOptions(fileset,opts("CPU"));}
+  modelReady=true;
+  setStatus(state.running?"Сегментация активна":"Нейросеть готова · включите камеру","ok");
+}
+
+/* ───────── маска: сборка + автокалибровка «кто есть человек» ───────── */
+function maskDims(mask){
+  const {vw,vh}=state;
+  if(mask.length===vw*vh)return{mw:Math.max(2,vw>>1),mh:Math.max(2,vh>>1),full:true};
+  if(mask.length%256===0)return{mw:256,mh:mask.length/256,full:false};
+  const s=Math.round(Math.sqrt(mask.length));return{mw:s,mh:mask.length/s|0,full:false};
+}
+function buildMask(mask){
+  const {mw,mh,full}=maskDims(mask);
+  if(mw!==maskW||mh!==maskH||!maskData){
+    maskW=mw;maskH=mh;maskCanvas.width=mw;maskCanvas.height=mh;
+    maskData=maskCtx.createImageData(mw,mh);
+    const d=maskData.data;for(let i=0;i<d.length;i+=4)d[i]=d[i+1]=d[i+2]=255;
+  }
+  const d=maskData.data,pv=personVal;
+  if(full){
+    for(let y=0;y<mh;y++){let s=y*2*state.vw,o=y*mw;
+      for(let x=0;x<mw;x++,s+=2,o++)d[(o<<2)+3]=mask[s]===pv?255:0;}
+  }else for(let i=0;i<mask.length;i++)d[(i<<2)+3]=mask[i]===pv?255:0;
+  maskCtx.putImageData(maskData,0,0);
+}
+function calibrate(mask){
+  const {mw,mh,full}=maskDims(mask);
+  const W=full?state.vw:mw;
+  const x0=W*.36|0,x1=W*.64|0,y0=(full?state.vh:mh)*.3|0,y1=(full?state.vh:mh)*.58|0;
+  const cnt=new Map();
+  for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){
+    const v=mask[y*W+x];cnt.set(v,(cnt.get(v)||0)+1);}
+  if(!cnt.size)return;
+  let best=-1,bv=personVal;cnt.forEach((c,v)=>{if(c>best){best=c;bv=v;}});
+  calHist.push(bv);if(calHist.length>21)calHist.shift();
+  const tally=new Map();let pb=0;
+  for(const v of calHist){const c=(tally.get(v)||0)+1;tally.set(v,c);if(c>pb){pb=c;personVal=v;}}
+}
+
+/* ───────── композитинг кадра ───────── */
+function mirror(c){ if(state.mirror){c.translate(state.vw,0);c.scale(-1,1);} }
+function drawVideoMirrored(c){ c.save();mirror(c);c.drawImage(video,0,0,state.vw,state.vh);c.restore(); }
+
+function render(result,reuse=false){
+  const {vw,vh}=state;if(!vw)return;
+  outCtx.setTransform(1,0,0,1,0,0);
+  outCtx.fillStyle="#05080d";outCtx.fillRect(0,0,vw,vh);
+  if(state.raw){drawVideoMirrored(outCtx);return;}
+  const m=state.mode;
+  if(m.type==="none"){drawVideoMirrored(outCtx);return;}
+  if(result){const arr=result.categoryMask.getAsUint8Array();buildMask(arr);calibrate(arr);}
+
+  // фон
+  if(m.type==="blur"){
+    bsCtx.drawImage(video,0,0,blurScratch.width,blurScratch.height);
+    outCtx.save();mirror(outCtx);
+    if(filterOK)outCtx.filter="blur(8px) brightness(.94)";
+    outCtx.drawImage(blurScratch,-16,-16,vw+32,vh+32);
+    outCtx.restore();
+  }
+  else if(m.type==="scene")m.fn(outCtx,vw,vh,performance.now()/1000);
+  else if(m.el)drawCover(outCtx,m.el,vw,vh);
+
+  if(!result&&!reuse||!maskData)return;
+
+  // слой «человек»: видео, обрезанное маской
+  pCtx.setTransform(1,0,0,1,0,0);pCtx.clearRect(0,0,vw,vh);
+  pCtx.save();mirror(pCtx);pCtx.drawImage(video,0,0,vw,vh);pCtx.restore();
+  pCtx.save();
+  pCtx.globalCompositeOperation="destination-in";
+  if(filterOK)pCtx.filter=`blur(${state.smooth}px)`;
+  mirror(pCtx);
+  const s=1+state.expand*.012,dw=vw*s,dh=vh*s;
+  pCtx.drawImage(maskCanvas,(vw-dw)/2,(vh-dh)/2,dw,dh);
+  pCtx.restore();
+  outCtx.drawImage(personCanvas,0,0);
+}
+
+/* ───────── главный цикл ───────── */
+let frames=0,fpsT=0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  frames++;
+  if(ts-fpsT>500){fpsPill.textContent=Math.round(frames*1000/(ts-fpsT))+" FPS";frames=0;fpsT=ts;}
+  const s=ts/1000|0;
+  timecode.textContent=[s/3600|0,(s/60|0)%60,s%60].map(v=>String(v).padStart(2,"0")).join(":");
+  for(const b of bgList){
+    if(b.kind==="scene")scenes[b.id](b.tctx,TW,TH,ts/1000);
+    else if(b.kind==="video"&&b.el&&b.el.readyState>=2){
+      b.tctx.fillStyle="#000";b.tctx.fillRect(0,0,TW,TH);drawCover(b.tctx,b.el,TW,TH);}
+  }
+  if(!state.running||video.readyState<2){lastVT=-1;return;}
+  const ct=video.currentTime;
+  if(state.raw||state.mode.type==="none"){ if(ct!==lastVT){lastVT=ct;render(null);} return; }
+  if(!segmenter){render(null);return;}              // модель ещё грузится — показываем фон
+  if(ct!==lastVT){
+    if(!segBusy){segBusy=true;lastVT=ct;
+      segmenter.segmentForVideo(video,performance.now(),r=>{render(r);segBusy=false;});}
+  }else render(null,true);                          // тот же кадр камеры — анимируем фон по старой маске
+}
+
+/* ───────── органы управления ───────── */
+$("#smooth").oninput=e=>{state.smooth=+e.target.value;$("#smoothVal").textContent=e.target.value+"px";};
+$("#expand").oninput=e=>{state.expand=+e.target.value;$("#expandVal").textContent=e.target.value;};
+$("#mirrorCb").onchange=e=>state.mirror=e.target.checked;
+$("#rawCb").onchange=e=>state.raw=e.target.checked;
+$("#snapBtn").onclick=()=>{const a=document.createElement("a");
+  a.download="fonorez_"+Date.now()+".png";a.href=outCanvas.toDataURL("image/png");a.click();};
+
+$("#startBtn").onclick=async()=>{
+  $("#ovErr").textContent="";$("#startBtn").disabled=true;
+  try{
+    await startCamera(null,$("#resSel").value.split(",").map(Number));
+    state.running=true;
+    $("#overlay").classList.add("gone");
+    setMode(spaceTile);
+    setStatus(modelReady?"Сегментация активна":"Жду загрузку модели…",modelReady?"ok":"wait");
+  }catch(e){
+    $("#ovErr").textContent="Нет доступа к камере: "+e.message;
+    $("#startBtn").disabled=false;
+  }
+};
+
+if(!navigator.mediaDevices?.getUserMedia)
+  $("#ovErr").textContent="getUserMedia недоступен — откройте страницу по https или localhost";
+
+setMode(bgList[0]);bgList[0].dom.classList.remove("active"); // до старта — без подсветки
+initModel().catch(e=>setStatus("Не удалось загрузить модель: "+e.message,"err"));
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

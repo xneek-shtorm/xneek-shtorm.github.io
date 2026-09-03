@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Webcam Background Replacement</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #222; color: #fff; }
+    #canvas { border: 2px solid #555; border-radius: 8px; }
+    .controls { margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+  <h1>Webcam Background Replacement</h1>
+  <video id="webcam" autoplay playsinline style="display: none;"></video>
+
+  
+  <div>
+    <canvas id="canvas" width="640" height="480"></canvas>
+  </div>
+
+  <div class="controls">
+    <button id="btn">Start Webcam</button>
+  </div>
+
+  <!-- Load ONNX Runtime Web via CDN -->
+      <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.1/dist/ort.min.js"></script>
+
+
+  <script>
+    const webcam = document.getElementById('webcam');
+    const bgVideo = document.getElementById('bg-video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+          const backgroundImage = new Image();
+      backgroundImage.src = "ues.webp";
+    let model;
+    let isProcessing = false;
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { width: 640, height: 480 } 
+        });
+        webcam.srcObject = stream;
+        webcam.play();
+        //bgVideo.play();
+        
+        // Load the ONNX model
+        model = await ort.InferenceSession.create('./portrait_video.onnx');
+        isProcessing = true;
+        requestAnimationFrame(processVideoFrame);
+      } catch (err) {
+        console.error("Error accessing webcam or loading model: ", err);
+      }
+    }
+
+    btn.onclick = startCamera
+
+    async function processVideoFrame() {
+      if (!isProcessing) return;
+
+      // 1. Draw webcam to a temporary offscreen canvas to process as Float32/Tensor
+      const offscreenCanvas = document.createElement('canvas');
+      offscreenCanvas.width = 640;
+      offscreenCanvas.height = 480;
+      const offCtx = offscreenCanvas.getContext('2d');
+      offCtx.drawImage(webcam, 0, 0, 640, 480);
+
+      const frameData = offCtx.getImageData(0, 0, 640, 480);
+      
+      // 2. Preprocess data (Format: Float32Array, resize, normalize if needed)
+      // (This step depends on the exact input tensor shape your portrait_video.onnx expects)
+      const inputTensor = preprocessToONNX(frameData, 640, 480);
+
+      // 3. Run Inference
+      try {
+        const feeds = {};
+        // Use the exact input name your ONNX model exposes (e.g., 'input_1' or 'images')
+        feeds[model.inputNames[0]] = inputTensor; 
+        const results = await model.run(feeds);
+
+        // 4. Extract segmentation mask from the output tensor
+        const maskData = results[model.outputNames[0]].data;
+
+        // 5. Composite: Draw Background Video -> Subject/Mask -> Canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        
+        // Draw the person
+        compositeSubject(frameData, maskData);
+      } catch (e) {
+        console.error("Inference failed:", e);
+      }
+
+      requestAnimationFrame(processVideoFrame);
+    }
+
+    function preprocessToONNX(imageData, width, height) {
+      // Create a Float32Array for the NCHW/NHWC tensor the ONNX model needs
+      const float32Data = new Float32Array(width * height * 3);
+      // Example conversion: extract RGB and flatten
+      for (let i = 0; i < imageData.data.length / 4; i++) {
+        float32Data[i * 3 + 0] = imageData.data[i * 4 + 0] / 255.0; // R
+        float32Data[i * 3 + 1] = imageData.data[i * 4 + 1] / 255.0; // G
+        float32Data[i * 3 + 2] = imageData.data[i * 4 + 2] / 255.0; // B
+      }
+      return new ort.Tensor('float32', float32Data, [1, 3, height, width]);
+    }
+
+    function compositeSubject(frameData, maskData) {
+      const imgData = ctx.createImageData(640, 480);
+      for (let i = 0; i < maskData.length; i++) {
+        const alpha = maskData[i] > 0.5 ? 255 : 0; // Threshold mask
+        if (alpha > 0) {
+          // Subject pixels from the webcam
+          imgData.data[i * 4 + 0] = frameData.data[i * 4 + 0];
+          imgData.data[i * 4 + 1] = frameData.data[i * 4 + 1];
+          imgData.data[i * 4 + 2] = frameData.data[i * 4 + 2];
+          imgData.data[i * 4 + 3] = alpha;
+        } else {
+          imgData.data[i * 4 + 3] = 0; // Background transparent so bgVideo shows
+        }
+      }
+      
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = 640;
+      tempCanvas.height = 480;
+      tempCanvas.getContext('2d').putImageData(imgData, 0, 0);
+      
+      // Draw foreground subject over the background
+      ctx.drawImage(tempCanvas, 0, 0);
+    }
+  </script>
+</body>
+</html>

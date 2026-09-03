@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Замена фона на видео</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .video-container {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+        .video-container h3 {
+            margin-top: 0;
+        }
+        video, canvas {
+            width: 100%;
+            max-width: 640px;
+            max-height: 480px;
+            object-fit: contain;
+            background: #333;
+            border-radius: 4px;
+        }
+        canvas {
+            background: #2a2a2a;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        button.danger {
+            background: #d32f2f;
+        }
+        button.danger:hover {
+            background: #b71c1c;
+        }
+        .progress {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e9e9e9;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
+        }
+        .error {
+            color: #d32f2f;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: none;
+        }
+        .status {
+            margin-left: auto;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #e0e0e0;
+            font-size: 14px;
+        }
+        .status.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .file-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .file-input label {
+            background: #2196F3;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .file-input label:hover {
+            background: #1976D2;
+        }
+        .file-input input[type="file"] {
+            display: none;
+        }
+        .file-input span {
+            font-size: 14px;
+            color: #555;
+        }
+        .loading-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button id="startBtn">▶ Запустить камеру</button>
+        <button id="stopBtn" class="danger" disabled>⏹ Остановить</button>
+        <button id="processBtn" disabled>🔄 Заменить фон</button>
+        
+        <div class="file-input">
+            <label for="bgUpload">📁 Выбрать фон</label>
+            <input type="file" id="bgUpload" accept="image/*">
+            <span id="bgFileName">(фон не выбран)</span>
+        </div>
+        
+        <div id="status" class="status">Остановлено</div>
+        
+        <div id="progress" class="progress">Загрузка модели...</div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <div class="container">
+        <div class="video-container">
+            <h3>📷 Видео с камеры</h3>
+            <video id="inputVideo" autoplay playsinline></video>
+        </div>
+        <div class="video-container">
+            <h3>🎨 Результат (замена фона)</h3>
+            <canvas id="outputCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Загружаем TensorFlow.js и BodyPix -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.min.js"></script>
+
+    <script>
+        // ============================================================
+        //  КЛАСС ДЛЯ ЗАМЕНЫ ФОНА НА ВИДЕО (используем BodyPix)
+        // ============================================================
+        class VideoBackgroundReplacer {
+            constructor() {
+                // DOM-элементы
+                this.video = document.getElementById('inputVideo');
+                this.canvas = document.getElementById('outputCanvas');
+                this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+
+                this.startBtn = document.getElementById('startBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.processBtn = document.getElementById('processBtn');
+                this.statusEl = document.getElementById('status');
+                this.progress = document.getElementById('progress');
+                this.error = document.getElementById('error');
+                this.bgUpload = document.getElementById('bgUpload');
+                this.bgFileName = document.getElementById('bgFileName');
+
+                // Состояние
+                this.net = null;
+                this.isInitialized = false;
+                this.isProcessing = false;
+                this.stream = null;
+                this.animationId = null;
+                this.backgroundImage = null;
+                this.modelLoaded = false;
+                this.frameCount = 0;
+
+                this.init();
+                this.bindEvents();
+            }
+
+            // ----- Вспомогательные методы UI -----
+            showProgress(msg) {
+                this.progress.style.display = 'block';
+                this.progress.innerHTML = '<span class="loading-indicator"></span>' + msg;
+            }
+
+            hideProgress() {
+                this.progress.style.display = 'none';
+            }
+
+            showError(msg) {
+                this.error.style.display = 'block';
+                this.error.textContent = 'Ошибка: ' + msg;
+            }
+
+            hideError() {
+                this.error.style.display = 'none';
+            }
+
+            setStatus(text, isActive = false) {
+                this.statusEl.textContent = text;
+                this.statusEl.className = 'status' + (isActive ? ' active' : '');
+            }
+
+            // ----- Инициализация BodyPix -----
+            async init() {
+                try {
+                    this.showProgress('⏳ Загрузка модели BodyPix...');
+
+                    // Проверяем, что библиотека загружена
+                    if (typeof bodyPix === 'undefined') {
+                        throw new Error('Библиотека body-pix не загружена');
+                    }
+
+                    // Загружаем модель BodyPix
+                    this.net = await bodyPix.load({
+                        architecture: 'MobileNetV1',
+                        outputStride: 16,
+                        multiplier: 0.75,
+                        quantBytes: 2
+                    });
+
+                    this.isInitialized = true;
+                    this.modelLoaded = true;
+                    this.processBtn.disabled = false;
+
+                    this.hideProgress();
+                    console.log('✅ BodyPix успешно загружен');
+                    this.setStatus('Модель загружена');
+                    
+                } catch (error) {
+                    console.error('❌ Ошибка инициализации:', error);
+                    this.hideProgress();
+                    this.showError('Не удалось загрузить модель: ' + error.message);
+                    this.processBtn.disabled = true;
+                }
+            }
+
+            // ----- Привязка событий -----
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startCamera());
+                this.stopBtn.addEventListener('click', () => this.stopCamera());
+                this.processBtn.addEventListener('click', () => this.toggleProcessing());
+
+                this.bgUpload.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            this.backgroundImage = img;
+                            this.bgFileName.textContent = file.name;
+                            console.log('✅ Фоновое изображение загружено:', file.name);
+                        };
+                        img.onerror = () => {
+                            this.showError('Не удалось загрузить изображение фона');
+                        };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // ----- Управление камерой -----
+            async startCamera() {
+                if (this.stream) {
+                    this.stopCamera();
+                }
+
+                try {
+                    this.showProgress('📷 Запрос доступа к камере...');
+                    this.stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user', width: 640, height: 480 }
+                    });
+                    this.video.srcObject = this.stream;
+                    await this.video.play();
+
+                    // Устанавливаем размер canvas в соответствии с видео
+                    const videoWidth = this.video.videoWidth || 640;
+                    const videoHeight = this.video.videoHeight || 480;
+                    this.canvas.width = videoWidth;
+                    this.canvas.height = videoHeight;
+
+                    this.startBtn.disabled = true;
+                    this.stopBtn.disabled = false;
+                    this.setStatus('Камера активна', true);
+                    this.hideProgress();
+
+                    // Если обработка не включена, показываем только видео
+                    if (!this.isProcessing) {
+                        this.drawVideoOnly();
+                    } else {
+                        this.startProcessingLoop();
+                    }
+
+                } catch (err) {
+                    console.error('Ошибка доступа к камере:', err);
+                    this.hideProgress();
+                    this.showError('Не удалось получить доступ к камере: ' + err.message);
+                    this.startBtn.disabled = false;
+                    this.stopBtn.disabled = true;
+                }
+            }
+
+            stopCamera() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.stream = null;
+                }
+                this.video.srcObject = null;
+                this.startBtn.disabled = false;
+                this.stopBtn.disabled = true;
+
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+
+                this.setStatus('Остановлено');
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            // ----- Рисуем только видео (без обработки) -----
+            drawVideoOnly() {
+                const draw = () => {
+                    if (!this.stream || this.isProcessing) return;
+                    if (this.video.readyState >= 2) {
+                        this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+                    }
+                    this.animationId = requestAnimationFrame(draw);
+                };
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                draw();
+            }
+
+            // ----- Включение/выключение обработки -----
+            toggleProcessing() {
+                if (this.isProcessing) {
+                    this.isProcessing = false;
+                    this.processBtn.textContent = '🔄 Заменить фон';
+                    this.setStatus('Камера активна', true);
+                    if (this.stream) {
+                        if (this.animationId) {
+                            cancelAnimationFrame(this.animationId);
+                            this.animationId = null;
+                        }
+                        this.drawVideoOnly();
+                    }
+                } else {
+                    if (!this.isInitialized) {
+                        this.showError('Модель ещё не загружена. Подождите.');
+                        return;
+                    }
+                    if (!this.backgroundImage) {
+                        this.showError('Пожалуйста, выберите фоновое изображение.');
+                        return;
+                    }
+                    if (!this.stream) {
+                        this.showError('Сначала запустите камеру.');
+                        return;
+                    }
+                    this.isProcessing = true;
+                    this.processBtn.textContent = '⏹ Остановить замену';
+                    this.hideError();
+                    if (this.animationId) {
+                        cancelAnimationFrame(this.animationId);
+                    }
+                    this.startProcessingLoop();
+                }
+            }
+
+            // ----- Основной цикл обработки с BodyPix -----
+            startProcessingLoop() {
+                if (!this.isProcessing) return;
+
+                const processFrame = async () => {
+                    if (!this.isProcessing || !this.stream) {
+                        return;
+                    }
+
+                    try {
+                        if (this.video.readyState < 2) {
+                            this.animationId = requestAnimationFrame(processFrame);
+                            return;
+                        }
+
+                        // Получаем сегментацию от BodyPix
+                        const segmentation = await this.net.segmentPerson(this.video, {
+                            flipHorizontal: false,
+                            internalResolution: 'medium',
+                            segmentationThreshold: 0.6
+                        });
+
+                        // Рисуем фон
+                        this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+                        const bgData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+
+                        // Рисуем видео на временный canvas
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = this.canvas.width;
+                        tempCanvas.height = this.canvas.height;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCtx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+                        const fgData = tempCtx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+
+                        // Используем данные сегментации для замены фона
+                        const data = segmentation.data;
+                        const w = this.canvas.width;
+                        const h = this.canvas.height;
+                        const resultData = bgData;
+
+                        // Проходим по всем пикселям
+                        for (let i = 0; i < data.length; i++) {
+                            const pixelIndex = i * 4;
+                            const isPerson = data[i] === 1;
+                            
+                            if (isPerson) {
+                                // Человек - берем пиксель из видео
+                                resultData.data[pixelIndex] = fgData.data[pixelIndex];
+                                resultData.data[pixelIndex + 1] = fgData.data[pixelIndex + 1];
+                                resultData.data[pixelIndex + 2] = fgData.data[pixelIndex + 2];
+                                resultData.data[pixelIndex + 3] = 255;
+                            }
+                            // Иначе оставляем фон (уже нарисован)
+                        }
+
+                        this.ctx.putImageData(resultData, 0, 0);
+
+                    } catch (err) {
+                        console.warn('Ошибка при обработке кадра:', err);
+                        // В случае ошибки показываем видео без обработки
+                        this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+                    }
+
+                    // Планируем следующий кадр
+                    if (this.isProcessing) {
+                        this.animationId = requestAnimationFrame(processFrame);
+                    }
+                };
+
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                processFrame();
+            }
+        }
+
+        // ============================================================
+        //  ЗАПУСК
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = new VideoBackgroundReplacer();
+
+            // Двойной клик по canvas для быстрого переключения
+            document.getElementById('outputCanvas').addEventListener('dblclick', () => {
+                app.toggleProcessing();
+            });
+        });
+    </script>
+</body>
+</html>

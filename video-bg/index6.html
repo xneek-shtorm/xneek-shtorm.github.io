@@ -1,0 +1,480 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      html {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+      }
+
+      footer {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        color: #373737;
+        position: fixed;
+        bottom: 0;
+        padding: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255,255,255,0.9);
+        border-radius: 12px;
+        z-index: 10;
+      }
+
+      #output_canvas {
+        resize: both;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      }
+
+      label {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .controls-group {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .quality-badge {
+        background: #4CAF50;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+      }
+
+      #status {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 13px;
+        z-index: 20;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+
+      #status.show {
+        opacity: 1;
+      }
+    </style>
+    <!-- Подключаем ONNX Runtime Web -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.1/dist/ort.min.js">
+    </script>
+    <script src="cdn/camera_utils.js"></script>
+    <script src="cdn/selfie_segmentation.js"></script>
+  </head>
+  <body>
+    <div id="status">Загрузка модели...</div>
+    <div>
+      <video
+        id="input_video"
+        style="display: none"
+        autoplay
+        playsinline
+      ></video>
+      <canvas id="output_canvas" width="640" height="480"></canvas>
+
+      <footer>
+        <div class="controls-group">
+          <label>
+            Модель:
+            <select id="modelSelectionSelect">
+              <option value="0">Тяжелая (MediaPipe)</option>
+              <option value="1">Легкая (MediaPipe)</option>
+              <option value="2" selected>ONNX (улучшенная)</option>
+            </select>
+          </label>
+
+          <label>
+            Качество маски:
+            <select id="qualitySelect">
+              <option value="512">Среднее (512x512)</option>
+              <option value="768" selected>Высокое (768x768)</option>
+              <option value="1024">Максимум (1024x1024)</option>
+            </select>
+          </label>
+
+          <label>
+            Сглаживание:
+            <input type="range" id="blurRange" min="0" max="20" value="5" />
+            <span id="blurValue">5px</span>
+          </label>
+
+          <label>
+            Фон:
+            <input type="file" id="fileInput" accept="image/*" />
+          </label>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // ============================================================
+      // 1. КОНФИГУРАЦИЯ
+      // ============================================================
+      const videoElement = document.getElementById("input_video");
+      const canvasElement = document.getElementById("output_canvas");
+      const canvasCtx = canvasElement.getContext("2d");
+      const statusDiv = document.getElementById("status");
+      
+      const SELFIE_MODE = false;
+      let blur = 5;
+      let currentModelType = "mediapipe"; // "mediapipe" | "onnx"
+      let quality = 768; // разрешение маски
+      
+      const backgroundImage = new Image();
+      
+      // Переменные для ONNX
+      let onnxSession = null;
+      let onnxReady = false;
+      let onnxLoading = false;
+
+      // ============================================================
+      // 2. ONNX МОДЕЛЬ (загружаем предобученную модель сегментации)
+      // ============================================================
+      // Используем модель MODNet (или другую ONNX модель)
+      // Ссылка на модель: https://github.com/ZHKKKe/MODNet
+      const MODEL_URL = "modnet_photographic_portrait_matting.onnx";
+      // Альтернатива: можно использовать модель от MediaPipe в ONNX формате
+      //const MODEL_URL = "https://github.com/onnx/models/raw/main/vision/body_analysis/selfie_segmentation/model/selfie_segmentation_512x512.onnx";
+
+      async function loadONNXModel() {
+        if (onnxReady || onnxLoading) return;
+        onnxLoading = true;
+        showStatus("Загрузка ONNX модели...", true);
+        
+        try {
+          // Создаем сессию с оптимизациями
+          const session = await ort.InferenceSession.create(MODEL_URL, {
+            executionProviders: ['wasm', 'cpu'],
+            graphOptimizationLevel: 'all',
+            enableCpuMemArena: false,
+          });
+          
+          onnxSession = session;
+          onnxReady = true;
+          onnxLoading = false;
+          showStatus("✅ ONNX модель загружена!", true);
+          setTimeout(() => showStatus("", false), 2000);
+          console.log("ONNX модель загружена успешно");
+        } catch (err) {
+          console.error("Ошибка загрузки ONNX модели:", err);
+          showStatus("❌ Ошибка загрузки ONNX модели", true);
+          onnxLoading = false;
+          // Возвращаемся к MediaPipe
+          document.getElementById("modelSelectionSelect").value = "0";
+          currentModelType = "mediapipe";
+        }
+      }
+
+      // ============================================================
+      // 3. ПРЕДОБРАБОТКА И ОБРАБОТКА ONNX
+      // ============================================================
+      function preprocessImage(image, targetSize) {
+        // Изменяем размер и нормализуем для ONNX модели
+        const canvas = document.createElement('canvas');
+        canvas.width = targetSize;
+        canvas.height = targetSize;
+        const ctx = canvas.getContext('2d');
+        
+        // Сохраняем пропорции, добавляем паддинг
+        const aspect = image.width / image.height;
+        let drawW, drawH, offsetX = 0, offsetY = 0;
+        
+        if (aspect > 1) {
+          drawW = targetSize;
+          drawH = targetSize / aspect;
+          offsetY = (targetSize - drawH) / 2;
+        } else {
+          drawH = targetSize;
+          drawW = targetSize * aspect;
+          offsetX = (targetSize - drawW) / 2;
+        }
+        
+        // Рисуем черный фон
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, targetSize, targetSize);
+        ctx.drawImage(image, offsetX, offsetY, drawW, drawH);
+        
+        // Получаем данные и нормализуем
+        const imageData = ctx.getImageData(0, 0, targetSize, targetSize);
+        const data = imageData.data;
+        const floatData = new Float32Array(targetSize * targetSize * 3);
+        
+        // Нормализация: [0, 255] -> [0, 1]
+        for (let i = 0; i < data.length / 4; i++) {
+          floatData[i * 3] = data[i * 4] / 255.0;
+          floatData[i * 3 + 1] = data[i * 4 + 1] / 255.0;
+          floatData[i * 3 + 2] = data[i * 4 + 2] / 255.0;
+        }
+        
+        return {
+          data: floatData,
+          width: targetSize,
+          height: targetSize,
+          offsetX: offsetX / targetSize,
+          offsetY: offsetY / targetSize,
+          scaleW: drawW / targetSize,
+          scaleH: drawH / targetSize
+        };
+      }
+
+      function postprocessMask(outputData, originalW, originalH, meta) {
+        // Восстанавливаем маску до исходного размера
+        const maskSize = Math.sqrt(outputData.length);
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = maskSize;
+        tempCanvas.height = maskSize;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Создаем ImageData из выходных данных
+        const imageData = tempCtx.createImageData(maskSize, maskSize);
+        const data = imageData.data;
+        
+        // Маска в канале альфа
+        for (let i = 0; i < outputData.length; i++) {
+          const idx = i * 4;
+          const val = Math.min(255, Math.max(0, outputData[i] * 255));
+          data[idx] = 255;
+          data[idx + 1] = 255;
+          data[idx + 2] = 255;
+          data[idx + 3] = val;
+        }
+        
+        tempCtx.putImageData(imageData, 0, 0);
+        
+        // Обрезаем паддинг и масштабируем до нужного размера
+        const cropCanvas = document.createElement('canvas');
+        cropCanvas.width = originalW;
+        cropCanvas.height = originalH;
+        const cropCtx = cropCanvas.getContext('2d');
+        
+        const sx = meta.offsetX * maskSize;
+        const sy = meta.offsetY * maskSize;
+        const sw = meta.scaleW * maskSize;
+        const sh = meta.scaleH * maskSize;
+        
+        cropCtx.drawImage(tempCanvas, sx, sy, sw, sh, 0, 0, originalW, originalH);
+        
+        return cropCanvas;
+      }
+
+      // ============================================================
+      // 4. ONNX ИНФЕРЕНС
+      // ============================================================
+      async function runONNXInference(image) {
+        if (!onnxReady || !onnxSession) return null;
+        
+        try {
+          const targetSize = quality;
+          const preprocessed = preprocessImage(image, targetSize);
+          
+          // Создаем тензор
+          const tensor = new ort.Tensor('float32', preprocessed.data, [1, 3, targetSize, targetSize]);
+          
+          // Запускаем инференс
+          const feeds = { 'input': tensor };
+          const results = await onnxSession.run(feeds);
+          
+          // Получаем маску (выходной тензор)
+          const output = results['output'] || results['pred'] || results['segmentation'];
+          if (!output) {
+            console.warn("Не найден выходной тензор");
+            return null;
+          }
+          
+          // Преобразуем в плоский массив
+          const maskData = output.data;
+          const maskCanvas = postprocessMask(maskData, image.width, image.height, preprocessed);
+          
+          return maskCanvas;
+        } catch (err) {
+          console.error("ONNX инференс ошибка:", err);
+          return null;
+        }
+      }
+
+      // ============================================================
+      // 5. ФУНКЦИЯ ОТРИСОВКИ (улучшенная)
+      // ============================================================
+      async function onResults(results) {
+        const w = results.image.width;
+        const h = results.image.height;
+        canvasElement.width = w;
+        canvasElement.height = h;
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, w, h);
+
+        let maskCanvas = null;
+        
+        // Пытаемся использовать ONNX если выбран
+        if (currentModelType === "onnx" && onnxReady) {
+          try {
+            maskCanvas = await runONNXInference(results.image);
+          } catch (e) {
+            console.warn("ONNX ошибка, падаем на MediaPipe:", e);
+          }
+        }
+        
+        // Если ONNX не удался или не выбран - используем MediaPipe
+        if (!maskCanvas) {
+          // Используем стандартную маску от MediaPipe
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = w;
+          tempCanvas.height = h;
+          const tempCtx = tempCanvas.getContext("2d");
+          tempCtx.drawImage(results.segmentationMask, 0, 0, w, h);
+          maskCanvas = tempCanvas;
+        }
+
+        // Применяем сглаживание к маске
+        canvasCtx.filter = `blur(${blur}px)`;
+        canvasCtx.drawImage(maskCanvas, 0, 0, w, h);
+
+        // Накладываем видео (source-in) – обрезаем по маске
+        canvasCtx.globalCompositeOperation = "source-in";
+        canvasCtx.filter = "none";
+        canvasCtx.drawImage(results.image, 0, 0, w, h);
+
+        // Рисуем фон (destination-over)
+        canvasCtx.globalCompositeOperation = "destination-over";
+        if (backgroundImage.complete && backgroundImage.naturalWidth !== 0) {
+          canvasCtx.drawImage(backgroundImage, 0, 0, w, h);
+        } else {
+          // Если фон не загружен – размытый оригинал
+          canvasCtx.filter = "saturate(10%) blur(8px)";
+          canvasCtx.drawImage(results.image, 0, 0, w, h);
+        }
+        canvasCtx.restore();
+      }
+
+      // ============================================================
+      // 6. ИНИЦИАЛИЗАЦИЯ MEDIAPIPE
+      // ============================================================
+      selfieSegmentation = new SelfieSegmentation({
+        locateFile: (file) => `wasm/${file}`,
+      });
+      selfieSegmentation.setOptions({
+        modelSelection: 0,
+        selfieMode: SELFIE_MODE,
+        runningMode: "VIDEO",
+        minHandDetectionConfidence: 0.6,
+        minHandPresenceConfidence: 0.6,
+        minTrackingConfidence: 0.6,
+      });
+      selfieSegmentation.onResults(onResults);
+
+      // ============================================================
+      // 7. КАМЕРА
+      // ============================================================
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const widthValue = urlParams.get("width");
+
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await selfieSegmentation.send({ image: videoElement });
+        },
+        width: widthValue ? +widthValue : 640,
+        height: widthValue ? +widthValue / (4 / 3) : 480,
+      });
+      camera.start();
+
+      // ============================================================
+      // 8. UI ОБРАБОТЧИКИ
+      // ============================================================
+      
+      // Выбор модели
+      modelSelectionSelect.onchange = () => {
+        const val = +modelSelectionSelect.value;
+        if (val === 2) {
+          currentModelType = "onnx";
+          if (!onnxReady && !onnxLoading) {
+            loadONNXModel();
+          }
+          showStatus("🔄 Используется ONNX модель", true);
+        } else {
+          currentModelType = "mediapipe";
+          selfieSegmentation.setOptions({ modelSelection: val });
+          showStatus(`📷 Используется MediaPipe (${val === 0 ? 'тяжелая' : 'легкая'})`, true);
+        }
+        setTimeout(() => showStatus("", false), 1500);
+      };
+
+      // Качество маски
+      qualitySelect.onchange = () => {
+        quality = +qualitySelect.value;
+        showStatus(`🔄 Качество маски: ${quality}x${quality}`, true);
+        setTimeout(() => showStatus("", false), 1000);
+      };
+
+      // Сглаживание
+      blurRange.oninput = () => {
+        blur = +blurRange.value;
+        blurValue.textContent = `${blur}px`;
+      };
+
+      // Загрузка фона
+      document.getElementById("fileInput").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            backgroundImage.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Статус
+      function showStatus(msg, show) {
+        statusDiv.textContent = msg;
+        if (show) {
+          statusDiv.classList.add("show");
+        } else {
+          statusDiv.classList.remove("show");
+        }
+      }
+
+      // ============================================================
+      // 9. ПРЕДЗАГРУЗКА ONNX (опционально)
+      // ============================================================
+      // Автоматически загружаем ONNX при загрузке страницы
+      window.addEventListener('load', () => {
+        // Загружаем ONNX в фоне
+        setTimeout(() => {
+          loadONNXModel();
+        }, 1000);
+      });
+
+      // Переключение на ONNX при выборе
+      console.log("✅ Улучшенная версия с ONNX Runtime загружена");
+      console.log("ℹ️ Для использования ONNX выберите соответствующий пункт в меню модели");
+    </script>
+  </body>
+</html>

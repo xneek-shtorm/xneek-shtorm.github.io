@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Замена фона (Рабочая версия)</title>
+<style>
+  body { 
+    margin: 0; 
+    background: #000; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+  #output { 
+    max-width: 100%; 
+    max-height: 100vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  #status {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    background: rgba(0,0,0,0.8);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<video id="video" autoplay playsinline muted style="display:none"></video>
+<canvas id="output"></canvas>
+<div id="status">Инициализация...</div>
+
+<script src="tf.min.js"></script>
+<script src="body-pix.min.js"></script>
+
+<script>
+const video = document.getElementById('video');
+const output = document.getElementById('output');
+const ctx = output.getContext('2d', { willReadFrequently: true });
+const status = document.getElementById('status');
+
+let net, bgImage;
+let maskCanvas, maskCtx, tempCanvas, tempCtx, imageData;
+
+async function setupCamera() {
+  status.textContent = 'Запуск камеры...';
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { width: 640, height: 480, facingMode: 'user' }
+  });
+  video.srcObject = stream;
+  return new Promise(resolve => {
+    video.onloadedmetadata = () => { video.play(); resolve(); };
+  });
+}
+
+async function loadModel() {
+  status.textContent = 'Загрузка ResNet50 (Stride 32, максимальная точность)...';
+  net = await bodyPix.load({
+    architecture: 'ResNet50',
+    outputStride: 32, // <-- Максимальная точность контура
+    quantBytes: 2,
+    modelUrl: './model-resnet50-stride32.json' // <-- Новый файл
+  });
+}
+
+async function loadBackground() {
+  status.textContent = 'Загрузка фона...';
+  bgImage = new Image();
+  bgImage.src = './ues.png';
+  await new Promise((resolve, reject) => {
+    bgImage.onload = () => { 
+      console.log('✅ Фон загружен:', bgImage.width, 'x', bgImage.height); 
+      resolve(); 
+    };
+    bgImage.onerror = () => reject(new Error('bg.png не найден!'));
+  });
+}
+
+function initCanvases() {
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+  output.width = w;
+  output.height = h;
+  
+  maskCanvas = document.createElement('canvas');
+  maskCanvas.width = w;
+  maskCanvas.height = h;
+  maskCtx = maskCanvas.getContext('2d');
+  
+  tempCanvas = document.createElement('canvas');
+  tempCanvas.width = w;
+  tempCanvas.height = h;
+  tempCtx = tempCanvas.getContext('2d');
+  
+  imageData = tempCtx.createImageData(w, h);
+}
+
+async function render() {
+  if (!net || !bgImage || video.readyState < 2) {
+    requestAnimationFrame(render);
+    return;
+  }
+  
+const segmentation = await net.segmentPerson(video, {
+  flipHorizontal: true,
+  internalResolution: 'high', // <-- Повысили детализацию для компенсации stride 32
+  segmentationThreshold: 0.6, // <-- Оптимальный баланс для волос и плеч
+  maxDetections: 1,
+  scoreThreshold: 0.3
+});
+  
+  const maskData = segmentation.data;
+  
+  // Создаем маску прозрачности
+  for (let i = 0; i < maskData.length; i++) {
+    const alpha = maskData[i] * 255;
+    imageData.data[i * 4 + 0] = 0;
+    imageData.data[i * 4 + 1] = 0;
+    imageData.data[i * 4 + 2] = 0;
+    imageData.data[i * 4 + 3] = alpha;
+  }
+  
+  tempCtx.putImageData(imageData, 0, 0);
+  
+  // Размытие для мягких краев головы
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  maskCtx.filter = location.hash || 'blur(4px)';
+  maskCtx.drawImage(tempCanvas, 0, 0);
+  maskCtx.filter = 'none';
+  
+  const w = output.width;
+  const h = output.height;
+  
+  // === ПРАВИЛЬНАЯ ЛОГИКА ОТРИСОВКИ СЛОЕВ ===
+  
+  // 1. Очищаем холст
+  ctx.clearRect(0, 0, w, h);
+  
+  // 2. Рисуем маску (белый силуэт на прозрачном фоне)
+  ctx.drawImage(maskCanvas, 0, 0, w, h);
+  
+  // 3. Оставляем пиксели видео ТОЛЬКО там, где уже нарисована маска (source-in)
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.drawImage(video, 0, 0, w, h);
+  // Теперь на холсте: человек из видео, а вокруг него полная прозрачность.
+  
+  // 4. Рисуем фоновую картинку ПОД текущим содержимым холста (destination-over)
+  ctx.globalCompositeOperation = 'destination-over';
+  ctx.drawImage(bgImage, 0, 0, w, h);
+  
+  // 5. Возвращаем стандартный режим отрисовки для следующего кадра
+  ctx.globalCompositeOperation = 'source-over';
+  
+  requestAnimationFrame(render);
+}
+
+async function init() {
+  try {
+    await tf.setBackend('webgl');
+    await tf.ready();
+    await setupCamera();
+    initCanvases();
+    await loadModel();
+    await loadBackground();
+    
+    status.textContent = '✅ Готово!';
+    status.style.background = 'rgba(0, 150, 0, 0.8)';
+    setTimeout(() => { status.style.display = 'none'; }, 2000);
+    
+    render();
+  } catch (error) {
+    status.textContent = '❌ ОШИБКА:\n' + error.message;
+    status.style.background = 'rgba(200, 0, 0, 0.9)';
+    console.error(error);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
