@@ -1,0 +1,246 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      html { margin: 0; padding: 0; }
+      body {
+        margin: 0; padding: 0; background: #fff;
+        display: flex; justify-content: center; align-items: center;
+        height: 100vh; font-family: Arial, Helvetica, sans-serif; font-size: 12px;
+      }
+      footer {
+        display: flex; justify-content: center; flex-wrap: wrap; gap: 16px;
+        color: #373737; position: fixed; bottom: 0; padding: 16px;
+        left: 50%; transform: translateX(-50%);
+      }
+      #output_canvas { resize: both; background: #000; }
+      details {
+        position: fixed; top: 20px; right: 20px; color: #adadad;
+        background: rgba(255,255,255,0.9); padding: 12px; border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      label { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+      input[type="range"] { width: 120px; }
+      .val-display { min-width: 30px; text-align: right; color: #333; font-weight: bold; }
+    </style>
+    <script src="cdn/camera_utils.js"></script>
+    <script src="cdn/selfie_segmentation.js"></script>
+  </head>
+  <body>
+    <!-- SVG-фильтр для сглаживания контура (аппаратное ускорение) -->
+    <svg style="display: none;">
+      <defs>
+        <filter id="smooth-sharp-mask" x="-10%" y="-10%" width="120%" height="120%">
+          <!-- 1. Сглаживаем пиксельную "лесенку" -->
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blurred" />
+          <!-- 2. Делаем край снова резким (чётким), но уже по гладкой кривой -->
+          <feComponentTransfer in="blurred">
+            <!-- slope (крутизна) делает переход резким, intercept сдвигает порог -->
+            <feFuncA type="linear" slope="4" intercept="-0.6" />
+          </feComponentTransfer>
+        </filter>
+      </defs>
+    </svg>
+
+    <div>
+      <video id="input_video" style="display: none" autoplay playsinline></video>
+      <canvas id="output_canvas" width="640" height="480"></canvas>
+
+      <footer>
+        <label>
+          Модель:
+          <select id="modelSelectionSelect">
+            <option value="0">тяжелая, но более точная модель (меньше дергается)</option>
+            <option value="1">легкая модель для слабых устройств (может давать рваный край)</option>
+          </select>
+        </label>
+        <label>
+          Фон:
+          <input type="file" id="fileInput" accept="image/*" />
+        </label>
+      </footer>
+
+      <details open>
+        <summary>Настройки сглаживания</summary>
+
+        <label>
+          Гладкость контура (радиус):
+          <input type="range" id="smoothRadius" min="0" max="4" step="0.1" value="1.5" />
+          <span class="val-display" id="radiusVal">1.5</span>
+        </label>
+
+        <label>
+          Чёткость края (контраст):
+          <input type="range" id="sharpness" min="1" max="8" step="0.5" value="4" />
+          <span class="val-display" id="sharpVal">4</span>
+        </label>
+
+        <label>
+          Межкадровое сглаживание (стабилизация):
+          <input type="checkbox" id="withSmoothing" checked />
+          <input type="range" id="alphaInp" min="0.1" max="0.8" step="0.1" value="0.6" />
+          <span class="val-display" id="alphaVal">0.6</span>
+        </label>
+      </details>
+    </div>
+
+    <script>
+      const videoElement = document.getElementById("input_video");
+      const canvasElement = document.getElementById("output_canvas");
+      const canvasCtx = canvasElement.getContext("2d", { willReadFrequently: true });
+      
+      const backgroundImage = new Image();
+      let previousMaskData = null;
+      
+      // Настройки
+      let SMOOTHING_ALPHA = 0.6;
+      let applyAlphaSmoothing = true;
+      let svgSmoothRadius = 1.5;
+      let svgSharpness = 4;
+
+      // Обновление SVG-фильтра в реальном времени
+      function updateSVGFilter() {
+        const funcA = document.querySelector('#smooth-sharp-mask feFuncA');
+        // intercept рассчитывается так, чтобы середина перехода (0.5) оставалась на месте при изменении slope
+        const intercept = -0.5 * (svgSharpness - 1);
+        funcA.setAttribute('slope', svgSharpness);
+        funcA.setAttribute('intercept', intercept.toFixed(2));
+        
+        const blur = document.querySelector('#smooth-sharp-mask feGaussianBlur');
+        blur.setAttribute('stdDeviation', svgSmoothRadius);
+      }
+
+      function onResults(results) {
+        const w = results.image.width;
+        const h = results.image.height;
+        
+        if (canvasElement.width !== w || canvasElement.height !== h) {
+          canvasElement.width = w;
+          canvasElement.height = h;
+        }
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, w, h);
+
+        // 1. Получаем маску
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = w;
+        tempCanvas.height = h;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(results.segmentationMask, 0, 0, w, h);
+        let currentMaskData = tempCtx.getImageData(0, 0, w, h);
+
+        // 2. Межкадровое сглаживание (убирает мерцание края во времени)
+        if (previousMaskData && applyAlphaSmoothing) {
+          const data = currentMaskData.data;
+          const prevData = previousMaskData.data;
+          for (let i = 0; i < data.length; i += 4) {
+            const alpha = data[i + 3];
+            const prevAlpha = prevData[i + 3];
+            const newAlpha = SMOOTHING_ALPHA * alpha + (1 - SMOOTHING_ALPHA) * prevAlpha;
+            
+            // Сохраняем пропорции RGB относительно новой альфы
+            const ratio = newAlpha > 0 ? newAlpha / 255 : 0;
+            data[i] = prevData[i] * (1 - ratio) + data[i] * ratio;
+            data[i + 1] = prevData[i + 1] * (1 - ratio) + data[i + 1] * ratio;
+            data[i + 2] = prevData[i + 2] * (1 - ratio) + data[i + 2] * ratio;
+            data[i + 3] = newAlpha;
+          }
+        }
+        previousMaskData = currentMaskData;
+
+        // 3. Рисуем маску на временный canvas
+        const maskCanvas = document.createElement("canvas");
+        maskCanvas.width = w;
+        maskCanvas.height = h;
+        const maskCtx = maskCanvas.getContext("2d");
+        maskCtx.putImageData(currentMaskData, 0, 0);
+
+        // 4. ПРИМЕНЯЕМ SVG-ФИЛЬТР для гладкого и чёткого края
+        canvasCtx.filter = `url(#smooth-sharp-mask)`;
+        canvasCtx.drawImage(maskCanvas, 0, 0, w, h);
+
+        // 5. Накладываем видео (обрезка по маске)
+        canvasCtx.globalCompositeOperation = "source-in";
+        canvasCtx.filter = "none";
+        canvasCtx.drawImage(results.image, 0, 0, w, h);
+
+        // 6. Рисуем фон
+        canvasCtx.globalCompositeOperation = "destination-over";
+        if (backgroundImage.complete && backgroundImage.naturalWidth !== 0) {
+          canvasCtx.drawImage(backgroundImage, 0, 0, w, h);
+        } else {
+          canvasCtx.filter = "saturate(10%) blur(2px)";
+          canvasCtx.drawImage(results.image, 0, 0, w, h);
+        }
+        canvasCtx.restore();
+      }
+
+      // Инициализация MediaPipe
+      const selfieSegmentation = new SelfieSegmentation({
+        locateFile: (file) => `wasm/${file}`,
+      });
+      selfieSegmentation.setOptions({
+        modelSelection: 0, // Тяжёлая модель обязательна для гладкого края
+        runningMode: "VIDEO",
+      });
+      selfieSegmentation.onResults(onResults);
+
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await selfieSegmentation.send({ image: videoElement });
+        },
+        width: 640,
+        height: 480,
+      });
+      camera.start();
+
+      // --- Обработчики UI ---
+      document.getElementById("modelSelectionSelect").onchange = (e) => {
+        selfieSegmentation.setOptions({ modelSelection: +e.target.value });
+      };
+
+      const smoothRadiusInp = document.getElementById("smoothRadius");
+      const sharpnessInp = document.getElementById("sharpness");
+      const alphaInp = document.getElementById("alphaInp");
+      const withSmoothingInp = document.getElementById("withSmoothing");
+
+      smoothRadiusInp.oninput = () => {
+        svgSmoothRadius = +smoothRadiusInp.value;
+        document.getElementById("radiusVal").textContent = svgSmoothRadius;
+        updateSVGFilter();
+      };
+
+      sharpnessInp.oninput = () => {
+        svgSharpness = +sharpnessInp.value;
+        document.getElementById("sharpVal").textContent = svgSharpness;
+        updateSVGFilter();
+      };
+
+      alphaInp.oninput = () => {
+        SMOOTHING_ALPHA = +alphaInp.value;
+        document.getElementById("alphaVal").textContent = SMOOTHING_ALPHA;
+      };
+
+      withSmoothingInp.onchange = () => {
+        applyAlphaSmoothing = withSmoothingInp.checked;
+        alphaInp.disabled = !applyAlphaSmoothing;
+        if (!applyAlphaSmoothing) previousMaskData = null;
+      };
+
+      document.getElementById("fileInput").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => { backgroundImage.src = e.target.result; };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      backgroundImage.src = 'ues.png'
+
+      // Инициализация фильтра при старте
+      updateSVGFilter();
+    </script>
+  </body>
+</html>
