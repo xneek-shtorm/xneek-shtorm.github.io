@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Стикер на лбу</title>
+<style>
+  body { margin: 0; background: #111; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #eee; font-family: sans-serif; }
+  #stage { position: relative; width: 90vw; max-width: 800px; aspect-ratio: 4 / 3; background: #000; overflow: hidden; }
+  #video, #canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  #status { margin-top: 12px; font-size: 14px; opacity: .6; }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+</div>
+<div id="status">Загрузка…</div>
+
+<script type="module">
+import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const statusEl = document.getElementById('status');
+
+function drawForeheadSticker(ctx, cx, cy, size) {
+  const w = size * 1.6;
+  const h = size * 0.85;
+  const r = h * 0.18;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(-1, 1);
+
+  ctx.shadowColor = 'rgba(0,0,0,.35)';
+  ctx.shadowBlur = size * 0.08;
+  ctx.shadowOffsetY = size * 0.04;
+
+  ctx.beginPath();
+  ctx.moveTo(-w / 2 + r, -h / 2);
+  ctx.lineTo(w / 2 - r, -h / 2);
+  ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
+  ctx.lineTo(w / 2, h / 2 - r);
+  ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
+  ctx.lineTo(-w / 2 + r, h / 2);
+  ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
+  ctx.lineTo(-w / 2, -h / 2 + r);
+  ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
+  ctx.closePath();
+
+  ctx.fillStyle = '#ffd93b';
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+
+  ctx.lineWidth = Math.max(2, size * 0.03);
+  ctx.strokeStyle = '#222';
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#222';
+
+  ctx.font = `400 ${h * 0.17}px sans-serif`;
+  ctx.globalAlpha = 0.75;
+  ctx.fillText('Номер вашего талона', 0, -h * 0.20);
+  ctx.globalAlpha = 1;
+
+  ctx.font = `800 ${h * 0.38}px sans-serif`;
+  ctx.fillText('ТЭ-654', 0, h * 0.18);
+
+  ctx.restore();
+}
+
+let faceLandmarker = null;
+let lastVideoTime = -1;
+let lastResults = null;
+
+async function init() {
+  const fileset = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+  );
+
+  faceLandmarker = await FaceLandmarker.createFromOptions(fileset, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+      delegate: "GPU"
+    },
+    runningMode: "VIDEO",
+    numFaces: 1
+  });
+
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'user', width: 1280, height: 720 },
+    audio: false
+  });
+  video.srcObject = stream;
+
+  await new Promise(r => video.onloadedmetadata = r);
+  video.play();
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  statusEl.textContent = '';
+  requestAnimationFrame(loop);
+}
+
+function loop() {
+  if (video.readyState < 2) {
+    requestAnimationFrame(loop);
+    return;
+  }
+
+  if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  }
+
+  const now = performance.now();
+
+  if (video.currentTime !== lastVideoTime) {
+    lastVideoTime = video.currentTime;
+    lastResults = faceLandmarker.detectForVideo(video, now);
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (lastResults && lastResults.faceLandmarks && lastResults.faceLandmarks.length > 0) {
+    drawScene(lastResults.faceLandmarks[0]);
+  }
+
+  requestAnimationFrame(loop);
+}
+
+function drawScene(lm) {
+  const W = canvas.width;
+  const H = canvas.height;
+
+  const P = (i) => ({ x: lm[i].x * W, y: lm[i].y * H });
+
+  const forehead = P(10);
+  const rightEar = P(234);
+  const leftEar = P(454);
+
+  const faceWidth = Math.hypot(leftEar.x - rightEar.x, leftEar.y - rightEar.y);
+  const foreheadSize = faceWidth * 0.45;
+  drawForeheadSticker(ctx, forehead.x, forehead.y, foreheadSize);
+}
+
+init().catch(err => {
+  console.error(err);
+  statusEl.textContent = 'Ошибка: ' + err.message;
+});
+</script>
+
+</body>
+</html>
