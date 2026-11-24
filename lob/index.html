@@ -40,23 +40,14 @@ function drawForeheadSticker(ctx, cx, cy, size) {
   ctx.shadowOffsetY = size * 0.04;
 
   ctx.beginPath();
-  ctx.moveTo(-w / 2 + r, -h / 2);
-  ctx.lineTo(w / 2 - r, -h / 2);
-  ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
-  ctx.lineTo(w / 2, h / 2 - r);
-  ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
-  ctx.lineTo(-w / 2 + r, h / 2);
-  ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
-  ctx.lineTo(-w / 2, -h / 2 + r);
-  ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
+  ctx.rect(-w / 2, -h / 2, w, h);
   ctx.closePath();
 
   ctx.fillStyle = '#ffd93b';
   ctx.fill();
   ctx.shadowColor = 'transparent';
 
-  ctx.lineWidth = Math.max(2, size * 0.03);
-  ctx.strokeStyle = '#222';
+
   ctx.stroke();
 
   ctx.textAlign = 'center';

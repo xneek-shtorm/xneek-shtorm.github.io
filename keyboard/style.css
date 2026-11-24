@@ -1,0 +1,135 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-width: 850px;
+    width: 100%;
+    text-align: center;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: #eef2f7;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.text-display {
+    font-size: 26px;
+    letter-spacing: 2px;
+    background: #fafafa;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    min-height: 40px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.char.correct { color: #2ecc71; }
+.char.incorrect { color: #e74c3c; background-color: #fadbd8; }
+.char.current { border-bottom: 3px solid #3498db; background-color: #ebf5fb; }
+
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.row {
+    display: flex;
+    gap: 6px;
+}
+
+.key {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+    border: 1px solid #bbb;
+    text-transform: uppercase;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.key.space {
+    width: 320px;
+    background-color: #e0e0e0;
+}
+
+/* Цветовые зоны пальцев */
+.pinky { background-color: #ffcccc; }   /* Мизинец */
+.ring { background-color: #ffe5cc; }    /* Безымянный */
+.middle { background-color: #ffffcc; }  /* Средний */
+.index-l { background-color: #ccffcc; } /* Левый указательный */
+.index-r { background-color: #ccffff; } /* Правый указательный */
+.thumb { background-color: #e6e6e6; }   /* Большой палец */
+
+/* Подсветка нужной клавиши */
+.key.active {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.9);
+    border: 2px solid #2980b9;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover { background-color: #2980b9; }
+
+.controls {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.controls select {
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+#next-btn {
+    background-color: #2ecc71;
+}
+
+#next-btn:hover {
+    background-color: #27ae60;
+}

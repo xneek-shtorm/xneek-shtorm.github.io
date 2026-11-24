@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клавиатурный тренажер (Десятипальцевый метод)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Тренажер слепой печати</h1>
+
+        <div class="controls">
+            <label for="lesson-select">Упражнение:</label>
+            <select id="lesson-select"></select>
+        </div>
+        
+        <div class="stats">
+            <div>Скорость: <span id="speed">0</span> зн/мин</div>
+            <div>Точность: <span id="accuracy">100</span>%</div>
+            <div>Палец: <span id="finger-hint">—</span></div>
+        </div>
+
+        <div class="text-display" id="text-display"></div>
+
+        <div class="keyboard" id="keyboard"></div>
+
+        <div class="actions">
+            <button id="restart-btn">Повторить урок</button>
+            <button id="next-btn" style="display: none;">Следующий урок →</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

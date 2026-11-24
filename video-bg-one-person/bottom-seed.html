@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Видеофон: серии от центра низа</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; margin: 16px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    canvas { width: 100%; max-width: 480px; background: #000; border-radius: 8px; }
+    p { margin: 4px 0 8px; }
+    .fps { color: #9c9; }
+  </style>
+</head>
+<body>
+  <h2>Видеофон: серии от центра низа</h2>
+  <p id="status">Запуск камеры...</p>
+  <p>
+    Слева — все люди в кадре (маска MediaPipe Selfie Segmentation). Справа — только оператор:
+    стартовая серия пикселей на нижней строке, ближайшая к центру, и все серии, связанные с ней
+    через соседние строки. Решение принимается на маске 1/4 размера, обнуление — заливкой диапазонов по строкам.
+    <span class="fps" id="fps"></span>
+  </p>
+
+  <video id="video" autoplay muted playsinline style="display: none"></video>
+
+  <div class="row">
+    <div>
+      <p><b>Было</b></p>
+      <canvas id="before" width="640" height="480"></canvas>
+    </div>
+    <div>
+      <p><b>Стало</b></p>
+      <canvas id="after" width="640" height="480"></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1.1675465747/selfie_segmentation.js"></script>
+  <script>
+    const W = 640;
+    const H = 480;
+    const BG = '#2b5d3a';
+    const ALPHA_THRESHOLD = 127;
+    const DS = 4; // коэффициент уменьшения маски для поиска оператора (W и H кратны DS)
+    const LW = W / DS;
+    const LH = H / DS;
+
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+    const fpsLabel = document.getElementById('fps');
+    const beforeCtx = document.getElementById('before').getContext('2d');
+    const afterCtx = document.getElementById('after').getContext('2d');
+
+    // Маска полного разрешения: сюда кладём сырую маску и затем обнуляем лишнее.
+    const maskCanvas = makeCanvas(W, H);
+    const maskCtx = maskCanvas.getContext('2d', { willReadFrequently: true });
+
+    // Маска уменьшенного разрешения: здесь ищется оператор.
+    const smallCanvas = makeCanvas(LW, LH);
+    const smallCtx = smallCanvas.getContext('2d', { willReadFrequently: true });
+    smallCtx.imageSmoothingQuality = 'high';
+
+    // Буферы выделяются один раз.
+    // В строке серии не пересекаются и не соприкасаются, поэтому их не больше ceil(LW / 2).
+    const maxRuns = LH * Math.ceil(LW / 2);
+    const bin = new Uint8Array(LW * LH);
+    const runRow = new Int32Array(maxRuns);
+    const runStart = new Int32Array(maxRuns); // координаты в низком разрешении
+    const runEnd = new Int32Array(maxRuns); // включительно
+    const runKept = new Uint8Array(maxRuns);
+    const rowFirst = new Int32Array(LH + 1); // серии строки y: rowFirst[y] .. rowFirst[y + 1] - 1
+    const queue = new Int32Array(maxRuns);
+    let runCount = 0;
+
+    function makeCanvas(w, h) {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      return c;
+    }
+
+    // Серии всех строк низкого разрешения.
+    function buildRuns() {
+      runCount = 0;
+      for (let y = 0; y < LH; y++) {
+        rowFirst[y] = runCount;
+        const base = y * LW;
+        let x = 0;
+        while (x < LW) {
+          if (!bin[base + x]) {
+            x++;
+            continue;
+          }
+          const s = x;
+          while (x < LW && bin[base + x]) x++;
+          runRow[runCount] = y;
+          runStart[runCount] = s;
+          runEnd[runCount] = x - 1;
+          runCount++;
+        }
+      }
+      rowFirst[LH] = runCount;
+    }
+
+    // Стартовая серия: на нижней строке, ближайшая к центру кадра. -1, если людей там нет.
+    function findBottomCenterRun() {
+      const cx = LW >> 1;
+      let best = -1;
+      let bestDist = Infinity;
+      for (let r = rowFirst[LH - 1]; r < rowFirst[LH]; r++) {
+        // Расстояние от центра до отрезка серии; 0, если центр внутри.
+        const d = Math.max(runStart[r] - cx, cx - runEnd[r], 0);
+        if (d < bestDist) {
+          bestDist = d;
+          best = r;
+        }
+      }
+      return best;
+    }
+
+    // Помечает серии, связанные со стартовой через перекрытие с соседними строками (обход в ширину).
+    function growFromSeed(seed) {
+      let head = 0;
+      let tail = 0;
+      queue[tail++] = seed;
+      runKept[seed] = 1;
+      while (head < tail) {
+        const r = queue[head++];
+        const y = runRow[r];
+        for (const ny of [y - 1, y + 1]) {
+          if (ny < 0 || ny >= LH) continue;
+          for (let q = rowFirst[ny]; q < rowFirst[ny + 1]; q++) {
+            if (!runKept[q] && runStart[q] <= runEnd[r] && runEnd[q] >= runStart[r]) {
+              runKept[q] = 1;
+              queue[tail++] = q;
+            }
+          }
+        }
+      }
+    }
+
+    // Ищет оператора на сырой маске maskCanvas. Возвращает true, если найден.
+    function findOperator() {
+      smallCtx.clearRect(0, 0, LW, LH);
+      smallCtx.drawImage(maskCanvas, 0, 0, LW, LH);
+      const data = smallCtx.getImageData(0, 0, LW, LH).data;
+      for (let i = 0; i < LW * LH; i++) bin[i] = data[i * 4 + 3] > ALPHA_THRESHOLD ? 1 : 0;
+
+      runKept.fill(0);
+      buildRuns();
+      const seed = findBottomCenterRun();
+      if (seed >= 0) growFromSeed(seed);
+      return seed >= 0;
+    }
+
+    // Обнуляет в полноразмерных данных маски всё, что не входит в отмеченные серии.
+    function clearOutsideKept(data) {
+      for (let y = 0; y < H; y++) {
+        const rowBase = y * W * 4;
+        const ly = Math.floor(y / DS);
+        let cursor = 0; // первая колонка, которую ещё не обработали
+        for (let r = rowFirst[ly]; r < rowFirst[ly + 1]; r++) {
+          if (!runKept[r]) continue;
+          const from = runStart[r] * DS;
+          const to = (runEnd[r] + 1) * DS;
+          if (from > cursor) data.fill(0, rowBase + cursor * 4, rowBase + from * 4);
+          cursor = to;
+        }
+        if (cursor < W) data.fill(0, rowBase + cursor * 4, rowBase + W * 4);
+      }
+    }
+
+    // Рисует кадр, вырезает по маске (канвас) и кладёт фон под человека.
+    function paint(ctx, mask) {
+      ctx.save();
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(video, 0, 0, W, H);
+      ctx.globalCompositeOperation = 'destination-in';
+      ctx.drawImage(mask, 0, 0, W, H);
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = BG;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+
+    let fpsFrames = 0;
+    let fpsLast = performance.now();
+    function tickFps() {
+      fpsFrames++;
+      const now = performance.now();
+      if (now - fpsLast >= 1000) {
+        fpsLabel.textContent = `(${fpsFrames} кадр/с)`;
+        fpsFrames = 0;
+        fpsLast = now;
+      }
+    }
+
+    const selfie = new SelfieSegmentation({
+      locateFile: (f) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1.1675465747/${f}`,
+    });
+    selfie.setOptions({ modelSelection: 0 });
+    selfie.onResults((res) => {
+      // Было: все люди в кадре.
+      paint(beforeCtx, res.segmentationMask);
+
+      // Стало: сырая маска → поиск оператора → обнуление остального → вырезание.
+      maskCtx.clearRect(0, 0, W, H);
+      maskCtx.drawImage(res.segmentationMask, 0, 0, W, H);
+      findOperator();
+      const img = maskCtx.getImageData(0, 0, W, H);
+      clearOutsideKept(img.data);
+      maskCtx.putImageData(img, 0, 0);
+      paint(afterCtx, maskCanvas);
+
+      tickFps();
+    });
+
+    let busy = false;
+    function loop() {
+      if (video.readyState >= 2 && !busy) {
+        busy = true;
+        selfie.send({ image: video }).finally(() => (busy = false));
+      }
+      requestAnimationFrame(loop);
+    }
+
+    async function start() {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: W, height: H },
+        audio: false,
+      });
+      video.srcObject = stream;
+      await video.play();
+      status.textContent = 'Готово';
+      loop();
+    }
+
+    start().catch((e) => {
+      status.textContent = 'Ошибка: ' + e.message;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>MediaPipe: Корпоративный фон (1 оператор)</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #121212;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      position: relative;
+      width: 640px;
+      height: 480px;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    video, canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); 
+    }
+    video {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    button {
+      padding: 10px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+    }
+    #status {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Видеозвонок: Корпоративный фон</h2>
+  
+  <div class="container">
+    <video id="webcam" autoplay playsinline></video>
+    <canvas id="output_canvas" width="640" height="480"></canvas>
+  </div>
+
+  <div class="controls">
+    <button id="startBtn" disabled>Загрузка ресурсов...</button>
+    <div id="status">Инициализация моделей и фона...</div>
+  </div>
+
+  <script type="module">
+    import {
+      FilesetResolver,
+      FaceDetector,
+      ImageSegmenter
+    } from "./libs/vision_bundle.mjs";
+
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("output_canvas");
+    const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+    const startBtn = document.getElementById("startBtn");
+    const statusText = document.getElementById("status");
+
+    let faceDetector;
+    let imageSegmenter;
+    let lastVideoTime = -1;
+    let isRunning = false;
+    let frameCount = 0;
+
+    const WIDTH = 640;
+    const HEIGHT = 480;
+
+    // Уменьшенный буфер маски (в 8 раз меньше пикселей -> низкая нагрузка на CPU)
+    const MASK_W = 256;
+    const MASK_H = 144;
+    const smoothMask = new Float32Array(MASK_W * MASK_H);
+    let smoothedBox = null;
+    let secondaryBoxes = [];
+
+    // Кэшированный корпоративный фон (отрисовывается один раз при загрузке)
+    const cachedBgCanvas = document.createElement("canvas");
+    cachedBgCanvas.width = WIDTH;
+    cachedBgCanvas.height = HEIGHT;
+    const cachedBgCtx = cachedBgCanvas.getContext("2d");
+    cachedBgCtx.fillStyle = "#1e3a8a";
+    cachedBgCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    const bgImage = new Image();
+    bgImage.src = "./bg.png";
+    bgImage.onload = () => {
+      cachedBgCtx.save();
+      cachedBgCtx.translate(WIDTH, 0);
+      cachedBgCtx.scale(-1, 1);
+      cachedBgCtx.drawImage(bgImage, 0, 0, WIDTH, HEIGHT);
+      cachedBgCtx.restore();
+    };
+    bgImage.onerror = () => {
+      statusText.textContent = "Внимание: файл ./bg.png не найден, используется запасной цвет.";
+    };
+
+    // Буферы для маски 256x144
+    const smallMaskCanvas = document.createElement("canvas");
+    smallMaskCanvas.width = MASK_W;
+    smallMaskCanvas.height = MASK_H;
+    const smallMaskCtx = smallMaskCanvas.getContext("2d");
+    const smallMaskImgData = smallMaskCtx.createImageData(MASK_W, MASK_H);
+
+    const smoothMaskCanvas = document.createElement("canvas");
+    smoothMaskCanvas.width = MASK_W;
+    smoothMaskCanvas.height = MASK_H;
+    const smoothMaskCtx = smoothMaskCanvas.getContext("2d");
+
+    // Буфер итоговой композиции оператора
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = WIDTH;
+    tempCanvas.height = HEIGHT;
+    const tempCtx = tempCanvas.getContext("2d");
+
+    // Буфер для передачи уменьшенного кадра в сегментатор
+    const smallVideoCanvas = document.createElement("canvas");
+    smallVideoCanvas.width = MASK_W;
+    smallVideoCanvas.height = MASK_H;
+    const smallVideoCtx = smallVideoCanvas.getContext("2d");
+
+    async function initModels() {
+      try {
+        const vision = await FilesetResolver.forVisionTasks("./libs/wasm");
+
+        faceDetector = await FaceDetector.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: "./models/blaze_face_short_range.tflite",
+            delegate: "GPU"
+          },
+          runningMode: "VIDEO"
+        });
+
+        imageSegmenter = await ImageSegmenter.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: "./models/selfie_segmenter.tflite",
+            delegate: "GPU"
+          },
+          runningMode: "VIDEO",
+          outputCategoryMask: false,
+          outputConfidenceMasks: true
+        });
+
+        statusText.textContent = "Готово к работе";
+        startBtn.textContent = "Включить камеру";
+        startBtn.disabled = false;
+      } catch (err) {
+        statusText.textContent = "Ошибка инициализации: " + err.message;
+        console.error(err);
+      }
+    }
+
+    startBtn.addEventListener("click", async () => {
+      if (isRunning) return;
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: WIDTH, height: HEIGHT, frameRate: { ideal: 24, max: 25 } }
+        });
+        video.srcObject = stream;
+        video.addEventListener("loadeddata", () => {
+          isRunning = true;
+          startBtn.disabled = true;
+          startBtn.textContent = "Камера активна";
+          statusText.textContent = "Трансляция с корпоративным фоном";
+          predictWebcam();
+        });
+      } catch (err) {
+        statusText.textContent = "Нет доступа к камере: " + err.message;
+      }
+    });
+
+    async function predictWebcam() {
+      const startTimeMs = performance.now();
+
+      if (video.currentTime !== lastVideoTime) {
+        lastVideoTime = video.currentTime;
+        frameCount++;
+
+        // Поиск лиц (каждый 5-й кадр для экономии CPU)
+        if (frameCount % 5 === 1 || !smoothedBox) {
+          const faceResult = faceDetector.detectForVideo(video, startTimeMs);
+          let mainOperatorBox = null;
+          let maxArea = 0;
+          const allBoxes = [];
+
+          for (const detection of faceResult.detections) {
+            const box = detection.boundingBox;
+            const area = box.width * box.height;
+            allBoxes.push(box);
+            if (area > maxArea) {
+              maxArea = area;
+              mainOperatorBox = box;
+            }
+          }
+
+          // Все лица, кроме самого крупного — посторонние люди на фоне
+          secondaryBoxes = allBoxes.filter(b => b !== mainOperatorBox);
+
+          if (mainOperatorBox) {
+            if (!smoothedBox) {
+              smoothedBox = { ...mainOperatorBox };
+            } else {
+              const lerp = 0.35;
+              smoothedBox.originX += (mainOperatorBox.originX - smoothedBox.originX) * lerp;
+              smoothedBox.originY += (mainOperatorBox.originY - smoothedBox.originY) * lerp;
+              smoothedBox.width += (mainOperatorBox.width - smoothedBox.width) * lerp;
+              smoothedBox.height += (mainOperatorBox.height - smoothedBox.height) * lerp;
+            }
+          } else {
+            smoothedBox = null;
+          }
+        }
+
+        // Сегментация на уменьшенном кадре
+        smallVideoCtx.drawImage(video, 0, 0, MASK_W, MASK_H);
+        const segmentResult = imageSegmenter.segmentForVideo(smallVideoCanvas, startTimeMs);
+        const confidenceMask = segmentResult.confidenceMasks[0];
+
+        drawResult(confidenceMask, smoothedBox, secondaryBoxes);
+        segmentResult.confidenceMasks.forEach(m => m.close());
+      }
+
+      if (isRunning) {
+        requestAnimationFrame(predictWebcam);
+      }
+    }
+
+    function drawResult(confidenceMask, faceBox, otherBoxes) {
+      // 1. Отрисовка кэшированного корпоративного фона
+      ctx.drawImage(cachedBgCanvas, 0, 0);
+
+      if (!faceBox) return;
+
+      const rawData = confidenceMask.getAsFloat32Array();
+      const rawPixels = smallMaskImgData.data;
+
+      const lowT = 0.30;
+      const highT = 0.48;
+      const invRange = 1.0 / (highT - lowT);
+
+      // Единый проход: 3-ступенчатый анти-джиттер + порог без обратного чтения getImageData
+      for (let i = 0; i < rawData.length; i++) {
+        const prob = rawData[i];
+        const prev = smoothMask[i];
+        const diff = Math.abs(prob - prev);
+        
+        let alphaWeight;
+        if (diff < 0.12) {
+          alphaWeight = 0.08; // Подавление микрошума камеры
+        } else if (diff < 0.28) {
+          alphaWeight = 0.35; // Плавное смещение
+        } else {
+          alphaWeight = 0.90; // Быстрое движение без шлейфа
+        }
+
+        const blended = prev * (1 - alphaWeight) + prob * alphaWeight;
+        smoothMask[i] = blended;
+
+        let a = (blended - lowT) * invRange;
+        if (a < 0) a = 0;
+        else if (a > 1) a = 1;
+        a = a * a * (3 - 2 * a);
+
+        const offset = i * 4;
+        rawPixels[offset] = 255;
+        rawPixels[offset + 1] = 255;
+        rawPixels[offset + 2] = 255;
+        rawPixels[offset + 3] = (a * 255) | 0;
+      }
+      smallMaskCtx.putImageData(smallMaskImgData, 0, 0);
+
+      // Аппаратное сглаживание краёв на GPU
+      smoothMaskCtx.clearRect(0, 0, MASK_W, MASK_H);
+      smoothMaskCtx.filter = "blur(2.5px)";
+      smoothMaskCtx.drawImage(smallMaskCanvas, 0, 0);
+      smoothMaskCtx.filter = "none";
+
+      // Формируем вырезанный силуэт на tempCanvas
+      tempCtx.globalCompositeOperation = "source-over";
+      tempCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      tempCtx.drawImage(smoothMaskCanvas, 0, 0, WIDTH, HEIGHT);
+
+      // Активное вычитание посторонних лиц и их силуэтов на фоне
+
+if (otherBoxes && otherBoxes.length > 0) {
+tempCtx.globalCompositeOperation = "destination-out";
+for (const other of otherBoxes) {
+const padX = other.width * 1.4;
+const padTop = other.height * 0.8;
+tempCtx.fillRect(
+other.originX - padX,
+other.originY - padTop,
+other.width + padX * 2,
+HEIGHT
+);
+}
+}
+tempCtx.globalCompositeOperation = "source-in";
+tempCtx.drawImage(video, 0, 0, WIDTH, HEIGHT);
+      // 1. Сначала отрисовываем самого оператора (маска уже очищена от посторонних лиц через otherBoxes)
+      const faceCenterX = faceBox.originX + faceBox.width / 2;
+      const headTop = Math.max(0, faceBox.originY - faceBox.height * 0.9);
+      
+      // Начинаем расширение к плечам высоко (на уровне середины лица / ушей),
+      // чтобы при любом наклоне головы плечо гарантированно оставалось внутри зоны
+      const earLevelY = faceBox.originY + faceBox.height * 0.55;
+      const shoulderLevelY = faceBox.originY + faceBox.height * 1.1;
+      
+      const headHalfW = faceBox.width * 1.3; // Свободный запас вокруг головы и гарнитуры
+
+      ctx.save();
+      ctx.beginPath();
+      // Верх над головой
+      ctx.moveTo(faceCenterX - headHalfW, headTop);
+      ctx.lineTo(faceCenterX + headHalfW, headTop);
+      // До уровня ушей
+      ctx.lineTo(faceCenterX + headHalfW, earLevelY);
+      // Плавное расширение до самого правого края кадра (WIDTH) — плечи больше никогда не обрежутся!
+      ctx.quadraticCurveTo(
+        WIDTH * 0.85, earLevelY,
+        WIDTH, shoulderLevelY
+      );
+      // Весь низ кадра от края до края
+      ctx.lineTo(WIDTH, HEIGHT);
+      ctx.lineTo(0, HEIGHT);
+      ctx.lineTo(0, shoulderLevelY);
+      // Плавное сужение от левого края (0) обратно к голове
+      ctx.quadraticCurveTo(
+        WIDTH * 0.15, earLevelY,
+        faceCenterX - headHalfW, earLevelY
+      );
+      ctx.closePath();
+      ctx.clip();
+
+      ctx.drawImage(tempCanvas, 0, 0);
+      ctx.restore();
+}
+initModels();
+  </script>
+</body>
+</html>

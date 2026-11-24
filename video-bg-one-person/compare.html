@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Видеофон: MediaPipe против BodyPix</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; margin: 16px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+    canvas { width: 100%; max-width: 420px; background: #000; border-radius: 8px; }
+    p { margin: 4px 0 8px; }
+    .fps { color: #9c9; }
+  </style>
+</head>
+<body>
+  <h2>Видеофон: MediaPipe против BodyPix</h2>
+  <p>Оба подхода работают на одной камере одновременно. Слева «было», справа «стало».</p>
+
+  <video id="video" autoplay muted playsinline style="display: none"></video>
+  <img id="photo" alt="" style="display: none" />
+
+  <p>
+    Источник кадра:
+    <input type="file" id="photoInput" accept="image/*" />
+    <button id="camBtn" type="button">Камера</button>
+  </p>
+
+  <h3>MediaPipe (ObjectDetector: person + маска селфи) <span class="fps" id="mpFps"></span></h3>
+  <p id="mpStatus">Загрузка детектора людей...</p>
+  <div class="row">
+    <div><p><b>Было</b></p><canvas id="mpBefore" width="640" height="480"></canvas></div>
+    <div><p><b>Стало</b></p><canvas id="mpAfter" width="640" height="480"></canvas></div>
+  </div>
+
+  <h3>BodyPix (главная персона) <span class="fps" id="bpFps"></span></h3>
+  <p id="bpStatus">Загрузка...</p>
+  <div class="row">
+    <div><p><b>Было</b></p><canvas id="bpBefore" width="640" height="480"></canvas></div>
+    <div><p><b>Стало</b></p><canvas id="bpAfter" width="640" height="480"></canvas></div>
+  </div>
+
+  <h3>MediaPipe: серии от центра низа <span class="fps" id="seedFps"></span></h3>
+  <p>Та же маска, что в блоке MediaPipe выше. Оператор — серия пикселей у центра нижней строки и серии, связанные с ней через соседние строки.</p>
+  <div class="row">
+    <div><p><b>Было</b></p><canvas id="seedBefore" width="640" height="480"></canvas></div>
+    <div><p><b>Стало</b></p><canvas id="seedAfter" width="640" height="480"></canvas></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1.1675465747/selfie_segmentation.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/face_detection.js"></script>
+  <script src="tf.min.js"></script>
+  <script src="body-pix.min.js"></script>
+  <script>
+    const W = 640;
+    const H = 480;
+    const BG = '#2b5d3a';
+    const FACE_INTERVAL_MS = 250;
+    const DETECT_INTERVAL_MS = 250; // ObjectDetector синхронный, поэтому редко
+    const BOX_MARGIN = 0.1; // запас вокруг бокса человека, в долях его размера
+    const DEBUG_BOXES = true; // отладка: рисовать боксы ObjectDetector поверх «стало»
+
+    const video = document.getElementById('video');
+    const photo = document.getElementById('photo');
+    const $ = (id) => document.getElementById(id);
+
+    // Источник кадра: видео с камеры или загруженная картинка (для быстрого теста).
+    let source = video;
+    const srcW = () => (source === video ? video.videoWidth : photo.naturalWidth);
+    const srcH = () => (source === video ? video.videoHeight : photo.naturalHeight);
+    const srcReady = () =>
+      source === video ? video.readyState >= 2 : photo.complete && photo.naturalWidth > 0;
+
+    $('photoInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      photo.onload = () => {
+        source = photo;
+        $('mpStatus').textContent = 'Тест по картинке: ' + file.name;
+        $('bpStatus').textContent = 'Тест по картинке: ' + file.name;
+      };
+      photo.src = URL.createObjectURL(file);
+    });
+    $('camBtn').addEventListener('click', () => {
+      source = video;
+    });
+
+    // Вспомогательный канвас маски: сюда кладём маску и накладываем на кадр.
+    function makeCanvas() {
+      const c = document.createElement('canvas');
+      c.width = W;
+      c.height = H;
+      return c;
+    }
+
+    // Рисует кадр, вырезает по маске (канвас) и кладёт фон под человека.
+    function paint(ctx, maskCanvas) {
+      ctx.save();
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(source, 0, 0, W, H);
+      ctx.globalCompositeOperation = 'destination-in';
+      ctx.drawImage(maskCanvas, 0, 0, W, H);
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = BG;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+
+    // Счётчик кадров в секунду для каждого подхода.
+    function makeFpsCounter(label) {
+      let frames = 0;
+      let last = performance.now();
+      return () => {
+        frames++;
+        const now = performance.now();
+        if (now - last >= 1000) {
+          label.textContent = `(${frames} кадр/с)`;
+          frames = 0;
+          last = now;
+        }
+      };
+    }
+
+    // ───────── MediaPipe: маска селфи + бокс главного человека из ObjectDetector ─────────
+    const mpBeforeCtx = $('mpBefore').getContext('2d');
+    const mpAfterCtx = $('mpAfter').getContext('2d');
+    const mpStaCanvas = makeCanvas();
+    const mpStaCtx = mpStaCanvas.getContext('2d');
+    const mpFpsTick = makeFpsCounter($('mpFps'));
+    let face = null;
+    let mpBusy = false;
+    let faceBusy = false;
+    let lastFaceTs = 0;
+
+    // ObjectDetector: боксы людей (в координатах канваса) и выбранный главный.
+    let objectDetector = null;
+    let personBox = null; // {x0, y0, x1, y1}
+    let debugBoxes = []; // отладка: все боксы с уверенностью
+    let debugMainIndex = -1;
+    let lastDetectTs = 0;
+
+    // Общий загрузчик Tasks Vision: библиотека и wasm грузятся один раз для всех детекторов.
+    let visionPromise = null;
+    function getVision() {
+      if (!visionPromise) {
+        visionPromise = import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs').then(
+          async (tasks) => ({
+            tasks,
+            vision: await tasks.FilesetResolver.forVisionTasks(
+              'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm',
+            ),
+          }),
+        );
+      }
+      return visionPromise;
+    }
+
+    async function loadObjectDetector() {
+      const { tasks, vision } = await getVision();
+      objectDetector = await tasks.ObjectDetector.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath:
+            'https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite',
+        },
+        runningMode: 'VIDEO',
+        scoreThreshold: 0.5,
+        maxResults: 5,
+        categoryAllowlist: ['person'],
+      });
+    }
+
+    const boxArea = (b) => (b.x1 - b.x0) * (b.y1 - b.y0);
+
+    // Главный человек — бокс, в котором лежит центр лица; если лица нет, самый большой бокс.
+    function updatePersonBox() {
+      if (!objectDetector || !srcReady()) return;
+      const res = objectDetector.detectForVideo(source, performance.now());
+      // Масштаб по осям отдельно: кадр растягивается на весь канвас W×H.
+      const kx = W / srcW();
+      const ky = H / srcH();
+      const boxes = res.detections.map((d) => {
+        const b = d.boundingBox;
+        return {
+          x0: b.originX * kx,
+          y0: b.originY * ky,
+          x1: (b.originX + b.width) * kx,
+          y1: (b.originY + b.height) * ky,
+          score: d.categories[0]?.score ?? 0,
+        };
+      });
+      debugBoxes = boxes;
+      if (boxes.length === 0) {
+        personBox = null;
+        debugMainIndex = -1;
+        return;
+      }
+      let main = null;
+      if (face) {
+        const fx = face.x * W;
+        const fy = face.y * H;
+        main = boxes.find((b) => fx >= b.x0 && fx <= b.x1 && fy >= b.y0 && fy <= b.y1) || null;
+      }
+      if (!main) main = boxes.reduce((a, b) => (boxArea(b) > boxArea(a) ? b : a));
+      debugMainIndex = boxes.indexOf(main);
+      const mx = (main.x1 - main.x0) * BOX_MARGIN;
+      const my = (main.y1 - main.y0) * BOX_MARGIN;
+      personBox = { x0: main.x0 - mx, y0: main.y0 - my, x1: main.x1 + mx, y1: main.y1 + my };
+    }
+
+    // Рисует маску только внутри бокса через clip: без чтения пикселей (быстро).
+    function drawMaskInBox(ctx, maskSrc, box) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+      ctx.clip();
+      ctx.drawImage(maskSrc, 0, 0, W, H);
+      ctx.restore();
+    }
+
+    // Отладка: боксы всех людей (номер и уверенность), главный — красным, запас — пунктиром, лицо — точкой.
+    function drawDebugBoxes(ctx) {
+      ctx.save();
+      ctx.lineWidth = 2;
+      ctx.font = '14px sans-serif';
+      debugBoxes.forEach((b, i) => {
+        const isMain = i === debugMainIndex;
+        ctx.strokeStyle = isMain ? 'red' : 'yellow';
+        ctx.strokeRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0);
+        ctx.fillStyle = isMain ? 'red' : 'yellow';
+        ctx.fillText(`#${i} ${b.score.toFixed(2)}`, b.x0 + 4, b.y0 + 16);
+      });
+      if (personBox) {
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = 'cyan';
+        ctx.strokeRect(personBox.x0, personBox.y0, personBox.x1 - personBox.x0, personBox.y1 - personBox.y0);
+        ctx.setLineDash([]);
+      }
+      if (face) {
+        ctx.fillStyle = 'lime';
+        ctx.beginPath();
+        ctx.arc(face.x * W, face.y * H, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = 'white';
+      ctx.fillText(`людей: ${debugBoxes.length}, главный: #${debugMainIndex}`, 8, H - 8);
+      ctx.restore();
+    }
+
+    const selfie = new SelfieSegmentation({
+      locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1.1675465747/${f}`,
+    });
+    selfie.setOptions({ modelSelection: 0 });
+    selfie.onResults((res) => {
+      paint(mpBeforeCtx, res.segmentationMask);
+      mpStaCtx.clearRect(0, 0, W, H);
+      if (personBox) drawMaskInBox(mpStaCtx, res.segmentationMask, personBox);
+      paint(mpAfterCtx, mpStaCanvas);
+      if (DEBUG_BOXES) drawDebugBoxes(mpAfterCtx);
+      mpFpsTick();
+      renderSeedOperator(res.segmentationMask);
+    });
+
+    const detector = new FaceDetection({
+      locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/${f}`,
+    });
+    detector.setOptions({ model: 'short', minDetectionConfidence: 0.5 });
+    detector.onResults((results) => {
+      if (results.detections.length === 0) return;
+      const area = (d) => d.boundingBox.width * d.boundingBox.height;
+      const main = results.detections.reduce((a, b) => (area(b) > area(a) ? b : a));
+      const b = main.boundingBox;
+      face = { x: b.xCenter, y: b.yCenter, w: b.width, h: b.height };
+    });
+
+    // ───────── BodyPix: маска на каждого человека, главный — с крупным лицом ─────────
+    const bpBeforeCtx = $('bpBefore').getContext('2d');
+    const bpAfterCtx = $('bpAfter').getContext('2d');
+    const bpBeforeCanvas = makeCanvas();
+    const bpAfterCanvas = makeCanvas();
+    const bpBeforeMaskCtx = bpBeforeCanvas.getContext('2d');
+    const bpAfterMaskCtx = bpAfterCanvas.getContext('2d');
+    // Буферы ImageData переиспользуем, чтобы не выделять память каждый кадр.
+    const bpBeforeImg = bpBeforeMaskCtx.createImageData(W, H);
+    const bpAfterImg = bpAfterMaskCtx.createImageData(W, H);
+    const bpFpsTick = makeFpsCounter($('bpFps'));
+    let net = null;
+    let bpBusy = false;
+
+    // Маска 0/1 на пиксель → канвас с альфой (через готовый буфер).
+    function fillMask(ctx, img, mask, w, h) {
+      const d = img.data;
+      for (let i = 0; i < w * h; i++) d[i * 4 + 3] = mask[i] ? 255 : 0;
+      ctx.putImageData(img, 0, 0);
+    }
+
+    function faceSize(pose) {
+      const l = pose.keypoints.find((k) => k.part === 'leftEye' && k.score > 0.3);
+      const r = pose.keypoints.find((k) => k.part === 'rightEye' && k.score > 0.3);
+      if (!l || !r) return 0;
+      return Math.hypot(l.position.x - r.position.x, l.position.y - r.position.y);
+    }
+
+    function renderBodyPix(people) {
+      const w = people[0].width;
+      const h = people[0].height;
+      // Было: объединённая маска всех людей.
+      const union = new Uint8Array(w * h);
+      for (const p of people) {
+        for (let i = 0; i < w * h; i++) if (p.data[i]) union[i] = 1;
+      }
+      fillMask(bpBeforeMaskCtx, bpBeforeImg, union, w, h);
+      paint(bpBeforeCtx, bpBeforeCanvas);
+
+      // Стало: главный — человек, в маске которого лежит точка позы с самым крупным лицом.
+      const faceScore = people.map(() => 0);
+      for (const pose of people[0].allPoses || []) {
+        const fs = faceSize(pose);
+        const pt = pose.keypoints.find((k) => k.score > 0.3);
+        if (fs <= 0 || !pt) continue;
+        const x = Math.round(pt.position.x);
+        const y = Math.round(pt.position.y);
+        if (x < 0 || y < 0 || x >= w || y >= h) continue;
+        people.forEach((p, j) => {
+          if (p.data[y * w + x]) faceScore[j] = Math.max(faceScore[j], fs);
+        });
+      }
+      // Если лиц нет, берём самую крупную маску.
+      const area = (p) => p.data.reduce((sum, v) => sum + v, 0);
+      let main = 0;
+      people.forEach((p, j) => {
+        const better =
+          faceScore[j] > faceScore[main] ||
+          (faceScore[j] === faceScore[main] && area(p) > area(people[main]));
+        if (better) main = j;
+      });
+      fillMask(bpAfterMaskCtx, bpAfterImg, people[main].data, w, h);
+      paint(bpAfterCtx, bpAfterCanvas);
+      bpFpsTick();
+    }
+
+    // ───────── MediaPipe: серии от центра низа (подход из ветки) ─────────
+    const seedBeforeCtx = $('seedBefore').getContext('2d');
+    const seedAfterCtx = $('seedAfter').getContext('2d');
+    const seedFpsTick = makeFpsCounter($('seedFps'));
+
+    const SEED_DS = 4; // коэффициент уменьшения маски для поиска оператора (W и H кратны DS)
+    const SEED_LW = W / SEED_DS;
+    const SEED_LH = H / SEED_DS;
+    const SEED_ALPHA_THRESHOLD = 127;
+
+    // Маска полного разрешения: сюда кладём сырую маску и затем обнуляем лишнее.
+    const seedFullCanvas = makeCanvas();
+    const seedFullCtx = seedFullCanvas.getContext('2d', { willReadFrequently: true });
+
+    // Маска уменьшенного разрешения: здесь ищется оператор.
+    const seedSmallCanvas = document.createElement('canvas');
+    seedSmallCanvas.width = SEED_LW;
+    seedSmallCanvas.height = SEED_LH;
+    const seedSmallCtx = seedSmallCanvas.getContext('2d', { willReadFrequently: true });
+    seedSmallCtx.imageSmoothingQuality = 'high';
+
+    // Буферы выделяются один раз.
+    // В строке серии не пересекаются и не соприкасаются, поэтому их не больше ceil(SEED_LW / 2).
+    const SEED_MAX_RUNS = SEED_LH * Math.ceil(SEED_LW / 2);
+    const seedBin = new Uint8Array(SEED_LW * SEED_LH);
+    const seedRunRow = new Int32Array(SEED_MAX_RUNS);
+    const seedRunStart = new Int32Array(SEED_MAX_RUNS);
+    const seedRunEnd = new Int32Array(SEED_MAX_RUNS); // включительно
+    const seedRunKept = new Uint8Array(SEED_MAX_RUNS);
+    const seedRowFirst = new Int32Array(SEED_LH + 1); // серии строки y: rowFirst[y] .. rowFirst[y + 1] - 1
+    const seedQueue = new Int32Array(SEED_MAX_RUNS);
+    let seedRunCount = 0;
+
+    function seedBuildRuns() {
+      seedRunCount = 0;
+      for (let y = 0; y < SEED_LH; y++) {
+        seedRowFirst[y] = seedRunCount;
+        const base = y * SEED_LW;
+        let x = 0;
+        while (x < SEED_LW) {
+          if (!seedBin[base + x]) {
+            x++;
+            continue;
+          }
+          const s = x;
+          while (x < SEED_LW && seedBin[base + x]) x++;
+          seedRunRow[seedRunCount] = y;
+          seedRunStart[seedRunCount] = s;
+          seedRunEnd[seedRunCount] = x - 1;
+          seedRunCount++;
+        }
+      }
+      seedRowFirst[SEED_LH] = seedRunCount;
+    }
+
+    // Стартовая серия: на нижней строке, ближайшая к центру кадра. -1, если людей там нет.
+    function seedFindBottomCenterRun() {
+      const cx = SEED_LW >> 1;
+      let best = -1;
+      let bestDist = Infinity;
+      for (let r = seedRowFirst[SEED_LH - 1]; r < seedRowFirst[SEED_LH]; r++) {
+        // Расстояние от центра до отрезка серии; 0, если центр внутри.
+        const d = Math.max(seedRunStart[r] - cx, cx - seedRunEnd[r], 0);
+        if (d < bestDist) {
+          bestDist = d;
+          best = r;
+        }
+      }
+      return best;
+    }
+
+    // Помечает серии, связанные со стартовой через перекрытие с соседними строками (обход в ширину).
+    function seedGrow(seed) {
+      let head = 0;
+      let tail = 0;
+      seedQueue[tail++] = seed;
+      seedRunKept[seed] = 1;
+      while (head < tail) {
+        const r = seedQueue[head++];
+        const y = seedRunRow[r];
+        for (const ny of [y - 1, y + 1]) {
+          if (ny < 0 || ny >= SEED_LH) continue;
+          for (let q = seedRowFirst[ny]; q < seedRowFirst[ny + 1]; q++) {
+            if (!seedRunKept[q] && seedRunStart[q] <= seedRunEnd[r] && seedRunEnd[q] >= seedRunStart[r]) {
+              seedRunKept[q] = 1;
+              seedQueue[tail++] = q;
+            }
+          }
+        }
+      }
+    }
+
+    // Ищет оператора на сырой маске seedFullCanvas. Возвращает true, если найден.
+    function seedFindOperator() {
+      seedSmallCtx.clearRect(0, 0, SEED_LW, SEED_LH);
+      seedSmallCtx.drawImage(seedFullCanvas, 0, 0, SEED_LW, SEED_LH);
+      const data = seedSmallCtx.getImageData(0, 0, SEED_LW, SEED_LH).data;
+      for (let i = 0; i < SEED_LW * SEED_LH; i++) {
+        seedBin[i] = data[i * 4 + 3] > SEED_ALPHA_THRESHOLD ? 1 : 0;
+      }
+
+      seedRunKept.fill(0);
+      seedBuildRuns();
+      const seed = seedFindBottomCenterRun();
+      if (seed >= 0) seedGrow(seed);
+      return seed >= 0;
+    }
+
+    // Обнуляет в полноразмерных данных маски всё, что не входит в отмеченные серии.
+    function seedClearOutside(data) {
+      for (let y = 0; y < H; y++) {
+        const rowBase = y * W * 4;
+        const ly = Math.floor(y / SEED_DS);
+        let cursor = 0; // первая колонка, которую ещё не обработали
+        for (let r = seedRowFirst[ly]; r < seedRowFirst[ly + 1]; r++) {
+          if (!seedRunKept[r]) continue;
+          const from = seedRunStart[r] * SEED_DS;
+          const to = (seedRunEnd[r] + 1) * SEED_DS;
+          if (from > cursor) data.fill(0, rowBase + cursor * 4, rowBase + from * 4);
+          cursor = to;
+        }
+        if (cursor < W) data.fill(0, rowBase + cursor * 4, rowBase + W * 4);
+      }
+    }
+
+    function renderSeedOperator(mask) {
+      // Было: все люди в кадре.
+      paint(seedBeforeCtx, mask);
+
+      // Стало: сырая маска → поиск оператора → обнуление остального → вырезание.
+      seedFullCtx.clearRect(0, 0, W, H);
+      seedFullCtx.drawImage(mask, 0, 0, W, H);
+      seedFindOperator();
+      const img = seedFullCtx.getImageData(0, 0, W, H);
+      seedClearOutside(img.data);
+      seedFullCtx.putImageData(img, 0, 0);
+      paint(seedAfterCtx, seedFullCanvas);
+      seedFpsTick();
+    }
+
+    // ───────── цикл ─────────
+    async function loop() {
+      if (srcReady()) {
+        if (!mpBusy) {
+          mpBusy = true;
+          selfie.send({ image: source }).finally(() => (mpBusy = false));
+        }
+        const now = performance.now();
+        if (objectDetector && now - lastDetectTs > DETECT_INTERVAL_MS) {
+          lastDetectTs = now;
+          updatePersonBox();
+        }
+        if (!faceBusy && now - lastFaceTs > FACE_INTERVAL_MS) {
+          lastFaceTs = now;
+          faceBusy = true;
+          detector.send({ image: source }).finally(() => (faceBusy = false));
+        }
+        if (net && !bpBusy) {
+          bpBusy = true;
+          try {
+            const people = await net.segmentMultiPerson(source, {
+              internalResolution: 'low',
+              segmentationThreshold: 0.7,
+              maxDetections: 5,
+              scoreThreshold: 0.3,
+              nmsRadius: 20,
+            });
+            if (people.length > 0) renderBodyPix(people);
+          } catch (e) {
+            console.error(e);
+          } finally {
+            bpBusy = false;
+          }
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    async function start() {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: W, height: H },
+        audio: false,
+      });
+      video.srcObject = stream;
+      await video.play();
+      loop();
+
+      loadObjectDetector()
+        .then(() => ($('mpStatus').textContent = 'Готово'))
+        .catch((e) => ($('mpStatus').textContent = 'Ошибка детектора: ' + e.message));
+      $('bpStatus').textContent = 'Загрузка модели...';
+      net = await bodyPix.load({
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        multiplier: 0.75,
+        quantBytes: 2,
+        modelUrl: 'model-stride16.json',
+      });
+      $('bpStatus').textContent = 'Готово';
+    }
+
+    start().catch((e) => {
+      $('mpStatus').textContent = 'Ошибка: ' + e.message;
+    });
+  </script>
+</body>
+</html>

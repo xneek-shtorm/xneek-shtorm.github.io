@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Видеофон: главная персона</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; margin: 16px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    canvas { width: 100%; max-width: 480px; background: #000; border-radius: 8px; }
+    p { margin: 4px 0 8px; }
+  </style>
+</head>
+<body>
+  <h2>Видеофон: главная персона</h2>
+  <p id="status">Запуск камеры...</p>
+  <p>Слева — все люди в кадре. Справа — только главный человек (самая крупная маска).</p>
+
+  <video id="video" autoplay muted playsinline style="display: none"></video>
+
+  <div class="row">
+    <div>
+      <p><b>Было</b></p>
+      <canvas id="before" width="640" height="480"></canvas>
+    </div>
+    <div>
+      <p><b>Стало</b></p>
+      <canvas id="after" width="640" height="480"></canvas>
+    </div>
+  </div>
+
+  <!-- Библиотеки TensorFlow.js и BodyPix лежат рядом с демо -->
+  <script src="tf.min.js"></script>
+  <script src="body-pix.min.js"></script>
+  <script>
+    const W = 640;
+    const H = 480;
+    const BG = '#2b5d3a'; // цвет фона, чтобы было видно, что вырезано
+
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+    const beforeCanvas = document.getElementById('before');
+    const afterCanvas = document.getElementById('after');
+    const beforeCtx = beforeCanvas.getContext('2d');
+    const afterCtx = afterCanvas.getContext('2d');
+
+    // Канвас для маски: через него маска попадает в destination-in.
+    const maskCanvas = document.createElement('canvas');
+    const maskCtx = maskCanvas.getContext('2d');
+
+    let net = null;
+    let busy = false;
+
+    // Рисует кадр, вырезает его по маске (0/1 на пиксель) и кладёт фон под человека.
+    function drawMasked(ctx, mask, w, h) {
+      if (maskCanvas.width !== w || maskCanvas.height !== h) {
+        maskCanvas.width = w;
+        maskCanvas.height = h;
+      }
+      const img = maskCtx.createImageData(w, h);
+      for (let i = 0; i < w * h; i++) img.data[i * 4 + 3] = mask[i] ? 255 : 0;
+      maskCtx.putImageData(img, 0, 0);
+
+      ctx.save();
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(video, 0, 0, w, h);
+      ctx.globalCompositeOperation = 'destination-in';
+      ctx.drawImage(maskCanvas, 0, 0, w, h);
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = BG;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
+
+    // Размер лица = расстояние между глазами (0, если глаза не найдены).
+    function faceSize(pose) {
+      const l = pose.keypoints.find((k) => k.part === 'leftEye' && k.score > 0.3);
+      const r = pose.keypoints.find((k) => k.part === 'rightEye' && k.score > 0.3);
+      if (!l || !r) return 0;
+      return Math.hypot(l.position.x - r.position.x, l.position.y - r.position.y);
+    }
+
+    // people — массив: по одной маске на каждого человека (data — 0/1 на пиксель).
+    function render(people) {
+      const w = people[0].width;
+      const h = people[0].height;
+      for (const c of [beforeCanvas, afterCanvas]) {
+        if (c.width !== w || c.height !== h) {
+          c.width = w;
+          c.height = h;
+        }
+      }
+
+      // Было: объединяем маски всех людей.
+      const union = new Uint8Array(w * h);
+      for (const p of people) {
+        for (let i = 0; i < w * h; i++) if (p.data[i]) union[i] = 1;
+      }
+      drawMasked(beforeCtx, union, w, h);
+
+      // Стало: главный — человек, в маске которого лежит ключевая точка позы с самым крупным лицом.
+      const faceScore = people.map(() => 0);
+      for (const pose of people[0].allPoses || []) {
+        const fs = faceSize(pose);
+        const pt = pose.keypoints.find((k) => k.score > 0.3);
+        if (fs <= 0 || !pt) continue;
+        const x = Math.round(pt.position.x);
+        const y = Math.round(pt.position.y);
+        if (x < 0 || y < 0 || x >= w || y >= h) continue;
+        people.forEach((p, j) => {
+          if (p.data[y * w + x]) faceScore[j] = Math.max(faceScore[j], fs);
+        });
+      }
+      // Если лица не найдены, берём самую крупную маску.
+      const area = (p) => p.data.reduce((sum, v) => sum + v, 0);
+      let main = 0;
+      people.forEach((p, j) => {
+        const better = faceScore[j] > faceScore[main] ||
+          (faceScore[j] === faceScore[main] && area(p) > area(people[main]));
+        if (better) main = j;
+      });
+      drawMasked(afterCtx, people[main].data, w, h);
+    }
+
+    async function loop() {
+      if (video.readyState >= 2 && net && !busy) {
+        busy = true;
+        try {
+          const people = await net.segmentMultiPerson(video, {
+            internalResolution: 'medium',
+            segmentationThreshold: 0.7,
+            maxDetections: 5,
+            scoreThreshold: 0.3,
+            nmsRadius: 20,
+          });
+          if (people.length > 0) render(people);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          busy = false;
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    async function start() {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: W, height: H },
+        audio: false,
+      });
+      video.srcObject = stream;
+      await video.play();
+
+      status.textContent = 'Загрузка модели...';
+      net = await bodyPix.load({
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        multiplier: 0.75,
+        quantBytes: 2,
+        modelUrl: 'model-stride16.json',
+      });
+      status.textContent = 'Готово';
+      loop();
+    }
+
+    start().catch((e) => {
+      status.textContent = 'Ошибка: ' + e.message;
+    });
+  </script>
+</body>
+</html>
