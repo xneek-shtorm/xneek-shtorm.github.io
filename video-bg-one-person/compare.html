@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Видеофон: MediaPipe против BodyPix</title>
+  <title>Видеофон мультиперсона не мулитиперсона</title>
   <style>
     body { font-family: sans-serif; background: #111; color: #eee; margin: 16px; }
     .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -12,8 +12,7 @@
   </style>
 </head>
 <body>
-  <h2>Видеофон: MediaPipe против BodyPix</h2>
-  <p>Оба подхода работают на одной камере одновременно. Слева «было», справа «стало».</p>
+
 
   <video id="video" autoplay muted playsinline style="display: none"></video>
   <img id="photo" alt="" style="display: none" />
@@ -24,26 +23,30 @@
     <button id="camBtn" type="button">Камера</button>
   </p>
 
-  <h3>MediaPipe (ObjectDetector: person + маска селфи) <span class="fps" id="mpFps"></span></h3>
+<details>
+  <summary>MediaPipe (ObjectDetector: person + маска селфи) <span class="fps" id="mpFps"></span></summary>
   <p id="mpStatus">Загрузка детектора людей...</p>
   <div class="row">
     <div><p><b>Было</b></p><canvas id="mpBefore" width="640" height="480"></canvas></div>
     <div><p><b>Стало</b></p><canvas id="mpAfter" width="640" height="480"></canvas></div>
   </div>
-
-  <h3>BodyPix (главная персона) <span class="fps" id="bpFps"></span></h3>
+</details>
+<details>
+  <summary>MediaPipe: серии от центра низа <span class="fps" id="seedFps"></span></summary>
+  <p>Оператор — серия пикселей у центра нижней строки и серии, связанные с ней через соседние строки.</p>
+  <div class="row">
+    <div><p><b>Было</b></p><canvas id="seedBefore" width="640" height="480"></canvas></div>
+    <div><p><b>Стало</b></p><canvas id="seedAfter" width="640" height="480"></canvas></div>
+  </div>
+</details>
+<details>
+  <summary>BodyPix (главная персона) <span class="fps" id="bpFps"></span></summary>
   <p id="bpStatus">Загрузка...</p>
   <div class="row">
     <div><p><b>Было</b></p><canvas id="bpBefore" width="640" height="480"></canvas></div>
     <div><p><b>Стало</b></p><canvas id="bpAfter" width="640" height="480"></canvas></div>
   </div>
-
-  <h3>MediaPipe: серии от центра низа <span class="fps" id="seedFps"></span></h3>
-  <p>Та же маска, что в блоке MediaPipe выше. Оператор — серия пикселей у центра нижней строки и серии, связанные с ней через соседние строки.</p>
-  <div class="row">
-    <div><p><b>Было</b></p><canvas id="seedBefore" width="640" height="480"></canvas></div>
-    <div><p><b>Стало</b></p><canvas id="seedAfter" width="640" height="480"></canvas></div>
-  </div>
+</details>
 
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1.1675465747/selfie_segmentation.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4.1646425229/face_detection.js"></script>
